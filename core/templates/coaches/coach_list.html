@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% block title %}Coaches — Pradip Sports Academy{% endblock %}
+{% block sb_coaches %}active{% endblock %}
+{% block nav_staff %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+
+/* stats */
+.stats-strip{display:flex;gap:14px;margin-bottom:2rem}
+.stat-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;flex:1}
+.stat-pill-icon{font-size:22px}
+.stat-pill-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--ink);line-height:1}
+.stat-pill-label{font-size:11.5px;color:var(--ink-muted);margin-top:2px}
+
+/* filter bar */
+.filter-bar{display:flex;align-items:center;gap:10px;padding:14px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.filter-select{padding:7px 28px 7px 12px;border-radius:20px;border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer}
+.filter-select:focus{border-color:var(--gold);outline:none}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;margin-left:auto}
+.search-box input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);width:180px}
+.search-box input::placeholder{color:var(--ink-muted)}
+.filter-btn{padding:8px 18px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer}
+
+/* add btn */
+.add-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;text-decoration:none;transition:all .15s}
+.add-btn:hover{background:#2e2a26}
+
+/* coach cards grid */
+.coaches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.coach-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:box-shadow .2s,transform .2s;animation:fadeUp .4s ease both}
+.coach-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.coach-card-head{padding:18px 20px;background:var(--ink);display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.coach-card-head::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;border:1px solid rgba(196,151,58,.15)}
+.coach-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;background:var(--gold-pale);color:var(--amber);flex-shrink:0;overflow:hidden;border:2px solid rgba(196,151,58,.3);z-index:1}
+.coach-avatar img{width:100%;height:100%;object-fit:cover}
+.coach-head-info{z-index:1}
+.coach-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--cream)}
+.coach-id{font-size:11px;color:rgba(248,244,238,.45);margin-top:2px}
+.coach-emp-badge{margin-left:auto;z-index:1;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px}
+.emp-full_time{background:rgba(58,122,82,.25);color:#7DCBA0}
+.emp-part_time{background:rgba(46,107,158,.25);color:#8FC5E8}
+.emp-freelance{background:rgba(196,122,48,.25);color:#F0BE80}
+.emp-contract {background:rgba(106,61,170,.25);color:#C4A0F0}
+
+.coach-card-body{padding:16px 20px}
+.coach-sports{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sport-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;background:var(--gold-pale);color:var(--amber)}
+.coach-meta-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);margin-bottom:7px}
+.coach-meta-row svg{width:13px;height:13px;color:var(--ink-muted);flex-shrink:0}
+.coach-exp{font-size:11.5px;color:var(--ink-muted)}
+
+.coach-card-footer{padding:12px 20px;border-top:1px solid var(--border);background:#FDFCFA;display:flex;align-items:center;justify-content:space-between}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500}
+.status-active   {background:var(--green-pale);color:var(--green)}
+.status-inactive {background:var(--cream-dark);color:var(--ink-muted)}
+.status-on_leave {background:var(--amber-pale);color:var(--amber)}
+.status-terminated{background:var(--red-pale);color:var(--red)}
+.status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.status-active .status-dot{background:var(--green)}.status-inactive .status-dot{background:var(--ink-faint)}
+.status-on_leave .status-dot{background:var(--amber)}.status-terminated .status-dot{background:var(--red)}
+.card-actions{display:flex;gap:6px}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:var(--radius-sm);font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none}
+.act-btn:hover{background:var(--cream)}
+.act-btn-view:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-pale)}
+.act-btn-edit:hover{border-color:var(--gold);color:var(--amber);background:var(--gold-pale)}
+.act-btn-del:hover{border-color:var(--red);color:var(--red);background:var(--red-pale)}
+
+/* empty */
+.empty-state{text-align:center;padding:60px 24px;color:var(--ink-muted)}
+.empty-icon{font-size:44px;margin-bottom:14px;opacity:.3}
+.empty-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink-soft);margin-bottom:8px}
+.empty-sub{font-size:13px;font-weight:300}
+
+/* delete modal */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,22,18,.45);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#fff;border-radius:var(--radius);padding:28px 28px 22px;max-width:400px;width:90%;transform:scale(.95);transition:transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.modal-overlay.open .modal-box{transform:scale(1)}
+.modal-icon{font-size:36px;margin-bottom:12px}.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.modal-body{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:22px}.modal-body strong{color:var(--ink)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-btn{padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
+.modal-btn-cancel{background:var(--cream-dark);color:var(--ink-soft)}.modal-btn-cancel:hover{background:var(--cream-deeper)}
+.modal-btn-delete{background:var(--red);color:#fff}.modal-btn-delete:hover{background:#9e3535}
+
+/* toast */
+.toast{position:fixed;bottom:28px;right:28px;z-index:600;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:13px 18px;border-radius:var(--radius);font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-icon{font-size:16px;flex-shrink:0}
+
+@media(max-width:900px){.page-wrap{padding:1.5rem 1rem 3rem}.stats-strip{flex-direction:column}.coaches-grid{grid-template-columns:1fr}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span><span>Coaches</span>
+  </div>
+  <div class="page-header">
+    <div>
+      <h1>Coaches</h1>
+      <p>{{ total }} coach{{ total|pluralize:"es" }} registered at the academy</p>
+    </div>
+    <a href="{% url 'coach_add' %}" class="add-btn">＋ Add Coach</a>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-pill">
+      <span class="stat-pill-icon">🧑‍🏫</span>
+      <div><div class="stat-pill-num">{{ total }}</div><div class="stat-pill-label">Total Coaches</div></div>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-icon">✅</span>
+      <div><div class="stat-pill-num">{{ active_count }}</div><div class="stat-pill-label">Active</div></div>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-icon">🏸</span>
+      <div><div class="stat-pill-num">{{ sports|length }}</div><div class="stat-pill-label">Sports Covered</div></div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <form method="GET">
+    <div class="filter-bar">
+      <span class="filter-label">Filter</span>
+      <select class="filter-select" name="sport">
+        <option value="">All Sports</option>
+        {% for s in sports %}<option value="{{ s.pk }}" {% if sel_sport == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.icon }} {{ s.name }}</option>{% endfor %}
+      </select>
+      <select class="filter-select" name="status">
+        <option value="">All Status</option>
+        <option value="active" {% if sel_status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if sel_status == 'inactive' %}selected{% endif %}>Inactive</option>
+        <option value="on_leave" {% if sel_status == 'on_leave' %}selected{% endif %}>On Leave</option>
+        <option value="terminated" {% if sel_status == 'terminated' %}selected{% endif %}>Terminated</option>
+      </select>
+      <select class="filter-select" name="emp_type">
+        <option value="">All Employment</option>
+        {% for val, lbl in employment_choices %}<option value="{{ val }}" {% if sel_emp == val %}selected{% endif %}>{{ lbl }}</option>{% endfor %}
+      </select>
+      <div class="search-box">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" name="q" value="{{ search }}" placeholder="Name, ID, contact…">
+      </div>
+      <button type="submit" class="filter-btn">Search</button>
+      {% if search or sel_sport or sel_status or sel_emp %}
+        <a href="{% url 'coach_list' %}" style="font-size:12px;color:var(--ink-muted);text-decoration:none">✕ Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Coach Cards Grid -->
+  {% if coaches %}
+  <div class="coaches-grid">
+    {% for c in coaches %}
+    <div class="coach-card" style="animation-delay:{{ forloop.counter0 }}0ms">
+      <div class="coach-card-head">
+        <div class="coach-avatar">
+          {% if c.photo %}<img src="{{ c.photo.url }}" alt="{{ c.full_name }}">
+          {% else %}{{ c.initials }}{% endif %}
+        </div>
+        <div class="coach-head-info">
+          <div class="coach-name">{{ c.full_name }}</div>
+          <div class="coach-id">{{ c.coach_id }}</div>
+        </div>
+        <span class="coach-emp-badge emp-{{ c.employment_type }}">{{ c.employment_label }}</span>
+      </div>
+      <div class="coach-card-body">
+        <!-- Sports -->
+        <div class="coach-sports">
+          {% for s in c.sports_coached.all %}
+            <span class="sport-tag">{{ s.icon }} {{ s.name }}</span>
+          {% empty %}
+            <span style="font-size:12px;color:var(--ink-muted)">No sport assigned</span>
+          {% endfor %}
+        </div>
+        <!-- Meta -->
+        <div class="coach-meta-row">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.13 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16.92z"/></svg>
+          {{ c.contact_number }}
+        </div>
+        {% if c.email %}
+        <div class="coach-meta-row">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          {{ c.email }}
+        </div>
+        {% endif %}
+        <div class="coach-meta-row">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Joined {{ c.joining_date|date:"d M Y" }} · {{ c.experience_years }} yr{{ c.experience_years|pluralize }} exp
+        </div>
+        {% if c.qualification %}
+        <div class="coach-exp">🎓 {{ c.qualification }}</div>
+        {% endif %}
+      </div>
+      <div class="coach-card-footer">
+        <span class="status-badge status-{{ c.status }}">
+          <span class="status-dot"></span>{{ c.status_label }}
+        </span>
+        <div class="card-actions">
+          <a class="act-btn act-btn-view" href="{% url 'coach_detail' c.pk %}">👁 View</a>
+          <a class="act-btn act-btn-edit" href="{% url 'coach_edit' c.pk %}">✎ Edit</a>
+          <button class="act-btn act-btn-del" onclick="confirmDelete({{ c.pk }},'{{ c.full_name|escapejs }}')">✕</button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🧑‍🏫</div>
+    <div class="empty-title">No coaches found</div>
+    <div class="empty-sub">
+      {% if search or sel_sport or sel_status %}
+        Try adjusting your filters or <a href="{% url 'coach_list' %}" style="color:var(--gold)">clear all</a>
+      {% else %}
+        <a href="{% url 'coach_add' %}" style="color:var(--gold)">Add your first coach</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Remove Coach?</div>
+    <div class="modal-body">Are you sure you want to remove <strong id="del-name"></strong>? This will unassign them from all students.</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      <form method="POST" id="del-form" style="margin:0">{% csrf_token %}
+        <button type="submit" class="modal-btn modal-btn-delete">Yes, Remove</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-msg"></span></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(pk, name) {
+  document.getElementById('del-name').textContent = name;
+  document.getElementById('del-form').action = `/coaches/${pk}/delete/`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('delete-modal').classList.remove('open'); }
+document.getElementById('delete-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+function showToast(msg,icon='✓'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=icon;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+{% if messages %}{% for message in messages %}
+  {% if message.tags == 'success' %}window.addEventListener('DOMContentLoaded',()=>showToast('{{ message|escapejs }}'));{% endif %}
+{% endfor %}{% endif %}
+</script>
+{% endblock %}

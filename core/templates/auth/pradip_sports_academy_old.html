@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pradip Sports Academy — Champion Every Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black:      #0A0A08;
+  --ink:        #111210;
+  --surface:    #141412;
+  --surface-2:  #1C1C19;
+  --surface-3:  #232320;
+  --border:     rgba(255,255,255,0.08);
+  --border-m:   rgba(255,255,255,0.14);
+  --gold:       #C9912A;
+  --gold-light: #E8B84B;
+  --gold-pale:  rgba(201,145,42,0.12);
+  --gold-glow:  rgba(201,145,42,0.25);
+  --green:      #2D6A42;
+  --green-light:#3A8A55;
+  --cream:      #F2EDE4;
+  --cream-dim:  #C8C2B8;
+  --white:      #FAFAF8;
+  --muted:      #7A7870;
+  --red:        #B84040;
+
+  --radius:     10px;
+  --radius-lg:  18px;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-serif:   'Playfair Display', serif;
+  --font-body:    'DM Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--black);
+  color: var(--cream);
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════
+   GRAIN OVERLAY
+═══════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.4;
+}
+
+/* ═══════════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 60px;
+  background: linear-gradient(180deg, rgba(10,10,8,0.95) 0%, transparent 100%);
+  backdrop-filter: blur(0px);
+  transition: all 0.4s ease;
+}
+
+nav.scrolled {
+  background: rgba(10,10,8,0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 60px;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.nav-logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.nav-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.nav-logo-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--white);
+}
+
+.nav-logo-sub {
+  font-size: 9px;
+  color: var(--gold);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--cream-dim);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover { color: var(--white); }
+.nav-links a:hover::after { width: 100%; }
+
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-login {
+  padding: 9px 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border-m);
+  background: transparent;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-login:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-pale);
+}
+
+.btn-enroll {
+  padding: 9px 24px;
+  border-radius: 6px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-enroll:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px var(--gold-glow);
+}
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background elements */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-bg-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 75% 50%, rgba(201,145,42,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(45,106,66,0.08) 0%, transparent 60%),
+    linear-gradient(180deg, var(--black) 0%, var(--ink) 100%);
+}
+
+.hero-bg-lines {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+.hero-bg-circle {
+  position: absolute;
+  right: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,145,42,0.08);
+}
+
+.hero-bg-circle::before {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,145,42,0.06);
+}
+
+.hero-bg-circle::after {
+  content: '';
+  position: absolute;
+  inset: 100px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,145,42,0.04);
+}
+
+/* Floating sport icons */
+.float-icon {
+  position: absolute;
+  font-size: 32px;
+  opacity: 0.07;
+  animation: floatAround 8s ease-in-out infinite;
+}
+.float-icon:nth-child(1) { top: 15%; left: 8%;  animation-delay: 0s;   font-size: 48px; }
+.float-icon:nth-child(2) { top: 70%; left: 5%;  animation-delay: 2s;   font-size: 28px; }
+.float-icon:nth-child(3) { top: 30%; right: 18%; animation-delay: 1s;  font-size: 36px; }
+.float-icon:nth-child(4) { top: 75%; right: 22%; animation-delay: 3s;  font-size: 26px; }
+.float-icon:nth-child(5) { top: 10%; right: 38%; animation-delay: 1.5s;font-size: 22px; }
+
+@keyframes floatAround {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-14px) rotate(5deg); }
+  66%       { transform: translateY(8px) rotate(-3deg); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid rgba(201,145,42,0.3);
+  border-radius: 20px;
+  background: var(--gold-pale);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+
+.hero-eyebrow span { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 10vw, 130px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  color: var(--white);
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.35s forwards;
+}
+
+.hero-title-gold {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--gold);
+  display: block;
+}
+
+.hero-title em {
+  font-style: italic;
+  font-family: var(--font-serif);
+  font-size: 0.52em;
+  color: var(--gold);
+  letter-spacing: 0px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.hero-subtitle {
+  font-size: 17px;
+  color: var(--cream-dim);
+  font-weight: 300;
+  line-height: 1.65;
+  max-width: 500px;
+  margin: 24px 0 44px;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.5s forwards;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.65s forwards;
+}
+
+.btn-hero-primary {
+  padding: 16px 36px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+  box-shadow: 0 8px 32px var(--gold-glow);
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(201,145,42,0.4);
+}
+
+.btn-hero-secondary {
+  padding: 15px 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-m);
+  background: transparent;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-hero-secondary:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  opacity: 0;
+  animation: fadeUp 0.9s ease 0.8s forwards;
+}
+
+.stat-item {}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 42px;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  left: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  z-index: 1;
+  opacity: 0;
+  animation: fadeUp 1s ease 1.2s forwards;
+}
+
+.scroll-line {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+  animation: scrollPulse 2s ease infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; width: 40px; }
+  50%       { opacity: 1;   width: 60px; }
+}
+
+/* ═══════════════════════════════════════════════
+   SPORTS TICKER
+═══════════════════════════════════════════════ */
+.ticker {
+  padding: 18px 0;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-track {
+  display: flex;
+  gap: 0;
+  animation: ticker 25s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 3px;
+  color: var(--black);
+  padding: 0 28px;
+}
+
+.ticker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION COMMONS
+═══════════════════════════════════════════════ */
+section { padding: 100px 60px; }
+
+.section-eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 60px);
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.section-title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 0.75em;
+}
+
+.section-sub {
+  font-size: 15px;
+  color: var(--cream-dim);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+/* ═══════════════════════════════════════════════
+   SPORTS WE OFFER
+═══════════════════════════════════════════════ */
+#sports {
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+#sports::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,145,42,0.05) 0%, transparent 70%);
+}
+
+.sports-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 60px;
+  gap: 40px;
+}
+
+.sports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.sport-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: default;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sport-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.sport-card:hover {
+  border-color: rgba(201,145,42,0.3);
+  background: var(--surface-3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.sport-card:hover::before { transform: scaleX(1); }
+
+.sport-icon {
+  font-size: 38px;
+  margin-bottom: 14px;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.sport-card:hover .sport-icon { transform: scale(1.15); }
+
+.sport-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+
+.sport-level {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════
+   WHY US
+═══════════════════════════════════════════════ */
+#why {
+  background: var(--black);
+  position: relative;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin-top: 60px;
+}
+
+.why-features {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.feature-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 22px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.feature-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201,145,42,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.feature-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 5px;
+}
+
+.feature-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+/* Visual card on the right */
+.why-visual {
+  position: relative;
+}
+
+.why-visual-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.why-visual-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--green-light));
+}
+
+.why-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201,145,42,0.25);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--gold-light);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.academy-quote {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-style: italic;
+  color: var(--white);
+  line-height: 1.4;
+  margin-bottom: 28px;
+}
+
+.academy-quote span { color: var(--gold); }
+
+.coach-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.coach-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+.coach-name { font-size: 14px; font-weight: 600; color: var(--white); }
+.coach-title { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.achievement-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ach-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.ach-num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.ach-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   FEES / PRICING
+═══════════════════════════════════════════════ */
+#fees {
+  background: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.fees-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.fees-header .section-eyebrow { justify-content: center; }
+.fees-header .section-eyebrow::before { display: none; }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.pricing-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 28px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.pricing-card.featured {
+  background: linear-gradient(135deg, #1A1A14 0%, #1E1E17 100%);
+  border-color: rgba(201,145,42,0.4);
+  transform: translateY(-8px);
+}
+
+.pricing-card.featured::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+}
+
+.pricing-card:hover:not(.featured) {
+  border-color: rgba(201,145,42,0.2);
+  transform: translateY(-4px);
+}
+
+.featured-badge {
+  position: absolute;
+  top: 18px; right: 18px;
+  padding: 3px 10px;
+  background: var(--gold);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.pricing-duration {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.pricing-name {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--white);
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.pricing-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.price-symbol { font-size: 22px; color: var(--gold); font-weight: 300; }
+.price-num {
+  font-family: var(--font-display);
+  font-size: 52px;
+  color: var(--white);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.price-period {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+.pricing-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+.pricing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.pricing-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--cream-dim);
+}
+
+.pricing-features li::before {
+  content: '✓';
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold-pale);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pricing-features li.muted { opacity: 0.4; }
+.pricing-features li.muted::before { content: '—'; background: transparent; color: var(--muted); }
+
+.btn-pricing {
+  width: 100%;
+  padding: 13px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-pricing-outline {
+  background: transparent;
+  border: 1px solid var(--border-m);
+  color: var(--cream);
+}
+
+.btn-pricing-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn-pricing-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border: none;
+  color: var(--black);
+  box-shadow: 0 6px 24px var(--gold-glow);
+}
+
+.btn-pricing-gold:hover {
+  box-shadow: 0 10px 32px rgba(201,145,42,0.45);
+  transform: translateY(-1px);
+}
+
+/* ═══════════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════════ */
+#testimonials {
+  background: var(--black);
+  overflow: hidden;
+}
+
+.testimonials-header {
+  margin-bottom: 60px;
+}
+
+.testimonials-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.testimonial-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.3s ease;
+}
+
+.testimonial-card:hover {
+  border-color: rgba(201,145,42,0.2);
+  transform: translateY(-3px);
+}
+
+.testimonial-stars {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 16px;
+}
+
+.star { color: var(--gold); font-size: 13px; }
+
+.testimonial-text {
+  font-size: 14px;
+  color: var(--cream-dim);
+  line-height: 1.7;
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.author-av {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--black);
+  flex-shrink: 0;
+}
+
+.author-name { font-size: 13px; font-weight: 600; color: var(--white); }
+.author-sport { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   CONTACT
+═══════════════════════════════════════════════ */
+#contact {
+  background: var(--surface);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 40px;
+}
+
+.contact-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.contact-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201,145,42,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.contact-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+
+.contact-val {
+  font-size: 15px;
+  color: var(--white);
+  font-weight: 400;
+}
+
+.contact-form-wrap {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-form-wrap::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+}
+
+.form-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--white);
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-input, .form-select, .form-textarea {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-3);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: rgba(201,145,42,0.5);
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-select { appearance: none; cursor: pointer; }
+
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px var(--gold-glow);
+}
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  background: var(--black);
+  border-top: 1px solid var(--border);
+  padding: 60px 60px 36px;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 60px;
+  margin-bottom: 48px;
+}
+
+.footer-brand p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-top: 14px;
+  font-weight: 300;
+  max-width: 280px;
+}
+
+.footer-col-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-col ul a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+
+.footer-col ul a:hover { color: var(--gold); }
+
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.footer-copy span { color: var(--gold); }
+
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.social-link {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.social-link:hover {
+  border-color: var(--gold);
+  background: var(--gold-pale);
+}
+
+/* ═══════════════════════════════════════════════
+   LOGIN MODAL
+═══════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,4,0.85);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-m);
+  border-radius: 22px;
+  padding: 44px 40px 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  transform: translateY(20px) scale(0.97);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--green-light));
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--surface-3);
+  color: var(--white);
+  border-color: var(--border-m);
+}
+
+.modal-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.modal-logo-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 14px;
+  box-shadow: 0 0 30px var(--gold-glow);
+}
+
+.modal-logo-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--white);
+  text-align: center;
+}
+
+.modal-logo-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.modal-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0 28px;
+}
+
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.modal-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.modal-input-wrap {
+  position: relative;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.modal-input:focus {
+  border-color: rgba(201,145,42,0.5);
+  background: var(--surface-3);
+}
+
+.modal-input::placeholder { color: var(--muted); }
+
+.modal-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.modal-input-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 15px;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.modal-input-toggle:hover { color: var(--white); }
+
+.modal-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 24px;
+}
+
+.modal-remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-remember input {
+  accent-color: var(--gold);
+  width: 13px;
+  height: 13px;
+}
+
+.modal-forgot {
+  font-size: 12px;
+  color: var(--gold);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.modal-forgot:hover { opacity: 0.7; }
+
+.btn-modal-login {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--black);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-modal-login:hover {
+  box-shadow: 0 8px 30px var(--gold-glow);
+  transform: translateY(-1px);
+}
+
+.btn-modal-login:active { transform: scale(0.99); }
+
+.modal-footer-text {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+.modal-footer-text a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+/* Error state */
+.modal-input.error { border-color: var(--red); }
+.modal-error {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 5px;
+  display: none;
+}
+.modal-error.show { display: block; }
+
+/* Success state */
+.modal-success {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.modal-success.show { display: flex; }
+.modal-success-icon { font-size: 52px; margin-bottom: 16px; }
+.modal-success-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--white);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.modal-success-sub { font-size: 13px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════
+   SCROLL ANIMATIONS
+═══════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  nav { padding: 18px 30px; }
+  nav.scrolled { padding: 12px 30px; }
+  .nav-links { gap: 22px; }
+  .hero { padding: 120px 30px 60px; }
+  section { padding: 70px 30px; }
+  footer { padding: 50px 30px 28px; }
+  .why-grid { gap: 50px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+  .sports-header { flex-direction: column; align-items: flex-start; }
+  .why-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-card.featured { transform: none; }
+  .testimonials-track { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  .form-row { grid-template-columns: 1fr; }
+  .modal { padding: 36px 24px 28px; margin: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">🏆</div>
+    <div class="nav-logo-text">
+      <span class="nav-logo-name">PRADIP SPORTS</span>
+      <span class="nav-logo-sub">Academy</span>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#sports">Sports</a></li>
+    <li><a href="#why">About</a></li>
+    <li><a href="#fees">Pricing</a></li>
+    <li><a href="#testimonials">Stories</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <div class="nav-cta">
+    <button class="btn-login" onclick="openModal()">Login</button>
+    <button class="btn-enroll" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Enrol Now</button>
+  </div>
+</nav>
+
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <div class="hero-bg-gradient"></div>
+    <div class="hero-bg-lines"></div>
+    <div class="hero-bg-circle"></div>
+    <span class="float-icon">🏸</span>
+    <span class="float-icon">⚽</span>
+    <span class="float-icon">🎾</span>
+    <span class="float-icon">🏊</span>
+    <span class="float-icon">🥊</span>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span></span>
+      Est. 2010 · Ahmedabad, Gujarat
+    </div>
+{% if messages %}
+      {% for message in messages %}
+        <div class="alert"><span class="alert-icon">✕</span><span>{{ message }}</span></div>
+      {% endfor %}
+    {% endif %}
+    <h1 class="hero-title">
+      CHAMPION<br>
+      <em>every</em>
+      <span class="hero-title-gold">DAY</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Where passion meets discipline. Pradip Sports Academy nurtures athletes of all levels — from first steps to podium finishes — with world-class coaching and facilities.
+    </p>
+
+    <div class="hero-actions">
+      <button class="btn-hero-primary" onclick="document.getElementById('sports').scrollIntoView({behavior:'smooth'})">
+        Explore Sports
+      </button>
+      <button class="btn-hero-secondary" onclick="document.getElementById('fees').scrollIntoView({behavior:'smooth'})">
+        <span>View Pricing</span>
+        <span>→</span>
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Athletes Trained</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">15+</div>
+        <div class="stat-label">Sports Offered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">25+</div>
+        <div class="stat-label">Expert Coaches</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">14</div>
+        <div class="stat-label">Years of Excellence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item">🏸 BADMINTON <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⚽ FOOTBALL <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🎾 TENNIS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏊 SWIMMING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🥊 BOXING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">♟️ CHESS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏓 TABLE TENNIS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⛸️ SKATING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🤸 GYMNASTICS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏋️ WEIGHTLIFTING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🎯 ARCHERY <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏀 BASKETBALL <span class="ticker-dot"></span></span>
+    <!-- Duplicate for seamless loop -->
+    <span class="ticker-item">🏸 BADMINTON <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⚽ FOOTBALL <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🎾 TENNIS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏊 SWIMMING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🥊 BOXING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">♟️ CHESS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏓 TABLE TENNIS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⛸️ SKATING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🤸 GYMNASTICS <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏋️ WEIGHTLIFTING <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🎯 ARCHERY <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🏀 BASKETBALL <span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+
+<!-- ═══ SPORTS ═══ -->
+<section id="sports">
+  <div class="sports-header">
+    <div>
+      <div class="section-eyebrow reveal">Our Programs</div>
+      <h2 class="section-title reveal reveal-delay-1">SPORTS WE <em>offer</em></h2>
+    </div>
+    <p class="section-sub reveal reveal-delay-2">
+      From individual disciplines to team sports — find your game, discover your potential.
+    </p>
+  </div>
+
+  <div class="sports-grid">
+    <div class="sport-card reveal">
+      <span class="sport-icon">🏸</span>
+      <div class="sport-name">BADMINTON</div>
+      <div class="sport-level">Beginner · Advanced</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-1">
+      <span class="sport-icon">⚽</span>
+      <div class="sport-name">FOOTBALL</div>
+      <div class="sport-level">All Levels</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-2">
+      <span class="sport-icon">🎾</span>
+      <div class="sport-name">TENNIS</div>
+      <div class="sport-level">Beginner · Pro</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-3">
+      <span class="sport-icon">🏊</span>
+      <div class="sport-name">SWIMMING</div>
+      <div class="sport-level">All Ages</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-1">
+      <span class="sport-icon">🥊</span>
+      <div class="sport-name">BOXING</div>
+      <div class="sport-level">Amateur · Competitive</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-2">
+      <span class="sport-icon">♟️</span>
+      <div class="sport-name">CHESS</div>
+      <div class="sport-level">All Levels</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-3">
+      <span class="sport-icon">🏓</span>
+      <div class="sport-name">TABLE TENNIS</div>
+      <div class="sport-level">Recreational · Elite</div>
+    </div>
+    <div class="sport-card reveal">
+      <span class="sport-icon">⛸️</span>
+      <div class="sport-name">SKATING</div>
+      <div class="sport-level">Beginner · Advanced</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-1">
+      <span class="sport-icon">🤸</span>
+      <div class="sport-name">GYMNASTICS</div>
+      <div class="sport-level">Kids · Adults</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-2">
+      <span class="sport-icon">🏋️</span>
+      <div class="sport-name">WEIGHTLIFTING</div>
+      <div class="sport-level">All Levels</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-3">
+      <span class="sport-icon">🎯</span>
+      <div class="sport-name">ARCHERY</div>
+      <div class="sport-level">Beginner · Advanced</div>
+    </div>
+    <div class="sport-card reveal reveal-delay-4">
+      <span class="sport-icon">🏀</span>
+      <div class="sport-name">BASKETBALL</div>
+      <div class="sport-level">Team · Individual</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ WHY US ═══ -->
+<section id="why">
+  <div class="section-eyebrow reveal">Why Choose Us</div>
+  <h2 class="section-title reveal reveal-delay-1">BUILT FOR <em>champions</em></h2>
+
+  <div class="why-grid">
+    <div class="why-features">
+      <div class="feature-item reveal">
+        <div class="feature-icon-wrap">🏅</div>
+        <div>
+          <div class="feature-title">Expert Coaching Staff</div>
+          <div class="feature-desc">All our coaches are certified professionals with state & national-level competition experience, dedicated to unlocking your full potential.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-1">
+        <div class="feature-icon-wrap">🏟️</div>
+        <div>
+          <div class="feature-title">World-Class Facilities</div>
+          <div class="feature-desc">Professionally maintained courts, pools, and arenas equipped with modern training equipment — all in one campus.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-2">
+        <div class="feature-icon-wrap">📊</div>
+        <div>
+          <div class="feature-title">Progress Tracking</div>
+          <div class="feature-desc">Digital performance reports, attendance monitoring, and personalized growth plans for every athlete.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-3">
+        <div class="feature-icon-wrap">👨‍👩‍👧</div>
+        <div>
+          <div class="feature-title">All Ages Welcome</div>
+          <div class="feature-desc">Programs designed for children from age 5, teens, adults, and senior citizens — sport is for every stage of life.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="why-visual reveal reveal-delay-2">
+      <div class="why-visual-card">
+        <div class="why-badge">⭐ Trusted Academy</div>
+        <div class="academy-quote">
+          "Sport is the <span>language of champions</span> — we teach it fluently."
+        </div>
+        <div class="coach-row">
+          <div class="coach-avatar">P</div>
+          <div>
+            <div class="coach-name">Pradip Patel</div>
+            <div class="coach-title">Founder & Head Coach</div>
+          </div>
+        </div>
+        <div class="achievement-grid">
+          <div class="ach-box">
+            <div class="ach-num">48</div>
+            <div class="ach-label">State Medals</div>
+          </div>
+          <div class="ach-box">
+            <div class="ach-num">12</div>
+            <div class="ach-label">National Titles</div>
+          </div>
+          <div class="ach-box">
+            <div class="ach-num">6AM</div>
+            <div class="ach-label">First Batch</div>
+          </div>
+          <div class="ach-box">
+            <div class="ach-num">9PM</div>
+            <div class="ach-label">Last Batch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ FEES ═══ -->
+<section id="fees">
+  <div class="fees-header">
+    <div class="section-eyebrow reveal">Transparent Pricing</div>
+    <h2 class="section-title reveal reveal-delay-1">SIMPLE, HONEST <em>fees</em></h2>
+    <p class="section-sub reveal reveal-delay-2" style="margin: 0 auto; text-align:center">
+      No hidden charges. Choose a plan that fits your schedule and budget.
+    </p>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <div class="pricing-duration">Monthly Plan</div>
+      <div class="pricing-name">STARTER</div>
+      <div class="pricing-amount">
+        <span class="price-symbol">₹</span>
+        <span class="price-num">2,500</span>
+      </div>
+      <div class="price-period">per month · one sport</div>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>5 sessions per week</li>
+        <li>Group coaching</li>
+        <li>Basic equipment provided</li>
+        <li>Monthly progress report</li>
+        <li class="muted">Personal coach</li>
+        <li class="muted">Competition prep</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get Started</button>
+    </div>
+
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <div class="featured-badge">Most Popular</div>
+      <div class="pricing-duration">Quarterly Plan</div>
+      <div class="pricing-name">CHAMPION</div>
+      <div class="pricing-amount">
+        <span class="price-symbol">₹</span>
+        <span class="price-num">6,500</span>
+      </div>
+      <div class="price-period">per 3 months · one sport</div>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>6 sessions per week</li>
+        <li>Small group coaching</li>
+        <li>All equipment included</li>
+        <li>Weekly progress reports</li>
+        <li>Personal coach access</li>
+        <li class="muted">Competition prep</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-gold" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Enrol Now</button>
+    </div>
+
+    <div class="pricing-card reveal reveal-delay-2">
+      <div class="pricing-duration">Annual Plan</div>
+      <div class="pricing-name">ELITE</div>
+      <div class="pricing-amount">
+        <span class="price-symbol">₹</span>
+        <span class="price-num">22,000</span>
+      </div>
+      <div class="price-period">per year · two sports</div>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>Unlimited sessions</li>
+        <li>1-on-1 personal coaching</li>
+        <li>Premium equipment</li>
+        <li>Daily progress reports</li>
+        <li>Dedicated personal coach</li>
+        <li>Full competition prep</li>
+      </ul>
+      <button class="btn-pricing btn-pricing-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Go Elite</button>
+    </div>
+  </div>
+
+  <p class="reveal" style="text-align:center; margin-top:28px; font-size:12px; color:var(--muted)">
+    * Prices may vary by sport. Multi-sport discounts available. Contact us for custom packages.
+  </p>
+</section>
+
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section id="testimonials">
+  <div class="testimonials-header">
+    <div class="section-eyebrow reveal">Student Stories</div>
+    <h2 class="section-title reveal reveal-delay-1">WHAT OUR <em>athletes</em> SAY</h2>
+  </div>
+
+  <div class="testimonials-track">
+    <div class="testimonial-card reveal">
+      <div class="testimonial-stars">
+        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+      </div>
+      <p class="testimonial-text">"Pradip Sports Academy completely transformed my game. The coaching quality is exceptional and the facilities are better than anything I've seen in Ahmedabad."</p>
+      <div class="testimonial-author">
+        <div class="author-av" style="background:linear-gradient(135deg,#C9912A,#E8B84B)">R</div>
+        <div>
+          <div class="author-name">Rohan Mehta</div>
+          <div class="author-sport">Badminton · 2 years</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="testimonial-stars">
+        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+      </div>
+      <p class="testimonial-text">"My daughter started swimming here at age 7. Now at 11, she has won three district-level medals. The coaches here genuinely care about each child."</p>
+      <div class="testimonial-author">
+        <div class="author-av" style="background:linear-gradient(135deg,#2D6A42,#3A8A55)">P</div>
+        <div>
+          <div class="author-name">Priya Shah</div>
+          <div class="author-sport">Parent · Swimming</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="testimonial-stars">
+        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+      </div>
+      <p class="testimonial-text">"Joined for chess and ended up loving the whole academy culture. The discipline and focus I learned here helped me not just in sport, but in academics too."</p>
+      <div class="testimonial-author">
+        <div class="author-av" style="background:linear-gradient(135deg,#2E6B9E,#4A8FC0)">A</div>
+        <div>
+          <div class="author-name">Arjun Trivedi</div>
+          <div class="author-sport">Chess · 3 years</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="contact-grid">
+    <div>
+      <div class="section-eyebrow reveal">Get In Touch</div>
+      <h2 class="section-title reveal reveal-delay-1">START YOUR <em>journey</em></h2>
+      <p class="section-sub reveal reveal-delay-2">Ready to begin? Fill in the form or reach us directly — our team responds within 24 hours.</p>
+
+      <div class="contact-info">
+        <div class="contact-item reveal">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Address</div>
+            <div class="contact-val">Near Vastrapur Lake, Vastrapur,<br>Ahmedabad, Gujarat — 380015</div>
+          </div>
+        </div>
+        <div class="contact-item reveal reveal-delay-1">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">Phone / WhatsApp</div>
+            <div class="contact-val">+91 98765 43210</div>
+          </div>
+        </div>
+        <div class="contact-item reveal reveal-delay-2">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-val">info@pradipsportsacademy.com</div>
+          </div>
+        </div>
+        <div class="contact-item reveal reveal-delay-3">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div class="contact-label">Academy Hours</div>
+            <div class="contact-val">Monday – Saturday: 6 AM – 9 PM<br>Sunday: 7 AM – 1 PM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-wrap reveal reveal-delay-2">
+      <div class="form-title">ENQUIRE NOW</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" placeholder="+91 00000 00000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="you@email.com">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Sport Interested In</label>
+          <select class="form-select form-input">
+            <option value="">Select sport</option>
+            <option>Badminton</option>
+            <option>Football</option>
+            <option>Tennis</option>
+            <option>Swimming</option>
+            <option>Boxing</option>
+            <option>Chess</option>
+            <option>Table Tennis</option>
+            <option>Skating</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student Age</label>
+          <input type="number" class="form-input" placeholder="Age in years" min="4" max="80">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message (optional)</label>
+        <textarea class="form-textarea" placeholder="Tell us anything specific…"></textarea>
+      </div>
+      <button class="btn-submit">Send Enquiry →</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo" style="text-decoration:none;display:inline-flex">
+        <div class="nav-logo-icon">🏆</div>
+        <div class="nav-logo-text">
+          <span class="nav-logo-name">PRADIP SPORTS</span>
+          <span class="nav-logo-sub">Academy</span>
+        </div>
+      </a>
+      <p>Nurturing champions since 2010. We believe every child deserves world-class coaching, and every adult deserves the joy of sport.</p>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">SPORTS</div>
+      <ul>
+        <li><a href="#">Badminton</a></li>
+        <li><a href="#">Football</a></li>
+        <li><a href="#">Tennis</a></li>
+        <li><a href="#">Swimming</a></li>
+        <li><a href="#">Boxing</a></li>
+        <li><a href="#">View All →</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">ACADEMY</div>
+      <ul>
+        <li><a href="#why">About Us</a></li>
+        <li><a href="#fees">Pricing</a></li>
+        <li><a href="#testimonials">Success Stories</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#" onclick="openModal();return false;">Staff Login</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-col-title">CONNECT</div>
+      <ul>
+        <li><a href="#">📘 Facebook</a></li>
+        <li><a href="#">📸 Instagram</a></li>
+        <li><a href="#">▶️ YouTube</a></li>
+        <li><a href="#">💬 WhatsApp</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">
+      © 2024 <span>Pradip Sports Academy</span>. All rights reserved. Made with ❤️ in Ahmedabad.
+    </div>
+    <div class="social-links">
+      <a class="social-link" title="Facebook">📘</a>
+      <a class="social-link" title="Instagram">📸</a>
+      <a class="social-link" title="YouTube">▶️</a>
+      <a class="social-link" title="WhatsApp">💬</a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══ LOGIN MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="loginModal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <div class="modal-logo">
+      <div class="modal-logo-icon">🏆</div>
+      <div class="modal-logo-name">PRADIP SPORTS ACADEMY</div>
+      <div class="modal-logo-sub">Staff & Admin Portal</div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <!-- Login form -->
+     <form method="POST" action="{% url 'login' %}">
+      {% csrf_token %}
+    <div id="loginForm">
+      <div class="modal-form-group">
+        <label class="modal-label">Username</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon">👤</span>
+          <input type="text" class="modal-input" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="modal-error" id="usernameError">Please enter your username</div>
+      </div>
+
+      <div class="modal-form-group">
+        <label class="modal-label">Password</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon">🔒</span>
+         <input type="password" name="password" id="modal-password" class="modal-input" required>
+          <button class="modal-input-toggle" id="pwToggle" type="button" onclick="togglePassword()">👁</button>
+        </div>
+        <div class="modal-error" id="passwordError">Please enter your password</div>
+      </div>
+
+      <div class="modal-options">
+        <label class="modal-remember">
+          <input type="checkbox" id="rememberMe"> Remember me
+        </label>
+        <a href="#" class="modal-forgot">Forgot password?</a>
+      </div>
+
+      <div class="modal-error" id="loginError" style="text-align:center;margin-bottom:12px;font-size:12.5px"></div>
+
+      <button type="submit" class="btn-modal-login">
+        Sign In to Portal
+      </button>
+
+      <div class="modal-footer-text">
+        Issues logging in? <a href="#contact" onclick="closeModal()">Contact admin</a>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div class="modal-success" id="loginSuccess">
+      <div class="modal-success-icon">✅</div>
+      <div class="modal-success-title">WELCOME BACK!</div>
+      <div class="modal-success-sub">Redirecting to your dashboard…</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+// ── Navbar scroll ──
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ── Scroll reveal ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Modal ──
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('loginUsername').focus(), 350);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // Reset form after close
+  setTimeout(resetModal, 400);
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function resetModal() {
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('modal-password').value = '';
+  document.getElementById('loginUsername').classList.remove('error');
+  document.getElementById('modal-password').classList.remove('error');
+  document.getElementById('usernameError').classList.remove('show');
+  document.getElementById('passwordError').classList.remove('show');
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginForm').style.display = '';
+  document.getElementById('loginSuccess').classList.remove('show');
+}
+
+// ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) {
+    handleLogin();
+  }
+});
+
+// Password toggle
+function togglePassword() {
+  const inp = document.getElementById('modal-password');
+  const btn = document.getElementById('pwToggle');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+// ── Login handler ──
+function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('modal-password').value;
+  const btn = document.getElementById('loginBtn');
+
+  // Clear errors
+  document.getElementById('usernameError').classList.remove('show');
+  document.getElementById('passwordError').classList.remove('show');
+  document.getElementById('loginError').classList.remove('show');
+  document.getElementById('loginUsername').classList.remove('error');
+  document.getElementById('modal-password').classList.remove('error');
+
+  let valid = true;
+
+  if (!username) {
+    document.getElementById('usernameError').classList.add('show');
+    document.getElementById('loginUsername').classList.add('error');
+    valid = false;
+  }
+
+  if (!password) {
+    document.getElementById('passwordError').classList.add('show');
+    document.getElementById('modal-password').classList.add('error');
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  // Loading state
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+  btn.style.opacity = '0.8';
+
+  // Simulate auth — replace this with your actual Django login URL
+   setTimeout(() => {
+    if (username.length > 0 && password.length >= 1) {
+      showSuccess();
+    } else {
+      showError('Invalid username or password. Please try again.');
+      btn.textContent = 'Sign In to Portal';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+  }, 1200); 
+}
+
+function showSuccess() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('loginSuccess').classList.add('show');
+  // Redirect after 2s — change URL to your actual dashboard
+  setTimeout(() => {
+    window.location.href = '/';  // change to your dashboard URL
+  }, 2000);
+}
+
+function showError(msg) {
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = msg;
+  errEl.classList.add('show');
+  document.getElementById('loginBtn').textContent = 'Sign In to Portal';
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginBtn').style.opacity = '1';
+  // Shake animation
+  const modal = document.getElementById('loginModal');
+  modal.style.animation = 'shake 0.4s ease';
+  setTimeout(() => modal.style.animation = '', 400);
+}
+
+// Shake keyframe
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}`;
+document.head.appendChild(shakeStyle);
+
+// ── Smooth scroll for all anchor links ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

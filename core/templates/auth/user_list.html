@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Users & Access — Pradip Sports Academy{% endblock %}
+{% block sb_users %}active{% endblock %}
+{% block nav_staff %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.add-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;text-decoration:none;transition:all .15s}
+.add-btn:hover{background:#2e2a26}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem}
+.alert-success{background:var(--green-pale);color:var(--green);border:1px solid rgba(58,122,82,.2)}
+.alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
+.alert-close{margin-left:auto;cursor:pointer;opacity:.6}
+/* table */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:#FDFCFA}
+.card-head-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 18px;text-align:left;font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px;background:#FDFCFA;border-bottom:1px solid var(--border)}
+thead th:first-child{padding-left:22px}
+thead th:last-child{padding-right:22px;text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FDFCFA}
+tbody td{padding:13px 18px;vertical-align:middle;color:var(--ink)}
+tbody td:first-child{padding-left:22px}
+tbody td:last-child{padding-right:22px;text-align:right}
+.user-cell{display:flex;align-items:center;gap:10px}
+.u-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--gold-pale);color:var(--amber)}
+.u-name{font-weight:500;font-size:13px;color:var(--ink)}
+.u-uname{font-size:11px;color:var(--ink-muted);margin-top:1px}
+.role-badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:500}
+.role-admin{background:var(--gold-pale);color:var(--amber)}
+.role-coach{background:var(--blue-pale);color:var(--blue)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.status-badge:hover{opacity:.75}
+.badge-on{background:var(--green-pale);color:var(--green)}.badge-on .bd{background:var(--green)}
+.badge-off{background:var(--cream-dark);color:var(--ink-muted)}.badge-off .bd{background:var(--ink-faint)}
+.bd{width:5px;height:5px;border-radius:50%}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none}
+.act-btn:hover{background:var(--cream)}
+.act-btn-perm:hover{border-color:var(--gold);color:var(--amber);background:var(--gold-pale)}
+.act-btn-pw:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-pale)}
+.act-btn-del:hover{border-color:var(--red);color:var(--red);background:var(--red-pale)}
+.action-group{display:flex;gap:6px;justify-content:flex-end}
+.empty-state{text-align:center;padding:48px;color:var(--ink-muted);font-size:13px}
+/* PW Reset modal */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,22,18,.45);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#fff;border-radius:var(--radius);padding:28px;max-width:400px;width:90%;transform:scale(.95);transition:transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.modal-overlay.open .modal-box{transform:scale(1)}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);margin-bottom:16px}
+.modal-field{margin-bottom:14px}
+.modal-field label{display:block;font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.modal-field input{width:100%;padding:10px 13px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none;transition:border-color .15s}
+.modal-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,151,58,.12);background:#fff}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.modal-btn{padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
+.modal-btn-cancel{background:var(--cream-dark);color:var(--ink-soft)}.modal-btn-cancel:hover{background:var(--cream-deeper)}
+.modal-btn-save{background:var(--blue);color:#fff}.modal-btn-save:hover{background:#235880}
+.toast{position:fixed;bottom:28px;right:28px;z-index:600;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:13px 18px;border-radius:var(--radius);font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span><span>Users & Access</span>
+  </div>
+  <div class="page-header">
+    <div><h1>Users & Access Control</h1><p>Manage login accounts and module permissions</p></div>
+    <a href="{% url 'user_create' %}" class="add-btn">＋ Create User</a>
+  </div>
+
+  {% if messages %}{% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">
+      <span>{{ msg }}</span>
+      <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
+    </div>
+  {% endfor %}{% endif %}
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">All System Users ({{ total }})</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>User</th><th>Role</th><th>Linked Coach</th>
+          <th>Last Login</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="u-avatar">{{ u.full_name|slice:":2"|upper }}</div>
+                <div><div class="u-name">{{ u.full_name }}</div><div class="u-uname">@{{ u.username }}</div></div>
+              </div>
+            </td>
+            <td><span class="role-badge role-{{ u.role }}">{{ u.get_role_display }}</span></td>
+            <td style="font-size:12.5px;color:var(--ink-soft)">
+              {% if u.coach %}{{ u.coach.full_name }} ({{ u.coach.coach_id }}){% else %}<span style="color:var(--ink-faint)">—</span>{% endif %}
+            </td>
+            <td style="font-size:12px;color:var(--ink-muted)">
+              {{ u.last_login|date:"d M Y, g:i A"|default:"Never" }}
+            </td>
+            <td>
+              <button class="status-badge {% if u.is_active %}badge-on{% else %}badge-off{% endif %}"
+                      id="status-{{ u.pk }}"
+                      {% if u == user %}disabled title="Cannot deactivate yourself"{% else %}onclick="toggleUser({{ u.pk }},this)"{% endif %}>
+                <span class="bd"></span>
+                <span class="sl">{% if u.is_active %}Active{% else %}Inactive{% endif %}</span>
+              </button>
+            </td>
+            <td>
+              <div class="action-group">
+                {% if u.role == 'coach' %}
+                  <a class="act-btn act-btn-perm" href="{% url 'user_permissions' u.pk %}">🔑 Permissions</a>
+                {% endif %}
+                <button class="act-btn act-btn-pw" onclick="openPwModal({{ u.pk }},'{{ u.full_name|escapejs }}')">🔒 Reset PW</button>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6"><div class="empty-state">No users yet. <a href="{% url 'user_create' %}" style="color:var(--gold)">Create one</a></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PW Reset Modal -->
+<div class="modal-overlay" id="pw-modal">
+  <div class="modal-box">
+    <div class="modal-title">Reset Password</div>
+    <p style="font-size:13px;color:var(--ink-muted);margin-bottom:16px">Setting new password for <strong id="pw-name"></strong></p>
+    <form method="POST" id="pw-form">
+      {% csrf_token %}
+      <div class="modal-field">
+        <label>New Password</label>
+        <input type="password" name="new_password" id="pw-input" placeholder="Min 6 characters" minlength="6" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-btn-cancel" onclick="closePwModal()">Cancel</button>
+        <button type="submit" class="modal-btn modal-btn-save">Save Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"><span id="toast-icon">✓</span> <span id="toast-msg"></span></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openPwModal(pk, name) {
+  document.getElementById('pw-name').textContent = name;
+  document.getElementById('pw-form').action = `/users/${pk}/reset-password/`;
+  document.getElementById('pw-modal').classList.add('open');
+}
+function closePwModal() { document.getElementById('pw-modal').classList.remove('open'); }
+document.getElementById('pw-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closePwModal(); });
+
+function toggleUser(pk, btn) {
+  fetch(`/users/${pk}/toggle/`, { method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')} })
+    .then(r=>r.json()).then(d => {
+      if(d.error){ showToast(d.error,'⚠'); return; }
+      btn.className = `status-badge ${d.is_active?'badge-on':'badge-off'}`;
+      btn.querySelector('.sl').textContent = d.is_active ? 'Active' : 'Inactive';
+      showToast(d.message);
+    });
+}
+function showToast(msg,icon='✓'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=icon;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+function getCookie(n){let v=null;document.cookie.split(';').forEach(c=>{const[k,val]=c.trim().split('=');if(k===n)v=decodeURIComponent(val)});return v}
+
+{% if messages %}{% for m in messages %}{% if m.tags == 'success' %}
+window.addEventListener('DOMContentLoaded',()=>showToast('{{ m|escapejs }}'));{% endif %}{% endfor %}{% endif %}
+</script>
+{% endblock %}

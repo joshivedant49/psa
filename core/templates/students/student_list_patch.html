@@ -1,0 +1,29 @@
+{# ════════════════════════════════════════════════════════════════════
+   PATCH for  templates/students/student_list.html
+   
+   Find the row where each student's name is rendered in the table
+   and wrap the name cell (or add a "View" button) with the detail URL.
+
+   BEFORE (typical pattern in your list template):
+       <td>{{ s.full_name }}</td>
+
+   AFTER:
+       <td>
+         <a href="{% url 'student_detail' s.pk %}" style="color:var(--ink);text-decoration:none;font-weight:500">
+           {{ s.full_name }}
+         </a>
+         <div style="font-size:11px;color:var(--ink-muted)">{{ s.student_id }}</div>
+       </td>
+
+   ── OR — if your list has an actions column, add a View button: ──
+
+       <a href="{% url 'student_detail' s.pk %}" class="btn btn-outline btn-sm">👁 View</a>
+
+   ════════════════════════════════════════════════════════════════════ #}
+
+{# ── ALSO: In the student admission success page (admission_success.html)
+   you can add a "View Full Profile" link: ── #}
+
+<a href="{% url 'student_detail' student.pk %}" class="btn btn-primary">
+  👁 View Full Profile
+</a>

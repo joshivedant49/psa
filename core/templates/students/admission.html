@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block title %}New Student Admission — Pradip Sports Academy{% endblock %}
+{% block sb_students %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem;max-width:100%}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.stepper{display:flex;align-items:center;margin-bottom:2.5rem}
+.step{display:flex;align-items:center;gap:10px;flex:1;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:calc(28px + 10px);right:0;top:50%;height:2px;background:var(--border);z-index:0;transition:background .4s}
+.step.completed:not(:last-child)::after{background:var(--gold)}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;border:2px solid var(--border);background:#fff;color:var(--ink-muted);transition:all .3s;flex-shrink:0;z-index:1;position:relative}
+.step.active .step-circle{border-color:var(--gold);background:var(--gold);color:var(--ink)}
+.step.completed .step-circle{border-color:var(--green);background:var(--green);color:#fff}
+.step-info{line-height:1.3}
+.step-num{font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.step-name{font-size:13px;font-weight:500;color:var(--ink-muted)}
+.step.active .step-name{color:var(--ink)}.step.completed .step-name{color:var(--green)}
+.form-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.step-panel{display:none}.step-panel.active{display:block}
+.step-panel-head{padding:22px 28px;background:var(--ink);display:flex;align-items:center;gap:14px}
+.step-panel-icon{width:42px;height:42px;border-radius:10px;background:rgba(196,151,58,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.step-panel-head h2{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:var(--cream)}
+.step-panel-head p{font-size:12px;color:rgba(248,244,238,.5);margin-top:2px}
+.step-body{padding:28px}
+.field-grid{display:grid;gap:20px}.col-2{grid-template-columns:1fr 1fr}.col-3{grid-template-columns:1fr 1fr 1fr}.col-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+.req::after{content:' *';color:var(--red)}
+.field input,.field select,.field textarea{padding:11px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,151,58,.12);background:#fff}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.field textarea{resize:vertical;min-height:80px}
+.field-hint{font-size:11.5px;color:var(--ink-muted);margin-top:3px}
+.photo-upload{display:flex;align-items:center;gap:16px}
+.photo-preview{width:80px;height:80px;border-radius:50%;background:var(--cream-dark);border:2px dashed var(--border-mid);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0;cursor:pointer}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.fee-box{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);margin-top:4px}
+.fee-box-loading{padding:16px 18px;text-align:center;color:var(--ink-muted);font-size:13px}
+.fee-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.fee-row:last-child{border-bottom:none}
+.fee-row-label{font-size:12px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px}
+.fee-row-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--ink)}
+.fee-row-val.payable{color:var(--green)}
+.fee-row-val.strike{font-size:14px;text-decoration:line-through;color:var(--ink-muted);font-family:'DM Sans',sans-serif;font-weight:400}
+.disc-tag{background:var(--green-pale);color:var(--green);padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.fee-box-not-found{padding:14px 18px;background:var(--amber-pale);color:var(--amber);font-size:13px;display:flex;align-items:center;gap:8px}
+.form-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-top:1px solid var(--border);background:#FDFCFA}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .18s}
+.btn-ghost{background:var(--cream-dark);color:var(--ink-soft)}.btn-ghost:hover{background:var(--cream-deeper)}
+.btn-gold{background:var(--gold);color:var(--ink)}.btn-gold:hover{background:#d4a84a}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#2d6342}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem;animation:slideDown .3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
+.step-error-banner{background:var(--red-pale);border:1px solid rgba(184,64,64,.2);border-radius:var(--radius-sm);padding:11px 16px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+.step-error-banner.show{display:flex;align-items:center;gap:8px}
+@media(max-width:860px){.col-2,.col-3{grid-template-columns:1fr 1fr}.stepper{flex-direction:column;align-items:flex-start;gap:12px}.step::after{display:none}}
+@media(max-width:560px){.col-2,.col-3{grid-template-columns:1fr}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
+    <a href="{% url 'student_list' %}">Students</a><span class="breadcrumb-sep">›</span>
+    <span>New Admission</span>
+  </div>
+  <div class="page-header">
+    <h1>New Student Admission</h1>
+    <p>Complete all three sections to register a new student</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-error"><span>✕</span><span>{{ message }}</span></div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="stepper" id="stepper">
+    <div class="step active" id="s-1"><div class="step-circle">1</div><div class="step-info"><div class="step-num">Step 1</div><div class="step-name">Personal Details</div></div></div>
+    <div class="step" id="s-2"><div class="step-circle">2</div><div class="step-info"><div class="step-num">Step 2</div><div class="step-name">Parent / Guardian</div></div></div>
+    <div class="step" id="s-3"><div class="step-circle">3</div><div class="step-info"><div class="step-num">Step 3</div><div class="step-name">Sport Admission</div></div></div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" id="admission-form" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="fee_id" id="fee-id-hidden">
+
+    <div class="form-card">
+
+      <!-- STEP 1 -->
+      <div class="step-panel active" id="panel-1">
+        <div class="step-panel-head"><div class="step-panel-icon">👤</div><div><h2>Personal Details</h2><p>Basic information about the student</p></div></div>
+        <div class="step-body">
+          <div class="step-error-banner" id="err-1">⚠ Please fix the errors above before continuing.</div>
+          <div class="field-grid col-3">
+            <div class="field"><label class="req" for="f-fname">First Name</label>
+              <input type="text" name="first_name" id="f-fname" placeholder="e.g. Arjun" required></div>
+            <div class="field"><label class="req" for="f-lname">Last Name</label>
+              <input type="text" name="last_name" id="f-lname" placeholder="e.g. Mehta" required></div>
+            <div class="field"><label class="req" for="f-dob">Date of Birth</label>
+              <input type="date" name="dob" id="f-dob" required></div>
+            <div class="field"><label class="req" for="f-gender">Gender</label>
+              <select name="gender" id="f-gender" required>
+                <option value="">— Select —</option>
+                <option value="M">Male</option><option value="F">Female</option><option value="O">Other</option>
+              </select></div>
+            <div class="field"><label for="f-blood">Blood Group</label>
+              <select name="blood_group" id="f-blood">
+                <option value="NK">Not Known</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+              </select></div>
+            <div class="field"><label class="req" for="f-phone">Contact Number</label>
+              <input type="tel" name="contact_number" id="f-phone" placeholder="98765 43210" maxlength="10"
+                    required
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+            </div>
+
+          <div class="field"><label for="f-email">Email Address</label>
+            <input type="email" name="email" id="f-email" placeholder="student@email.com" maxlength="254"
+                  oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
+          </div>
+            <div class="field"><label>Photo</label>
+              <div class="photo-upload">
+                <div class="photo-preview" id="photo-preview" onclick="document.getElementById('f-photo').click()">📷</div>
+                <div>
+                  <div style="font-size:13px;color:var(--ink-soft)">Click to upload photo</div>
+                  <div style="font-size:11.5px;color:var(--ink-muted);margin-top:3px">JPG, PNG · max 2MB</div>
+                  <input type="file" name="photo" id="f-photo" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+                </div>
+              </div></div>
+            <div class="field col-full"><label class="req" for="f-address">Address</label>
+              <textarea name="address" id="f-address" placeholder="Full residential address…" required
+                        oninput="this.value=this.value.replace(/[^a-zA-Z0-9\s,.\-\/\#\(\)]/g,'')"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav"><span></span>
+          <button type="button" class="btn btn-gold" id="next-1" onclick="goNext(1)">Next: Parent Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-panel" id="panel-2">
+        <div class="step-panel-head"><div class="step-panel-icon">👨‍👩‍👦</div><div><h2>Parent / Guardian Details</h2><p>Contact information for parent or guardian</p></div></div>
+        <div class="step-body">
+          <div class="step-error-banner" id="err-2">⚠ Please fix the errors above before continuing.</div>
+          <div class="field-grid col-3">
+            <div class="field"><label class="req" for="f-pname">Parent / Guardian Name</label>
+              <input type="text" name="parent_name" id="f-pname" placeholder="e.g. Ramesh Mehta" required></div>
+            <div class="field"><label for="f-prelation">Relation</label>
+              <select name="parent_relation" id="f-prelation">
+                <option value="Father">Father</option><option value="Mother">Mother</option>
+                <option value="Guardian">Guardian</option><option value="Sibling">Sibling</option>
+                <option value="Other">Other</option>
+              </select></div>
+           <div class="field"><label class="req" for="f-pwa">WhatsApp Number</label>
+            <input type="tel" name="parent_whatsapp" id="f-pwa" placeholder="98765 43210" maxlength="10"
+                  required
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+            <span class="field-hint">Used for fee & expiry reminders</span>
+            </div>
+            <div class="field"><label for="f-pemail">Parent Email</label>
+            <input type="email" name="parent_email" id="f-pemail" placeholder="parent@email.com" maxlength="254"
+                  oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
+            </div>
+            <div class="field"><label for="f-poccu">Occupation</label>
+            <input type="text" name="parent_occupation" id="f-poccu" placeholder="e.g. Engineer" maxlength="100"
+                  oninput="this.value=this.value.replace(/[^a-zA-Z\s\.\-]/g,'')">
+            </div>
+            <div class="field"><label for="f-emerg" class="req">Emergency Contact</label>
+            <input type="tel" name="emergency_contact" id="f-emerg" placeholder="Alternate number" maxlength="10"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+            <span class="field-hint">Leave blank if same as WhatsApp</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <button type="button" class="btn btn-ghost" onclick="goPrev(2)">← Back</button>
+          <button type="button" class="btn btn-gold" id="next-2" onclick="goNext(2)">Next: Sport Details →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-panel" id="panel-3">
+        <div class="step-panel-head"><div class="step-panel-icon">🏅</div><div><h2>Sport Admission Details</h2><p>Select sport, batch and subscription details</p></div></div>
+        <div class="step-body">
+          <div class="step-error-banner" id="err-3">⚠ Please fix the errors above before submitting.</div>
+          <div class="field-grid col-3">
+            <div class="field"><label class="req" for="f-sport">Sport</label>
+              <select name="sport" id="f-sport" onchange="lookupFee()" required>
+                <option value="">— Select Sport —</option>
+                {% for s in sports %}<option value="{{ s.pk }}">{{ s.icon }} {{ s.name }}</option>{% endfor %}
+              </select></div>
+            <div class="field"><label class="req" for="f-batch">Batch</label>
+              <select name="batch" id="f-batch" onchange="lookupFee()" required>
+                <option value="">— Select Batch —</option>
+                {% for b in batches %}<option value="{{ b.pk }}">{{ b.name }}</option>{% endfor %}
+              </select></div>
+            <div class="field"><label class="req" for="f-level">Expertise Level</label>
+              <select name="expertise_level" id="f-level" onchange="lookupFee()" required>
+                <option value="">— Select Level —</option>
+                {% for lv in levels %}<option value="{{ lv.pk }}">{{ lv.name }}</option>{% endfor %}
+              </select></div>
+            <div class="field"><label class="req" for="f-duration">Duration</label>
+              <select name="duration" id="f-duration" onchange="lookupFee()" required>
+                <option value="">— Select Duration —</option>
+                {% for d in durations %}<option value="{{ d.pk }}">{{ d.duration_name }}</option>{% endfor %}
+              </select></div>
+            <div class="field"><label class="req" for="f-admdate">Admission Date</label>
+              <input type="date" name="admission_date" id="f-admdate" required></div>
+            <div class="field"><label for="f-slot">Preferred Time Slot</label>
+              <input type="text" name="time_slot" id="f-slot" placeholder="e.g. 6:00 – 7:00 AM"></div>
+            {% if coaches %}
+            <div class="field"><label for="f-coach">Assign Coach</label>
+              <select name="assigned_coach" id="f-coach">
+                <option value="">— No coach assigned —</option>
+                {% for c in coaches %}<option value="{{ c.pk }}">{{ c.full_name }}</option>{% endfor %}
+              </select></div>
+            {% endif %}
+            <div class="field col-full"><label>Fee Details</label>
+              <div class="fee-box" id="fee-box">
+                <div class="fee-box-loading">← Select all four fields above to load fee</div>
+              </div></div>
+            <div class="field" id="fee-paid-wrap" style="display:none"><label for="f-feepaid">Amount Paid Today (₹)</label>
+              <input type="number" name="fee_paid" id="f-feepaid" placeholder="0" min="0" step="0.01" value="0">
+              <span class="field-hint">Leave 0 if collecting later</span></div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <button type="button" class="btn btn-ghost" onclick="goPrev(3)">← Back</button>
+          <button type="submit" class="btn btn-green" id="submit-btn">✓ Confirm Admission</button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Rules for each step ─────────────────────────────────────────
+const RULES_1 = {
+  first_name:     [{rule:'required'},{rule:'alphaName'},{rule:'minLength',value:2},{rule:'maxLength',value:20}],
+  last_name:      [{rule:'required'},{rule:'alphaName'},{rule:'minLength',value:2},{rule:'maxLength',value:20}],
+  dob:            [{rule:'required'},{rule:'date'},{rule:'notFutureDate'},{rule:'minAge',value:3}],
+  gender:         [{rule:'required'}],
+  contact_number: [{rule:'required'},{rule:'phone'},{rule:'minLength',value:10},{rule:'maxLength',value:10},{rule:'regex',value:/^[6-9]\d{9}$/,message:'Must start with 6–9 and be 10 digits'}],
+  address: [{rule:'required'},{rule:'minLength',value:10},{rule:'regex',value:/^[a-zA-Z0-9\s,.\-\/\#\(\)]+$/,message:'No special characters allowed except , . - / # ( )'}],
+  email:          [{rule:'email'},{rule:'maxLength',value:254},{rule:'regex',value:/^[a-zA-Z0-9.@]+$/,message:'Only letters, numbers, @ and . are allowed'}],
+};
+const RULES_2 = {
+  parent_name:    [{rule:'required'},{rule:'alphaName'},{rule:'minLength',value:2},{rule:'maxLength',value:20}],
+  parent_whatsapp:   [{rule:'required'},{rule:'regex',value:/^[6-9]\d{9}$/,message:'Must start with 6–9 and be 10 digits'},{rule:'minLength',value:10},{rule:'maxLength',value:10}],
+  parent_email:      [{rule:'email'},{rule:'maxLength',value:254},{rule:'regex',value:/^[a-zA-Z0-9.@]+$/,message:'Only letters, numbers, @ and . are allowed'}],
+  parent_occupation: [{rule:'maxLength',value:20},{rule:'regex',value:/^[a-zA-Z\s\.\-]+$/,message:'Only letters, spaces, . and - are allowed'}],
+  emergency_contact: [{rule:'regex',value:/^[6-9]\d{9}$/,message:'Must start with 6–9 and be 10 digits'},{rule:'minLength',value:10},{rule:'maxLength',value:10}],
+};
+const RULES_3 = {
+  sport:           [{rule:'required'}],
+  batch:           [{rule:'required'}],
+  expertise_level: [{rule:'required'}],
+  duration:        [{rule:'required'}],
+  admission_date:  [{rule:'required'},{rule:'date'}],
+  fee_paid:        [{rule:'positiveNumber'}],
+};
+
+// Bind live validation
+window.addEventListener('DOMContentLoaded', () => {
+  SA.validate.bindAll('admission-form', {...RULES_1, ...RULES_2, ...RULES_3});
+  document.getElementById('f-admdate').valueAsDate = new Date();
+  SA.charCounter('#f-address', 200);
+});
+
+function goNext(step) {
+  const rules = step === 1 ? RULES_1 : RULES_2;
+  const ok = SA.validate.validateForm('admission-form', rules);
+  if (!ok) {
+    document.getElementById(`err-${step}`).classList.add('show');
+    SA.shake(`#next-${step}`);
+    return;
+  }
+  document.getElementById(`err-${step}`).classList.remove('show');
+  setStep(step + 1);
+}
+function goPrev(step) { setStep(step - 1); }
+
+function setStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${n}`).classList.add('active');
+  for (let i = 1; i <= 3; i++) {
+    const s = document.getElementById(`s-${i}`);
+    s.classList.remove('active','completed');
+    if (i < n) s.classList.add('completed');
+    else if (i === n) s.classList.add('active');
+  }
+  document.querySelector('.page-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Final submit validation
+document.getElementById('admission-form').addEventListener('submit', function(e) {
+  const ok = SA.validate.validateForm('admission-form', RULES_3);
+  if (!ok) {
+    e.preventDefault();
+    document.getElementById('err-3').classList.add('show');
+    SA.shake('#submit-btn');
+  }
+});
+
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Photo must be under 2MB.'); input.value = ''; return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const p = document.getElementById('photo-preview');
+    p.innerHTML = `<img src="${e.target.result}" alt="photo">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function lookupFee() {
+  const sport = document.getElementById('f-sport').value;
+  const batch = document.getElementById('f-batch').value;
+  const level = document.getElementById('f-level').value;
+  const dur   = document.getElementById('f-duration').value;
+  const box   = document.getElementById('fee-box');
+  if (!sport || !batch || !level || !dur) {
+    box.innerHTML = '<div class="fee-box-loading">← Select all four fields above to load fee</div>';
+    document.getElementById('fee-id-hidden').value = '';
+    document.getElementById('fee-paid-wrap').style.display = 'none';
+    return;
+  }
+  box.innerHTML = '<div class="fee-box-loading">🔍 Looking up fee…</div>';
+  fetch(`/students/get-fee/?sport=${sport}&batch=${batch}&level=${level}&duration=${dur}`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('fee-id-hidden').value = data.found ? data.fee_id : '';
+      document.getElementById('fee-paid-wrap').style.display = data.found ? 'block' : 'none';
+      if (data.found) {
+        const hasDisc = data.discount_pct > 0;
+        box.innerHTML = `<div>
+          <div class="fee-row"><span class="fee-row-label">Base Fee</span><span class="fee-row-val ${hasDisc?'strike':''}">₹${Math.round(data.fee_amount).toLocaleString('en-IN')}</span></div>
+          ${hasDisc?`<div class="fee-row"><span class="fee-row-label">Discount</span><span class="disc-tag">${data.discount_pct}% off</span></div>`:''}
+          <div class="fee-row" style="background:var(--green-pale)"><span class="fee-row-label" style="color:var(--green)">Payable</span><span class="fee-row-val payable">₹${Math.round(data.discounted_amount).toLocaleString('en-IN')}</span></div>
+        </div>`;
+        document.getElementById('f-feepaid').value = Math.round(data.discounted_amount);
+      } else {
+        box.innerHTML = '<div class="fee-box-not-found">⚠ No fee configured for this combination. You can still proceed.</div>';
+      }
+    })
+    .catch(() => { box.innerHTML = '<div class="fee-box-not-found">⚠ Could not load fee details.</div>'; });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+{% block title %}{{ student.full_name }} — Pradip Sports Academy{% endblock %}
+{% block sb_student_list %}active{% endblock %}
+
+{% block extra_css %}
+:root{--green:#3A7A52;--green-pale:#EBF4EF;--gold:#C4973A;--gold-pale:#FBF5E9;--amber:#C47A30;--amber-pale:#FDF0E3;--red:#B84040;--red-pale:#FAEAEA;--blue:#2E6B9E;--blue-pale:#E8F1FA;--ink:#1E1C1A;--ink-soft:#4A4540;--ink-muted:#8A8480;--ink-faint:#C8C4C0;--cream:#F9F7F4;--cream-dark:#F0EDE8;--border:#E8E4E0;--border-mid:#D4CFC9;--radius:10px;--radius-sm:6px}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:14px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+
+/* ── Hero banner ── */
+.hero{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;display:flex;align-items:flex-start;gap:22px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--green),var(--gold))}
+.hero-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid var(--border)}
+.hero-av-initials{width:80px;height:80px;border-radius:50%;background:var(--gold-pale);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:var(--amber);flex-shrink:0;border:3px solid var(--border)}
+.hero-main{flex:1;min-width:0}
+.hero-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--ink);letter-spacing:-.3px;margin-bottom:4px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.hero-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;background:var(--cream);color:var(--ink-soft);border:1px solid var(--border)}
+.hero-tag.sport{background:var(--green-pale);color:var(--green);border-color:#C2DFD0}
+.hero-tag.status-active{background:var(--green-pale);color:var(--green);border-color:#C2DFD0}
+.hero-tag.status-expired{background:var(--red-pale);color:var(--red);border-color:#EDBBBB}
+.hero-tag.status-suspended{background:var(--amber-pale);color:var(--amber);border-color:#F0CFB0}
+.hero-id{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;border:none;transition:all .15s}
+.btn-primary{background:var(--ink);color:var(--gold)}
+.btn-primary:hover{background:#2a2825}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#2e6442}
+.btn-whatsapp{background:#25D366;color:#fff}
+.btn-whatsapp:hover{background:#1ebe5d}
+.btn-outline{background:#fff;color:var(--ink-soft);border:1px solid var(--border-mid)}
+.btn-outline:hover{background:var(--cream)}
+.btn-red{background:var(--red-pale);color:var(--red);border:1px solid #EDBBBB}
+.btn-red:hover{background:#f5d0d0}
+.btn-sm{padding:6px 12px;font-size:12px}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0}
+.expiry-badge{text-align:right}
+.expiry-label{font-size:10px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.expiry-val{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--ink)}
+.expiry-days{font-size:11px;margin-top:2px}
+.expiry-days.ok{color:var(--green)}.expiry-days.warn{color:var(--amber)}.expiry-days.danger{color:var(--red)}
+
+/* ── Grid layout ── */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.detail-grid.three{grid-template-columns:1fr 1fr 1fr}
+.detail-grid.wide{grid-template-columns:2fr 1fr}
+
+/* ── Cards ── */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.card-head{padding:14px 20px;border-bottom:1px solid var(--border);background:#FDFCFA;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px}
+.card-body{padding:18px 20px}
+
+/* ── Field grid ── */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+.field-grid.one{grid-template-columns:1fr}
+.field-group{display:flex;flex-direction:column;gap:3px}
+.field-label{font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.field-val{font-size:13.5px;color:var(--ink);font-weight:400}
+.field-val.mono{font-family:monospace;font-size:13px}
+.field-val a{color:var(--blue);text-decoration:none}
+.field-val a:hover{text-decoration:underline}
+
+/* ── Fee widget ── */
+.fee-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.fee-row:last-child{border-bottom:none;padding-top:14px}
+.fee-row-label{font-size:12.5px;color:var(--ink-soft)}
+.fee-row-val{font-size:14px;font-weight:600;color:var(--ink)}
+.fee-row-val.green{color:var(--green)}
+.fee-row-val.red{color:var(--red)}
+.fee-progress{margin-top:12px}
+.fee-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-muted);margin-bottom:5px}
+.fee-bar-bg{height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden}
+.fee-bar-fill{height:100%;border-radius:4px;background:var(--green);transition:width .6s}
+
+/* ── Subscription timeline ── */
+.sub-timeline{display:flex;align-items:center;gap:0;margin:8px 0 4px}
+.sub-tl-dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sub-tl-line{flex:1;height:3px;background:var(--cream-dark);position:relative;overflow:hidden}
+.sub-tl-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,var(--green),var(--gold));border-radius:2px}
+.sub-tl-dot-end{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sub-dates{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-muted);margin-bottom:12px}
+
+/* ── Attendance summary ── */
+.att-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.att-mini{background:var(--cream);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;border:1px solid var(--border)}
+.att-mini-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;margin-bottom:2px}
+.att-mini-label{font-size:10px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px}
+.att-mini-val.green{color:var(--green)}.att-mini-val.red{color:var(--red)}.att-mini-val.amber{color:var(--amber)}.att-mini-val.blue{color:var(--blue)}
+
+/* ── Recent attendance list ── */
+.att-list{display:flex;flex-direction:column;gap:6px}
+.att-item{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:var(--radius-sm);background:var(--cream);font-size:12.5px}
+.att-item-date{color:var(--ink-soft);font-weight:500;min-width:100px}
+.att-badge{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.att-badge.present{background:var(--green-pale);color:var(--green)}
+.att-badge.absent{background:var(--red-pale);color:var(--red)}
+.att-badge.late{background:var(--amber-pale);color:var(--amber)}
+.att-badge.excused{background:#EEF2FD;color:#3B5CB8}
+.att-item-method{font-size:11px;color:var(--ink-muted)}
+
+/* ── WhatsApp notify panel ── */
+.wa-panel{background:var(--cream);border-radius:var(--radius-sm);padding:16px;border:1px solid var(--border)}
+.wa-panel-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.wa-msg-box{width:100%;border:1px solid var(--border-mid);border-radius:var(--radius-sm);padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);background:#fff;resize:vertical;min-height:100px;outline:none}
+.wa-msg-box:focus{border-color:var(--gold)}
+.wa-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.wa-chip{padding:5px 12px;border-radius:20px;font-size:11.5px;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);transition:all .15s}
+.wa-chip:hover,.wa-chip.active{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+
+/* ── Empty states ── */
+.empty-sm{text-align:center;padding:24px;color:var(--ink-muted);font-size:13px}
+.empty-icon-sm{font-size:24px;margin-bottom:6px;opacity:.4}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{background:var(--green)}.toast.error{background:var(--red)}
+
+@media(max-width:900px){
+  .page-wrap{padding:1.5rem 1rem 3rem}
+  .detail-grid,.detail-grid.three,.detail-grid.wide{grid-template-columns:1fr}
+  .hero{flex-direction:column}.hero-right{align-items:flex-start}
+  .att-summary{grid-template-columns:repeat(2,1fr)}
+}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="{% url 'student_list' %}">Students</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>{{ student.full_name }}</span>
+  </div>
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    {% if student.photo %}
+      <img class="hero-avatar" src="{{ student.photo.url }}" alt="{{ student.full_name }}">
+    {% else %}
+      <div class="hero-av-initials">{{ student.initials }}</div>
+    {% endif %}
+
+    <div class="hero-main">
+      <div class="hero-name">{{ student.full_name }}</div>
+      <div class="hero-meta">
+        <span class="hero-tag sport">{{ student.sport.icon }} {{ student.sport.name }}</span>
+        <span class="hero-tag">{{ student.batch.name }}</span>
+        <span class="hero-tag">{{ student.expertise_level.name }}</span>
+        <span class="hero-tag status-{{ student.status }}">
+          {% if student.status == 'active' %}✓{% elif student.status == 'expired' %}✗{% else %}⚠{% endif %}
+          {{ student.get_status_display }}
+        </span>
+      </div>
+      <div class="hero-id">ID: {{ student.student_id }} &nbsp;·&nbsp; Admitted: {{ student.admission_date|date:"d M Y" }}
+        {% if student.assigned_coach %}&nbsp;·&nbsp; Coach: {{ student.assigned_coach.full_name }}{% endif %}
+      </div>
+      <div class="hero-actions">
+        {% if user.is_admin %}
+        <a href="{% url 'student_admission' %}?edit={{ student.pk }}" class="btn btn-outline btn-sm">✎ Edit</a>
+        {% endif %}
+        <button class="btn btn-whatsapp btn-sm" onclick="openWhatsApp()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+        <a href="{% url 'student_attendance_history' %}?student={{ student.pk }}" class="btn btn-outline btn-sm">📅 Attendance</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="expiry-badge">
+        <div class="expiry-label">Subscription Expiry</div>
+        <div class="expiry-val">{{ student.subscription_expiry|date:"d M Y" }}</div>
+        <div class="expiry-days {% if student.days_until_expiry > 14 %}ok{% elif student.days_until_expiry > 0 %}warn{% else %}danger{% endif %}">
+          {% if student.days_until_expiry > 0 %}
+            {{ student.days_until_expiry }} days remaining
+          {% elif student.days_until_expiry == 0 %}
+            ⚠ Expires today
+          {% else %}
+            ✗ Expired {{ student.days_until_expiry|stringformat:"d"|cut:"-" }} days ago
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div><!-- /hero -->
+
+  <!-- ── Row 1: Personal + Parent ── -->
+  <div class="detail-grid" style="margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">👤 Personal Details</span>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-group">
+            <span class="field-label">Full Name</span>
+            <span class="field-val">{{ student.full_name }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Student ID</span>
+            <span class="field-val mono">{{ student.student_id }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Date of Birth</span>
+            <span class="field-val">{{ student.dob|date:"d M Y" }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Gender</span>
+            <span class="field-val">{{ student.get_gender_display }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Blood Group</span>
+            <span class="field-val">{{ student.get_blood_group_display }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Contact</span>
+            <span class="field-val"><a href="tel:{{ student.contact_number }}">{{ student.contact_number }}</a></span>
+          </div>
+          {% if student.email %}
+          <div class="field-group" style="grid-column:1/-1">
+            <span class="field-label">Email</span>
+            <span class="field-val"><a href="mailto:{{ student.email }}">{{ student.email }}</a></span>
+          </div>
+          {% endif %}
+          <div class="field-group" style="grid-column:1/-1">
+            <span class="field-label">Address</span>
+            <span class="field-val">{{ student.address }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">👨‍👩‍👦 Parent / Guardian</span>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-group">
+            <span class="field-label">Name</span>
+            <span class="field-val">{{ student.parent_name }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Relation</span>
+            <span class="field-val">{{ student.parent_relation }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">WhatsApp</span>
+            <span class="field-val">
+              <a href="https://wa.me/{{ student.parent_whatsapp|cut:' '|cut:'-'|cut:'+' }}" target="_blank" style="color:#25D366">
+                📱 {{ student.parent_whatsapp }}
+              </a>
+            </span>
+          </div>
+          {% if student.parent_email %}
+          <div class="field-group">
+            <span class="field-label">Email</span>
+            <span class="field-val"><a href="mailto:{{ student.parent_email }}">{{ student.parent_email }}</a></span>
+          </div>
+          {% endif %}
+          {% if student.parent_occupation %}
+          <div class="field-group">
+            <span class="field-label">Occupation</span>
+            <span class="field-val">{{ student.parent_occupation }}</span>
+          </div>
+          {% endif %}
+          {% if student.emergency_contact %}
+          <div class="field-group">
+            <span class="field-label">Emergency</span>
+            <span class="field-val"><a href="tel:{{ student.emergency_contact }}">{{ student.emergency_contact }}</a></span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Row 2: Sport details + Fee ── -->
+  <div class="detail-grid wide" style="margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">🏅 Sport & Admission Details</span>
+      </div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-group">
+            <span class="field-label">Sport</span>
+            <span class="field-val">{{ student.sport.icon }} {{ student.sport.name }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Batch</span>
+            <span class="field-val">{{ student.batch.name }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Expertise Level</span>
+            <span class="field-val">
+              <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:{{ student.expertise_level.color_hex }};margin-right:5px;vertical-align:middle"></span>
+              {{ student.expertise_level.name }}
+            </span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Duration</span>
+            <span class="field-val">{{ student.duration.duration_name }}</span>
+          </div>
+          {% if student.time_slot %}
+          <div class="field-group">
+            <span class="field-label">Time Slot</span>
+            <span class="field-val">🕐 {{ student.time_slot }}</span>
+          </div>
+          {% endif %}
+          {% if student.assigned_coach %}
+          <div class="field-group">
+            <span class="field-label">Assigned Coach</span>
+            <span class="field-val">
+              <a href="{% url 'coach_detail' student.assigned_coach.pk %}">{{ student.assigned_coach.full_name }}</a>
+            </span>
+          </div>
+          {% endif %}
+          <div class="field-group">
+            <span class="field-label">Admission Date</span>
+            <span class="field-val">{{ student.admission_date|date:"d M Y" }}</span>
+          </div>
+          <div class="field-group">
+            <span class="field-label">Subscription Start</span>
+            <span class="field-val">{{ student.subscription_start|date:"d M Y" }}</span>
+          </div>
+        </div>
+
+        <!-- Subscription timeline bar -->
+        <div style="margin-top:16px">
+          <div class="sub-dates">
+            <span>{{ student.subscription_start|date:"d M Y" }}</span>
+            <span>{{ student.subscription_expiry|date:"d M Y" }}</span>
+          </div>
+          <div class="sub-timeline">
+            <div class="sub-tl-dot"></div>
+            <div class="sub-tl-line">
+              <div class="sub-tl-fill" style="width:{{ sub_progress_pct }}%"></div>
+            </div>
+            <div class="sub-tl-dot-end" style="background:{% if student.days_until_expiry > 14 %}var(--green){% elif student.days_until_expiry > 0 %}var(--amber){% else %}var(--red){% endif %}"></div>
+          </div>
+          <div class="sub-dates" style="margin-top:4px">
+            <span></span>
+            <span style="font-size:11px;color:{% if student.days_until_expiry > 14 %}var(--green){% elif student.days_until_expiry > 0 %}var(--amber){% else %}var(--red){% endif %}">
+              {% if student.days_until_expiry > 0 %}{{ student.days_until_expiry }}d left{% else %}Expired{% endif %}
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Fee card -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">💰 Fee Details</span>
+      </div>
+      <div class="card-body" style="padding-top:10px">
+        <div class="fee-row">
+          <span class="fee-row-label">Total Fee</span>
+          <span class="fee-row-val">₹{{ student.total_fee }}</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-row-label">Fee Paid</span>
+          <span class="fee-row-val green">₹{{ student.fee_paid }}</span>
+        </div>
+        <div class="fee-row" style="border-bottom:none">
+          <span class="fee-row-label" style="font-weight:600">Fee Due</span>
+          <span class="fee-row-val {% if student.fee_due > 0 %}red{% else %}green{% endif %}" style="font-size:17px">
+            ₹{{ student.fee_due }}
+          </span>
+        </div>
+        {% if student.total_fee > 0 %}
+        <div class="fee-progress" style="margin-top:14px">
+          <div class="fee-progress-label">
+            <span>Payment Progress</span>
+            <span>{{ fee_paid_pct }}%</span>
+          </div>
+          <div class="fee-bar-bg">
+            <div class="fee-bar-fill" style="width:{{ fee_paid_pct }}%;background:{% if fee_paid_pct == 100 %}var(--green){% elif fee_paid_pct >= 50 %}var(--amber){% else %}var(--red){% endif %}"></div>
+          </div>
+        </div>
+        {% endif %}
+        {% if student.fee_due > 0 %}
+        <button class="btn btn-whatsapp btn-sm" style="width:100%;margin-top:14px;justify-content:center" onclick="sendFeeReminder()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Send Fee Reminder
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Row 3: Attendance + WhatsApp ── -->
+  <div class="detail-grid wide" style="margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">📅 Attendance (Last 30 Days)</span>
+        <a href="{% url 'student_attendance_history' %}?student={{ student.pk }}" class="btn btn-outline btn-sm">View Full History</a>
+      </div>
+      <div class="card-body" style="padding-top:12px">
+        <div class="att-summary">
+          <div class="att-mini">
+            <div class="att-mini-val green">{{ att_present }}</div>
+            <div class="att-mini-label">Present</div>
+          </div>
+          <div class="att-mini">
+            <div class="att-mini-val red">{{ att_absent }}</div>
+            <div class="att-mini-label">Absent</div>
+          </div>
+          <div class="att-mini">
+            <div class="att-mini-val amber">{{ att_late }}</div>
+            <div class="att-mini-label">Late</div>
+          </div>
+          <div class="att-mini">
+            <div class="att-mini-val blue">{{ att_pct }}%</div>
+            <div class="att-mini-label">Rate</div>
+          </div>
+        </div>
+
+        {% if recent_attendance %}
+        <div class="att-list">
+          {% for att in recent_attendance %}
+          <div class="att-item">
+            <span class="att-item-date">{{ att.date|date:"D, d M Y" }}</span>
+            <span class="att-badge {{ att.status }}">{{ att.get_status_display }}</span>
+            <span class="att-item-method">{{ att.get_method_display }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-sm">
+          <div class="empty-icon-sm">📭</div>
+          No attendance records found
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- WhatsApp Panel -->
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Notify
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="wa-panel">
+          <div class="wa-panel-title">📋 Quick Templates</div>
+          <div class="wa-chips">
+            <button class="wa-chip" onclick="setTemplate('expiry')">⏰ Expiry Reminder</button>
+            <button class="wa-chip" onclick="setTemplate('fee')">💸 Fee Due</button>
+            <button class="wa-chip" onclick="setTemplate('welcome')">👋 Welcome</button>
+            <button class="wa-chip" onclick="setTemplate('absence')">📅 Absence Alert</button>
+            <button class="wa-chip" onclick="setTemplate('custom')">✏️ Custom</button>
+          </div>
+          <textarea class="wa-msg-box" id="wa-message" placeholder="Select a template above or type a custom message..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-whatsapp" style="flex:1;justify-content:center" onclick="sendWhatsApp()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Open in WhatsApp
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyMsg()" title="Copy message">📋</button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--ink-muted);text-align:center">
+            Sending to: <strong>{{ student.parent_name }}</strong> · {{ student.parent_whatsapp }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data from Django ──
+const studentData = {
+  name:       "{{ student.full_name|escapejs }}",
+  studentId:  "{{ student.student_id }}",
+  parentName: "{{ student.parent_name|escapejs }}",
+  phone:      "{{ wa_phone }}",
+  sport:      "{{ student.sport.name|escapejs }}",
+  batch:      "{{ student.batch.name|escapejs }}",
+  duration:   "{{ student.duration.duration_name|escapejs }}",
+  expiry:     "{{ student.subscription_expiry|date:'d M Y' }}",
+  daysLeft:   {{ student.days_until_expiry }},
+  feeDue:     "{{ student.fee_due }}",
+  totalFee:   "{{ student.total_fee }}",
+};
+
+// ── WhatsApp templates ──
+const TEMPLATES = {
+  expiry: `Hello *${studentData.parentName}*! 🏅\n\nThis is a reminder from *Pradip Sports Academy*.\n\nYour child *${studentData.name}*'s *${studentData.sport}* subscription expires on *${studentData.expiry}*.\n\n📋 Details:\n• Student ID: ${studentData.studentId}\n• Sport: ${studentData.sport}\n• Batch: ${studentData.batch}\n\nPlease renew at the earliest to continue uninterrupted training.\n\nThank you! 🙏`,
+
+  fee: `Hello *${studentData.parentName}*! 🏅\n\nThis is a gentle reminder from *Pradip Sports Academy*.\n\nThere is a pending fee of *₹${studentData.feeDue}* for *${studentData.name}*'s ${studentData.sport} training.\n\n📋 Details:\n• Student ID: ${studentData.studentId}\n• Total Fee: ₹${studentData.totalFee}\n• Amount Due: ₹${studentData.feeDue}\n\nKindly clear the dues at your earliest convenience.\n\nThank you! 🙏`,
+
+  welcome: `Hello *${studentData.parentName}*! 👋\n\nWelcome to *Pradip Sports Academy*! 🎉\n\nWe are delighted to have *${studentData.name}* join our *${studentData.sport}* program.\n\n📋 Enrollment Details:\n• Student ID: ${studentData.studentId}\n• Sport: ${studentData.sport}\n• Batch: ${studentData.batch}\n\nWe look forward to seeing ${studentData.name} grow and excel!\n\nThank you! 🙏`,
+
+  absence: `Hello *${studentData.parentName}*,\n\nWe noticed that *${studentData.name}* was absent from today's *${studentData.sport}* session.\n\nIf there is any issue or you need to inform us in advance, please feel free to reach out.\n\nRegular attendance is important for progress. We hope to see ${studentData.name} back soon!\n\nPradip Sports Academy 🏅`,
+
+  custom: '',
+};
+
+function setTemplate(type) {
+  document.querySelectorAll('.wa-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('wa-message').value = TEMPLATES[type] || '';
+}
+
+function sendWhatsApp() {
+  const msg = document.getElementById('wa-message').value.trim();
+  if (!msg) { showToast('Please select or type a message first.', 'error'); return; }
+  const phone = studentData.phone.replace(/\D/g,'');
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  showToast('WhatsApp opened!', 'success');
+}
+
+function openWhatsApp() {
+  setTemplate('expiry');
+  document.querySelector('[onclick="setTemplate(\'expiry\')"]')?.classList.add('active');
+  sendWhatsApp();
+}
+
+function sendFeeReminder() {
+  document.getElementById('wa-message').value = TEMPLATES.fee;
+  sendWhatsApp();
+}
+
+function copyMsg() {
+  const msg = document.getElementById('wa-message').value.trim();
+  if (!msg) { showToast('Nothing to copy.', 'error'); return; }
+  navigator.clipboard.writeText(msg).then(() => showToast('Message copied!', 'success'));
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 2500);
+}
+</script>
+{% endblock %}

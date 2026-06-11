@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% block title %}Reports — Pradip Sports Academy{% endblock %}
+{% block sb_reports %}active{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block extra_css %}
+:root{--green:#3A7A52;--green-pale:#EBF4EF;--gold:#C4973A;--gold-pale:#FBF5E9;--amber:#C47A30;--amber-pale:#FDF0E3;--red:#B84040;--red-pale:#FAEAEA;--blue:#2E6B9E;--blue-pale:#E8F1FA;--ink:#1E1C1A;--ink-soft:#4A4540;--ink-muted:#8A8480;--ink-faint:#C8C4C0;--cream:#F9F7F4;--cream-dark:#F0EDE8;--border:#E8E4E0;--border-mid:#D4CFC9;--radius:10px;--radius-sm:6px}
+
+.page-wrap{padding:2.5rem 2.5rem 5rem;max-width:1100px;margin:0 auto}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:14px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+
+.page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:500;color:var(--ink);letter-spacing:-.3px;margin-bottom:4px}
+.page-header p{font-size:13.5px;color:var(--ink-muted);font-weight:300}
+
+/* ── Report type cards ── */
+.report-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.rtype-card{padding:16px 18px;border-radius:var(--radius);border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;position:relative}
+.rtype-card:hover{border-color:var(--border-mid);background:var(--cream)}
+.rtype-card.selected{border-color:var(--green);background:var(--green-pale)}
+.rtype-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.rtype-icon{font-size:24px;margin-bottom:8px}
+.rtype-label{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.rtype-desc{font-size:11.5px;color:var(--ink-muted)}
+.rtype-check{position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;border:2px solid var(--border-mid);background:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;transition:all .15s}
+.rtype-card.selected .rtype-check{background:var(--green);border-color:var(--green);color:#fff}
+
+/* ── Filter section ── */
+.filter-section{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.filter-section-head{padding:14px 22px;border-bottom:1px solid var(--border);background:#FDFCFA;display:flex;align-items:center;gap:10px}
+.filter-section-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink)}
+.filter-section-badge{padding:2px 8px;border-radius:10px;font-size:11px;background:var(--green-pale);color:var(--green);font-weight:500}
+.filter-body{padding:20px 22px}
+.filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
+.filter-grid.two{grid-template-columns:repeat(2,1fr)}
+
+.fgroup{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:11px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.fselect,.finput{padding:9px 32px 9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;width:100%;transition:border-color .15s;cursor:pointer}
+.finput{appearance:auto;background-image:none;padding-right:12px}
+.fselect:focus,.finput:focus{border-color:var(--gold);outline:none}
+.fselect option:disabled{color:var(--ink-muted)}
+
+/* date range row */
+.date-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.date-sep{font-size:13px;color:var(--ink-muted);text-align:center}
+
+/* ── Fee range slider area ── */
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.range-input{padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;width:100%;transition:border-color .15s}
+.range-input:focus{border-color:var(--gold)}
+
+/* ── Preview count ── */
+.preview-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:var(--green-pale);border:1px solid #C2DFD0;border-radius:var(--radius);margin-bottom:20px}
+.preview-count{font-size:14px;font-weight:600;color:var(--green)}
+.preview-sub{font-size:12px;color:var(--green);opacity:.8;margin-top:2px}
+.preview-actions{display:flex;gap:10px}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;text-decoration:none;border:none;transition:all .15s}
+.btn-primary{background:var(--ink);color:var(--gold)}
+.btn-primary:hover{background:#2a2825}
+.btn-pdf{background:var(--red);color:#fff}
+.btn-pdf:hover{background:#a33636}
+.btn-outline{background:#fff;color:var(--ink-soft);border:1px solid var(--border-mid)}
+.btn-outline:hover{background:var(--cream)}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#2e6442}
+.btn-lg{padding:12px 28px;font-size:14.5px}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Active filters display ── */
+.active-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.af-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;background:var(--gold-pale);color:var(--amber);border:1px solid #EDD9A3}
+.af-chip button{background:none;border:none;cursor:pointer;color:var(--amber);font-size:12px;padding:0;line-height:1}
+
+/* ── Column picker ── */
+.col-picker{display:flex;flex-wrap:wrap;gap:8px;padding:16px 22px}
+.col-check{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;border:1px solid var(--border-mid);background:#fff;font-size:12px;color:var(--ink-soft);cursor:pointer;transition:all .15s;user-select:none}
+.col-check input{accent-color:var(--green)}
+.col-check:has(input:checked){background:var(--green-pale);color:var(--green);border-color:#C2DFD0}
+
+/* ── Loading overlay ── */
+.loading{display:none;position:fixed;inset:0;background:rgba(30,28,26,.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.loading.show{display:flex}
+.loading-box{background:#fff;border-radius:var(--radius);padding:32px 40px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--ink-soft);font-weight:500}
+
+@media(max-width:900px){
+  .page-wrap{padding:1.5rem 1rem 4rem}
+  .report-types{grid-template-columns:1fr 1fr}
+  .filter-grid,.filter-grid.two{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .report-types{grid-template-columns:1fr}
+  .filter-grid,.filter-grid.two{grid-template-columns:1fr}
+}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Reports</span>
+  </div>
+
+  <div class="page-header">
+    <h1>📊 Generate Reports</h1>
+    <p>Apply filters, preview the matching records, then download a professional PDF report.</p>
+  </div>
+
+  <form method="GET" action="{% url 'report_pdf' %}" id="report-form" target="_blank">
+
+    <!-- ── Step 1: Report Type ── -->
+    <div class="filter-section" style="margin-bottom:20px">
+      <div class="filter-section-head">
+        <span class="filter-section-title">Step 1 — Report Type</span>
+      </div>
+      <div style="padding:18px 22px">
+        <div class="report-types">
+          <label class="rtype-card selected" id="rt-student">
+            <input type="radio" name="report_type" value="student" checked onchange="syncType(this)">
+            <div class="rtype-check">✓</div>
+            <div class="rtype-icon">🎓</div>
+            <div class="rtype-label">Student Report</div>
+            <div class="rtype-desc">All enrolled students with fees & subscription info</div>
+          </label>
+          <label class="rtype-card" id="rt-fee">
+            <input type="radio" name="report_type" value="fee" onchange="syncType(this)">
+            <div class="rtype-check">✓</div>
+            <div class="rtype-icon">💰</div>
+            <div class="rtype-label">Fee Collection Report</div>
+            <div class="rtype-desc">Revenue, dues, and payment status breakdown</div>
+          </label>
+          <label class="rtype-card" id="rt-expiry">
+            <input type="radio" name="report_type" value="expiry" onchange="syncType(this)">
+            <div class="rtype-check">✓</div>
+            <div class="rtype-icon">⏰</div>
+            <div class="rtype-label">Expiry Report</div>
+            <div class="rtype-desc">Students whose subscriptions are expiring soon</div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Filters ── -->
+    <div class="filter-section">
+      <div class="filter-section-head">
+        <span class="filter-section-title">Step 2 — Filters</span>
+        <span class="filter-section-badge" id="filter-count-badge">All records</span>
+      </div>
+      <div class="filter-body">
+        <div class="filter-grid">
+
+          <!-- Sport -->
+          <div class="fgroup">
+            <label class="flabel">Sport</label>
+            <select name="sport" class="fselect" onchange="refreshCount()">
+              <option value="">All Sports</option>
+              {% for s in sports %}
+              <option value="{{ s.pk }}" {% if request.GET.sport == s.pk|stringformat:"s" %}selected{% endif %}>
+                {{ s.icon }} {{ s.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Batch -->
+          <div class="fgroup">
+            <label class="flabel">Batch</label>
+            <select name="batch" class="fselect" onchange="refreshCount()">
+              <option value="">All Batches</option>
+              {% for b in batches %}
+              <option value="{{ b.pk }}" {% if request.GET.batch == b.pk|stringformat:"s" %}selected{% endif %}>
+                {{ b.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Expertise Level -->
+          <div class="fgroup">
+            <label class="flabel">Expertise Level</label>
+            <select name="expertise_level" class="fselect" onchange="refreshCount()">
+              <option value="">All Levels</option>
+              {% for l in levels %}
+              <option value="{{ l.pk }}" {% if request.GET.expertise_level == l.pk|stringformat:"s" %}selected{% endif %}>
+                {{ l.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Duration -->
+          <div class="fgroup">
+            <label class="flabel">Duration</label>
+            <select name="duration" class="fselect" onchange="refreshCount()">
+              <option value="">All Durations</option>
+              {% for d in durations %}
+              <option value="{{ d.pk }}" {% if request.GET.duration == d.pk|stringformat:"s" %}selected{% endif %}>
+                {{ d.duration_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Coach -->
+          <div class="fgroup">
+            <label class="flabel">Coach</label>
+            <select name="coach" class="fselect" onchange="refreshCount()">
+              <option value="">All Coaches</option>
+              {% for c in coaches %}
+              <option value="{{ c.pk }}" {% if request.GET.coach == c.pk|stringformat:"s" %}selected{% endif %}>
+                {{ c.full_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Student Status -->
+          <div class="fgroup">
+            <label class="flabel">Student Status</label>
+            <select name="status" class="fselect" onchange="refreshCount()">
+              <option value="">All Statuses</option>
+              <option value="active"    {% if request.GET.status == 'active' %}selected{% endif %}>✓ Active</option>
+              <option value="expired"   {% if request.GET.status == 'expired' %}selected{% endif %}>✗ Expired</option>
+              <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>⚠ Suspended</option>
+            </select>
+          </div>
+
+          <!-- Fee Status -->
+          <div class="fgroup">
+            <label class="flabel">Fee Status</label>
+            <select name="fee_status" class="fselect" onchange="refreshCount()">
+              <option value="">All Fee Statuses</option>
+              <option value="fully_paid"   {% if request.GET.fee_status == 'fully_paid' %}selected{% endif %}>✅ Fully Paid</option>
+              <option value="partial"      {% if request.GET.fee_status == 'partial' %}selected{% endif %}>🔶 Partially Paid</option>
+              <option value="unpaid"       {% if request.GET.fee_status == 'unpaid' %}selected{% endif %}>❌ Unpaid (₹0 paid)</option>
+              <option value="has_due"      {% if request.GET.fee_status == 'has_due' %}selected{% endif %}>⚠ Has Any Due</option>
+            </select>
+          </div>
+
+          <!-- Gender -->
+          <div class="fgroup">
+            <label class="flabel">Gender</label>
+            <select name="gender" class="fselect" onchange="refreshCount()">
+              <option value="">All Genders</option>
+              <option value="M" {% if request.GET.gender == 'M' %}selected{% endif %}>Male</option>
+              <option value="F" {% if request.GET.gender == 'F' %}selected{% endif %}>Female</option>
+              <option value="O" {% if request.GET.gender == 'O' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+
+          <!-- Expiry window (shown for expiry report) -->
+          <div class="fgroup" id="expiry-window-group">
+            <label class="flabel">Expiry Within</label>
+            <select name="expiry_within" class="fselect" onchange="refreshCount()">
+              <option value="">Any time</option>
+              <option value="7"  {% if request.GET.expiry_within == '7' %}selected{% endif %}>Next 7 days</option>
+              <option value="15" {% if request.GET.expiry_within == '15' %}selected{% endif %}>Next 15 days</option>
+              <option value="30" {% if request.GET.expiry_within == '30' %}selected{% endif %}>Next 30 days</option>
+              <option value="60" {% if request.GET.expiry_within == '60' %}selected{% endif %}>Next 60 days</option>
+              <option value="0"  {% if request.GET.expiry_within == '0' %}selected{% endif %}>Already Expired</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Admission Date range -->
+        <div style="margin-top:18px">
+          <div class="flabel" style="margin-bottom:8px">Admission Date Range</div>
+          <div class="date-range" style="max-width:480px">
+            <div class="fgroup">
+              <input type="date" name="date_from" class="finput fselect" value="{{ request.GET.date_from }}" onchange="refreshCount()" placeholder="From">
+            </div>
+            <div class="date-sep">→</div>
+            <div class="fgroup">
+              <input type="date" name="date_to" class="finput fselect" value="{{ request.GET.date_to }}" onchange="refreshCount()" placeholder="To">
+            </div>
+          </div>
+        </div>
+
+        <!-- Fee range -->
+        <div style="margin-top:18px">
+          <div class="flabel" style="margin-bottom:8px">Fee Due Range (₹)</div>
+          <div class="range-row" style="max-width:340px">
+            <div class="fgroup">
+              <input type="number" name="fee_due_min" class="range-input" placeholder="Min ₹0" min="0" value="{{ request.GET.fee_due_min }}" onchange="refreshCount()">
+            </div>
+            <div class="fgroup">
+              <input type="number" name="fee_due_max" class="range-input" placeholder="Max ₹99999" min="0" value="{{ request.GET.fee_due_max }}" onchange="refreshCount()">
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /filter-body -->
+    </div><!-- /filter-section -->
+
+    <!-- ── Step 3: Columns ── -->
+    <div class="filter-section" style="margin-bottom:20px">
+      <div class="filter-section-head">
+        <span class="filter-section-title">Step 3 — Columns to Include</span>
+      </div>
+      <div class="col-picker">
+        <label class="col-check"><input type="checkbox" name="col_photo"       value="1" checked> Photo</label>
+        <label class="col-check"><input type="checkbox" name="col_id"          value="1" checked> Student ID</label>
+        <label class="col-check"><input type="checkbox" name="col_name"        value="1" checked> Full Name</label>
+        <label class="col-check"><input type="checkbox" name="col_sport"       value="1" checked> Sport</label>
+        <label class="col-check"><input type="checkbox" name="col_batch"       value="1" checked> Batch</label>
+        <label class="col-check"><input type="checkbox" name="col_level"       value="1" checked> Level</label>
+        <label class="col-check"><input type="checkbox" name="col_duration"    value="1" checked> Duration</label>
+        <label class="col-check"><input type="checkbox" name="col_coach"       value="1" checked> Coach</label>
+        <label class="col-check"><input type="checkbox" name="col_timeslot"    value="1" checked> Time Slot</label>
+        <label class="col-check"><input type="checkbox" name="col_contact"     value="1" checked> Contact</label>
+        <label class="col-check"><input type="checkbox" name="col_admission"   value="1" checked> Admission Date</label>
+        <label class="col-check"><input type="checkbox" name="col_expiry"      value="1" checked> Expiry Date</label>
+        <label class="col-check"><input type="checkbox" name="col_total_fee"   value="1" checked> Total Fee</label>
+        <label class="col-check"><input type="checkbox" name="col_fee_paid"    value="1" checked> Fee Paid</label>
+        <label class="col-check"><input type="checkbox" name="col_fee_due"     value="1" checked> Fee Due</label>
+        <label class="col-check"><input type="checkbox" name="col_fee_status"  value="1" checked> Fee Status</label>
+        <label class="col-check"><input type="checkbox" name="col_status"      value="1" checked> Student Status</label>
+        <label class="col-check"><input type="checkbox" name="col_parent"      value="1"> Parent Name</label>
+        <label class="col-check"><input type="checkbox" name="col_whatsapp"    value="1"> WhatsApp</label>
+        <label class="col-check"><input type="checkbox" name="col_gender"      value="1"> Gender</label>
+      </div>
+    </div>
+
+    <!-- ── Preview bar ── -->
+    <div class="preview-bar">
+      <div>
+        <div class="preview-count" id="preview-count">{{ total_count }} student{{ total_count|pluralize }} match</div>
+        <div class="preview-sub">Based on current filters</div>
+      </div>
+      <div class="preview-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="resetFilters()">↺ Reset</button>
+        <button type="submit" class="btn btn-pdf btn-lg" id="gen-btn" onclick="showLoading()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Generate PDF Report
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- Loading overlay -->
+<div class="loading" id="loading-overlay">
+  <div class="loading-box">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Generating your PDF report…</div>
+    <div style="font-size:12px;color:var(--ink-muted);margin-top:6px">This may take a few seconds</div>
+  </div>
+</div>
+
+<script>
+// ── Report type selection ──
+function syncType(radio) {
+  document.querySelectorAll('.rtype-card').forEach(c => c.classList.remove('selected'));
+  radio.closest('.rtype-card').classList.add('selected');
+  refreshCount();
+}
+
+// ── AJAX preview count ──
+let countTimer;
+function refreshCount() {
+  clearTimeout(countTimer);
+  countTimer = setTimeout(_fetchCount, 350);
+}
+
+function _fetchCount() {
+  const form = document.getElementById('report-form');
+  const params = new URLSearchParams(new FormData(form));
+  fetch(`{% url 'report_count' %}?${params}`)
+    .then(r => r.json())
+    .then(d => {
+      const n = d.count;
+      document.getElementById('preview-count').textContent =
+        `${n} student${n !== 1 ? 's' : ''} match`;
+      document.getElementById('filter-count-badge').textContent =
+        n > 0 ? `${n} records` : 'No matches';
+      document.getElementById('gen-btn').disabled = n === 0;
+    }).catch(() => {});
+}
+
+// ── Reset ──
+function resetFilters() {
+  const form = document.getElementById('report-form');
+  form.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+  form.querySelectorAll('input[type=date], input[type=number]').forEach(i => i.value = '');
+  refreshCount();
+}
+
+// ── Loading overlay ──
+function showLoading() {
+  setTimeout(() => {
+    document.getElementById('loading-overlay').classList.add('show');
+    setTimeout(() => document.getElementById('loading-overlay').classList.remove('show'), 8000);
+  }, 100);
+}
+
+// ── Initial count ──
+document.addEventListener('DOMContentLoaded', refreshCount);
+</script>
+{% endblock %}

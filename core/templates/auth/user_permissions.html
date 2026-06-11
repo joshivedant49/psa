@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Permissions — {{ target_user.full_name }}{% endblock %}
+{% block sb_users %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem;max-width:700px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:500;color:var(--ink)}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.user-banner{background:var(--ink);border-radius:var(--radius);padding:18px 22px;display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.ub-avatar{width:46px;height:46px;border-radius:50%;background:var(--gold-pale);color:var(--amber);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0}
+.ub-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--cream)}
+.ub-detail{font-size:12px;color:rgba(248,244,238,.45);margin-top:2px}
+.perm-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.perm-head{padding:16px 22px;background:#FDFCFA;border-bottom:1px solid var(--border)}
+.perm-head h2{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink)}
+.perm-head p{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.perm-grid{padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.perm-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--cream);transition:all .15s;cursor:pointer}
+.perm-item:hover{border-color:var(--border-mid);background:#fff}
+.perm-item.checked{border-color:var(--gold);background:var(--gold-pale)}
+.perm-left{display:flex;align-items:center;gap:12px}
+.perm-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(26,22,18,.06);flex-shrink:0}
+.perm-item.checked .perm-icon{background:rgba(196,151,58,.15)}
+.perm-name{font-weight:500;font-size:13.5px;color:var(--ink)}
+.perm-desc{font-size:11.5px;color:var(--ink-muted);margin-top:1px}
+.perm-toggle{width:42px;height:24px;position:relative;flex-shrink:0}
+.perm-toggle input{opacity:0;width:0;height:0;position:absolute}
+.perm-slider{position:absolute;inset:0;cursor:pointer;background:var(--cream-deeper);border-radius:24px;border:1px solid var(--border-mid);transition:all .2s}
+.perm-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--ink-muted);border-radius:50%;transition:all .2s}
+.perm-toggle input:checked+.perm-slider{background:var(--green);border-color:var(--green)}
+.perm-toggle input:checked+.perm-slider::before{transform:translateX(18px);background:#fff}
+.action-bar{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .18s;text-decoration:none}
+.btn-ghost{background:var(--cream-dark);color:var(--ink-soft)}.btn-ghost:hover{background:var(--cream-deeper)}
+.btn-ink{background:var(--ink);color:var(--gold)}.btn-ink:hover{background:#2e2a26}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
+    <a href="{% url 'user_list' %}">Users</a><span class="breadcrumb-sep">›</span>
+    <span>Permissions</span>
+  </div>
+  <div class="page-header">
+    <h1>Module Permissions</h1>
+    <p>Control which sections this coach can access</p>
+  </div>
+
+  <div class="user-banner">
+    <div class="ub-avatar">{{ target_user.full_name|slice:":2"|upper }}</div>
+    <div>
+      <div class="ub-name">{{ target_user.full_name }}</div>
+      <div class="ub-detail">@{{ target_user.username }} · Coach Account
+        {% if target_user.coach %} · {{ target_user.coach.coach_id }}{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="perm-card">
+      <div class="perm-head">
+        <h2>Module Access</h2>
+        <p>Toggle each module on or off for this coach</p>
+      </div>
+      <div class="perm-grid">
+        {% for mod, lbl, allowed in modules %}
+        {% with icons="🏠,👤,➕,📅,🔔,💰,📊,🧑‍🏫" %}
+        <div class="perm-item {% if allowed %}checked{% endif %}" id="pi-{{ mod }}" onclick="togglePerm('{{ mod }}', this)">
+          <div class="perm-left">
+            <div class="perm-icon">
+              {% if mod == 'dashboard' %}🏠
+              {% elif mod == 'student_list' %}👤
+              {% elif mod == 'student_admission' %}➕
+              {% elif mod == 'attendance' %}📅
+              {% elif mod == 'notifications' %}🔔
+              {% elif mod == 'fee_structure' %}💰
+              {% elif mod == 'reports' %}📊
+              {% elif mod == 'coach_list' %}🧑‍🏫
+              {% elif mod == 'Payments' %}💸
+              {% endif %}
+            </div>
+            <div>
+              <div class="perm-name">{{ lbl }}</div>
+              <div class="perm-desc">
+                {% if mod == 'dashboard' %}View the main dashboard
+                {% elif mod == 'student_list' %}Browse and search students
+                {% elif mod == 'student_admission' %}Admit new students
+                {% elif mod == 'attendance' %}Mark attendance & QR scan
+                {% elif mod == 'notifications' %}View expiry alerts
+                {% elif mod == 'fee_structure' %}View fee configuration
+                {% elif mod == 'reports' %}Access reports section
+                {% elif mod == 'coach_list' %}View coach directory
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <label class="perm-toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" name="modules" value="{{ mod }}" {% if allowed %}checked{% endif %} id="cb-{{ mod }}">
+            <span class="perm-slider"></span>
+          </label>
+        </div>
+        {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <a href="{% url 'user_list' %}" class="btn btn-ghost">← Back</a>
+      <button type="submit" class="btn btn-ink">✓ Save Permissions</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePerm(mod, item) {
+  const cb = document.getElementById('cb-' + mod);
+  cb.checked = !cb.checked;
+  item.classList.toggle('checked', cb.checked);
+}
+</script>
+{% endblock %}

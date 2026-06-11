@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}{{ coach.full_name }} — Pradip Sports Academy{% endblock %}
+{% block sb_coaches %}active{% endblock %}
+{% block nav_staff %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem;max-width:1000px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+
+/* Profile banner */
+.profile-banner{background:var(--ink);border-radius:var(--radius);padding:2rem 2rem 0;overflow:hidden;position:relative;margin-bottom:24px}
+.profile-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(196,151,58,.12)}
+.profile-banner::after{content:'';position:absolute;top:30px;right:80px;width:100px;height:100px;border-radius:50%;border:1px solid rgba(196,151,58,.07)}
+.profile-top{display:flex;align-items:flex-start;gap:22px;position:relative;z-index:1}
+.profile-avatar{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;background:var(--gold-pale);color:var(--amber);flex-shrink:0;overflow:hidden;border:3px solid rgba(196,151,58,.3)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{flex:1}
+.profile-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:500;color:var(--cream);letter-spacing:-.2px}
+.profile-id{font-size:12px;color:rgba(248,244,238,.4);margin-top:3px}
+.profile-sports{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.profile-sport-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:rgba(196,151,58,.15);border:1px solid rgba(196,151,58,.2);font-size:12px;font-weight:500;color:var(--gold-light)}
+.profile-actions{display:flex;gap:10px;align-self:flex-start;margin-left:auto}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s;text-decoration:none}
+.btn-gold{background:var(--gold);color:var(--ink)}.btn-gold:hover{background:#d4a84a}
+.btn-ghost-light{background:rgba(255,255,255,.08);color:rgba(248,244,238,.7);border:1px solid rgba(255,255,255,.1)}.btn-ghost-light:hover{background:rgba(255,255,255,.13)}
+
+/* Profile stats strip */
+.profile-stats{display:flex;border-top:1px solid rgba(255,255,255,.07);margin-top:1.5rem;position:relative;z-index:1}
+.profile-stat{flex:1;padding:16px 20px;border-right:1px solid rgba(255,255,255,.06);text-align:center}
+.profile-stat:last-child{border-right:none}
+.profile-stat-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--cream);line-height:1}
+.profile-stat-label{font-size:10.5px;color:rgba(248,244,238,.4);margin-top:4px;letter-spacing:.3px}
+
+/* Status badge */
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500}
+.status-active{background:var(--green-pale);color:var(--green)}.status-inactive{background:var(--cream-dark);color:var(--ink-muted)}
+.status-on_leave{background:var(--amber-pale);color:var(--amber)}.status-terminated{background:var(--red-pale);color:var(--red)}
+.status-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.status-active .status-dot{background:var(--green)}.status-inactive .status-dot{background:var(--ink-faint)}
+.status-on_leave .status-dot{background:var(--amber)}.status-terminated .status-dot{background:var(--red)}
+
+/* Two col */
+.detail-grid{display:grid;grid-template-columns:1fr 340px;gap:20px}
+
+/* Detail card */
+.detail-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.detail-card:last-child{margin-bottom:0}
+.detail-card-head{padding:13px 20px;background:var(--cream);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.detail-card-head h3{font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px}
+.detail-grid-inner{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.detail-item .detail-label{font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.detail-item .detail-val{font-size:13.5px;font-weight:500;color:var(--ink)}
+.detail-item .detail-val.muted{font-weight:400;color:var(--ink-soft)}
+
+/* Level chips */
+.level-tags{display:flex;flex-wrap:wrap;gap:6px;padding:14px 20px}
+.level-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;color:#fff}
+.level-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6)}
+
+/* Students table */
+.students-table{width:100%;border-collapse:collapse;font-size:13px}
+.students-table thead th{padding:10px 18px;text-align:left;font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;background:#FDFCFA;border-bottom:1px solid var(--border)}
+.students-table thead th:first-child{padding-left:20px}
+.students-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+.students-table tbody tr:last-child{border-bottom:none}
+.students-table tbody tr:hover{background:#FDFCFA}
+.students-table tbody td{padding:11px 18px;vertical-align:middle;color:var(--ink)}
+.students-table tbody td:first-child{padding-left:20px}
+.s-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;background:var(--gold-pale);color:var(--amber);flex-shrink:0}
+.s-cell{display:flex;align-items:center;gap:9px}
+.s-name{font-weight:500;font-size:13px}.s-id{font-size:11px;color:var(--ink-muted)}
+.empty-card{text-align:center;padding:36px 20px;color:var(--ink-muted);font-size:13px}
+.empty-card-icon{font-size:28px;margin-bottom:8px;opacity:.35}
+
+@media(max-width:900px){.detail-grid{grid-template-columns:1fr}.profile-top{flex-direction:column}.profile-actions{margin-left:0}.page-wrap{padding:1.5rem 1rem 3rem}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
+    <a href="{% url 'coach_list' %}">Coaches</a><span class="breadcrumb-sep">›</span>
+    <span>{{ coach.full_name }}</span>
+  </div>
+
+  <!-- Profile Banner -->
+  <div class="profile-banner">
+    <div class="profile-top">
+      <div class="profile-avatar">
+        {% if coach.photo %}<img src="{{ coach.photo.url }}" alt="{{ coach.full_name }}">
+        {% else %}{{ coach.initials }}{% endif %}
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">{{ coach.full_name }}</div>
+        <div class="profile-id">{{ coach.coach_id }} · Joined {{ coach.joining_date|date:"d M Y" }}</div>
+        <div class="profile-sports">
+          {% for s in coach.sports_coached.all %}
+            <span class="profile-sport-tag">{{ s.icon }} {{ s.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="profile-actions">
+        <a href="{% url 'coach_edit' coach.pk %}" class="btn btn-gold">✎ Edit Profile</a>
+        <span class="status-badge status-{{ coach.status }}">
+          <span class="status-dot"></span>{{ coach.status_label }}
+        </span>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="profile-stat-num">{{ students.count }}</div>
+        <div class="profile-stat-label">Active Students</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num">{{ coach.experience_years }}</div>
+        <div class="profile-stat-label">Years Experience</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num">{{ coach.sports_coached.count }}</div>
+        <div class="profile-stat-label">Sports Coached</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-num">₹{{ coach.salary_amount|floatformat:0 }}</div>
+        <div class="profile-stat-label">{{ coach.salary_label }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-grid">
+
+    <!-- Left: Details -->
+    <div>
+      <!-- Personal -->
+      <div class="detail-card">
+        <div class="detail-card-head"><h3>👤 Personal Details</h3></div>
+        <div class="detail-grid-inner">
+          <div class="detail-item"><div class="detail-label">Full Name</div><div class="detail-val">{{ coach.full_name }}</div></div>
+          <div class="detail-item"><div class="detail-label">Gender</div><div class="detail-val">{{ coach.get_gender_display }}</div></div>
+          <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-val">{{ coach.contact_number }}</div></div>
+          <div class="detail-item"><div class="detail-label">WhatsApp</div><div class="detail-val">{{ coach.whatsapp_number|default:"—" }}</div></div>
+          <div class="detail-item"><div class="detail-label">Email</div><div class="detail-val detail-val muted">{{ coach.email|default:"—" }}</div></div>
+          <div class="detail-item"><div class="detail-label">Date of Birth</div><div class="detail-val">{{ coach.dob|date:"d M Y"|default:"—" }}</div></div>
+          {% if coach.address %}<div class="detail-item" style="grid-column:span 2"><div class="detail-label">Address</div><div class="detail-val muted">{{ coach.address }}</div></div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Professional -->
+      <div class="detail-card">
+        <div class="detail-card-head"><h3>🏅 Professional Details</h3></div>
+        <div class="detail-grid-inner">
+          <div class="detail-item"><div class="detail-label">Employment</div><div class="detail-val">{{ coach.employment_label }}</div></div>
+          <div class="detail-item"><div class="detail-label">Experience</div><div class="detail-val">{{ coach.experience_years }} year{{ coach.experience_years|pluralize }}</div></div>
+          <div class="detail-item" style="grid-column:span 2"><div class="detail-label">Qualification</div><div class="detail-val muted">{{ coach.qualification|default:"—" }}</div></div>
+        </div>
+        {% if coach.expertise_levels.exists %}
+        <div class="level-tags">
+          {% for lv in coach.expertise_levels.all %}
+            <span class="level-tag" style="background:{{ lv.color_hex }}">
+              <span class="level-dot"></span>{{ lv.name }}
+            </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Emergency -->
+      {% if coach.emergency_name %}
+      <div class="detail-card">
+        <div class="detail-card-head"><h3>🆘 Emergency Contact</h3></div>
+        <div class="detail-grid-inner">
+          <div class="detail-item"><div class="detail-label">Name</div><div class="detail-val">{{ coach.emergency_name }}</div></div>
+          <div class="detail-item"><div class="detail-label">Relation</div><div class="detail-val">{{ coach.emergency_relation|default:"—" }}</div></div>
+          <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-val">{{ coach.emergency_phone }}</div></div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Notes -->
+      {% if coach.notes %}
+      <div class="detail-card">
+        <div class="detail-card-head"><h3>📝 Admin Notes</h3></div>
+        <div style="padding:14px 20px;font-size:13px;color:var(--ink-soft);line-height:1.6">{{ coach.notes }}</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Right: Students -->
+    <div>
+      <div class="detail-card">
+        <div class="detail-card-head">
+          <h3>👥 Assigned Students ({{ students.count }})</h3>
+        </div>
+        {% if students %}
+        <div style="overflow-x:auto">
+          <table class="students-table">
+            <thead><tr><th>Student</th><th>Sport</th><th>Expiry</th></tr></thead>
+            <tbody>
+              {% for s in students %}
+              <tr>
+                <td>
+                  <div class="s-cell">
+                    <div class="s-avatar">{{ s.initials }}</div>
+                    <div><div class="s-name">{{ s.full_name }}</div><div class="s-id">{{ s.student_id }}</div></div>
+                  </div>
+                </td>
+                <td><span style="font-size:13px">{{ s.sport.icon }} {{ s.sport.name }}</span></td>
+                <td style="font-size:12px;color:{% if s.days_until_expiry <= 7 %}var(--red){% else %}var(--ink-muted){% endif %}">
+                  {{ s.subscription_expiry|date:"d M Y" }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-card">
+          <div class="empty-card-icon">👥</div>
+          No students assigned yet.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

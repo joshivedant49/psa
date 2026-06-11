@@ -1,0 +1,687 @@
+{% extends "base.html" %}
+
+{% block title %}Sports Master — Pradip Sports Academy{% endblock %}
+
+{% block sb_masters_parent %}has-active{% endblock %}
+{% block sb_master_sports %}active{% endblock %}
+
+{% block extra_css %}
+/* ── Page wrapper ── */
+.page-wrap { padding: 2.5rem 2.5rem 4rem; }
+
+/* ── Page header ── */
+.page-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 2rem; padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.page-header-left h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 500; color: var(--ink);
+  letter-spacing: -0.3px; line-height: 1.2;
+}
+.page-header-left p { font-size: 13px; color: var(--ink-muted); margin-top: 5px; font-weight: 300; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-muted); margin-bottom: 8px; }
+.breadcrumb a { color: var(--ink-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--gold); }
+.breadcrumb-sep { color: var(--ink-faint); }
+
+/* ── Stats strip ── */
+.stats-strip { display: flex; gap: 14px; margin-bottom: 2rem; }
+.stat-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 20px;
+  flex: 1; transition: box-shadow 0.2s;
+}
+.stat-pill:hover { box-shadow: var(--shadow-sm); }
+.stat-pill-icon { font-size: 22px; }
+.stat-pill-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 600; color: var(--ink); line-height: 1;
+}
+.stat-pill-label { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+
+/* ── Two column layout ── */
+.master-layout { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
+
+/* ── Form card ── */
+.form-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  position: sticky; top: 80px;
+}
+.form-card-head {
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  background: var(--ink);
+  display: flex; align-items: center; gap: 12px;
+}
+.form-card-head-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(196,151,58,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.form-card-head h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px; font-weight: 500; color: var(--cream);
+}
+.form-card-head p { font-size: 11.5px; color: rgba(248,244,238,0.5); margin-top: 2px; }
+.form-body { padding: 22px; display: flex; flex-direction: column; gap: 18px; }
+
+/* ── Form fields ── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-size: 12px; font-weight: 500; color: var(--ink-soft);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.field-required::after { content: ' *'; color: var(--red); }
+.field input[type="text"],
+.field textarea,
+.field select {
+  padding: 10px 13px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-mid); background: var(--cream);
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; color: var(--ink);
+  outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.field input[type="text"]:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(196,151,58,0.12);
+  background: #fff;
+}
+.field textarea { resize: vertical; min-height: 80px; }
+
+/* Icon picker */
+.icon-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+}
+.icon-option {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; aspect-ratio: 1;
+  border: 1.5px solid var(--border-mid);
+  border-radius: var(--radius-sm); font-size: 20px;
+  cursor: pointer; transition: all 0.15s;
+  background: var(--cream);
+}
+.icon-option:hover { background: var(--gold-pale); border-color: var(--gold); transform: scale(1.08); }
+.icon-option.selected { background: var(--gold-pale); border-color: var(--gold); box-shadow: 0 0 0 2px rgba(196,151,58,0.25); }
+.icon-hidden { display: none; }
+
+/* Toggle switch */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; }
+.toggle-label { font-size: 13px; color: var(--ink-soft); }
+.toggle-switch { position: relative; width: 42px; height: 24px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0; cursor: pointer;
+  background: var(--cream-deeper); border-radius: 24px;
+  border: 1px solid var(--border-mid); transition: all 0.2s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; left: 3px; bottom: 3px;
+  background: var(--ink-muted); border-radius: 50%; transition: all 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--green); border-color: var(--green); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); background: #fff; }
+
+/* Submit btn */
+.submit-btn {
+  width: 100%; padding: 12px; border-radius: var(--radius-sm);
+  background: var(--ink); color: var(--gold);
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500;
+  border: none; cursor: pointer; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.submit-btn:hover { background: #2e2a26; }
+.submit-btn.edit-mode { background: var(--blue); color: #fff; }
+.submit-btn.edit-mode:hover { background: #235880; }
+.cancel-edit-btn {
+  width: 100%; padding: 10px; border-radius: var(--radius-sm);
+  background: transparent; color: var(--ink-muted);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+  border: 1px solid var(--border-mid); cursor: pointer; transition: all 0.15s;
+  display: none;
+}
+.cancel-edit-btn:hover { background: var(--cream-dark); color: var(--ink); }
+
+/* ── Alerts ── */
+.alert {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 13px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; margin-bottom: 1.5rem;
+  animation: slideDown 0.3s ease;
+}
+@keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.alert-success { background: var(--green-pale); color: var(--green); border: 1px solid rgba(58,122,82,0.2); }
+.alert-error   { background: var(--red-pale);   color: var(--red);   border: 1px solid rgba(184,64,64,0.2); }
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-close { margin-left: auto; cursor: pointer; opacity: 0.6; font-size: 16px; flex-shrink: 0; line-height: 1; }
+.alert-close:hover { opacity: 1; }
+
+/* ── List card ── */
+.list-card {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.list-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px; border-bottom: 1px solid var(--border); background: #FDFCFA;
+}
+.list-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 500; color: var(--ink);
+}
+.list-card-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+.search-box {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 12px;
+}
+.search-box input {
+  border: none; background: transparent; outline: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--ink); width: 180px;
+}
+.search-box input::placeholder { color: var(--ink-muted); }
+
+/* ── Sports table ── */
+.sports-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sports-table thead th {
+  padding: 10px 18px; text-align: left;
+  font-size: 10.5px; font-weight: 600; color: var(--ink-muted);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  background: #FDFCFA; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.sports-table thead th:first-child { padding-left: 22px; }
+.sports-table thead th:last-child  { padding-right: 22px; text-align: right; }
+.sports-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  animation: fadeRow 0.3s ease both;
+  opacity: 0;
+}
+.sports-table tbody tr:last-child { border-bottom: none; }
+.sports-table tbody tr:hover { background: #FDFCFA; }
+@keyframes fadeRow { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.sports-table tbody td { padding: 14px 18px; vertical-align: middle; color: var(--ink); }
+.sports-table tbody td:first-child { padding-left: 22px; }
+.sports-table tbody td:last-child  { padding-right: 22px; text-align: right; }
+
+/* Sport name cell */
+.sport-name-cell { display: flex; align-items: center; gap: 12px; }
+.sport-icon-circle {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--gold-pale); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.sport-name-main { font-weight: 500; font-size: 13.5px; color: var(--ink); }
+.sport-desc-preview { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 500; cursor: pointer;
+  transition: opacity 0.15s; border: none; font-family: 'DM Sans', sans-serif;
+}
+.status-badge:hover { opacity: 0.75; }
+.badge-active   { background: var(--green-pale); color: var(--green); }
+.badge-inactive { background: var(--cream-dark); color: var(--ink-muted); }
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.badge-active .badge-dot   { background: var(--green); }
+.badge-inactive .badge-dot { background: var(--ink-faint); }
+
+/* Date cell */
+.date-cell { font-size: 12px; color: var(--ink-muted); }
+
+/* Action buttons */
+.action-group { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+.act-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border-mid); background: #fff;
+  color: var(--ink-soft); font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+}
+.act-btn:hover { background: var(--cream); }
+.act-btn-edit:hover  { border-color: var(--blue); color: var(--blue); background: var(--blue-pale); }
+.act-btn-delete:hover { border-color: var(--red); color: var(--red); background: var(--red-pale); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 56px 24px; color: var(--ink-muted); }
+.empty-icon  { font-size: 40px; margin-bottom: 14px; opacity: 0.35; }
+.empty-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--ink-soft); margin-bottom: 6px; }
+.empty-sub   { font-size: 13px; font-weight: 300; }
+
+/* Table footer */
+.table-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 22px; border-top: 1px solid var(--border);
+  background: #FDFCFA; font-size: 12px; color: var(--ink-muted);
+}
+
+/* ── Delete confirm modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(26,22,18,0.45);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: #fff; border-radius: var(--radius);
+  padding: 28px 28px 22px; max-width: 400px; width: 90%;
+  transform: scale(0.95); transition: transform 0.2s;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-icon  { font-size: 36px; margin-bottom: 12px; }
+.modal-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; color: var(--ink); margin-bottom: 8px; }
+.modal-body  { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 22px; }
+.modal-body strong { color: var(--ink); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-btn {
+  padding: 9px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; border: none; transition: all 0.15s;
+}
+.modal-btn-cancel { background: var(--cream-dark); color: var(--ink-soft); }
+.modal-btn-cancel:hover { background: var(--cream-deeper); }
+.modal-btn-delete { background: var(--red); color: #fff; }
+.modal-btn-delete:hover { background: #9e3535; }
+
+/* ── Toast notification ── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 600;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--ink); color: var(--cream);
+  padding: 13px 18px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 400;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none; max-width: 340px;
+}
+.toast.show { transform: translateY(0); opacity: 1; pointer-events: all; }
+.toast-icon { font-size: 16px; flex-shrink: 0; }
+
+@media (max-width: 1100px) {
+  .master-layout { grid-template-columns: 1fr; }
+  .form-card { position: static; }
+}
+@media (max-width: 900px) {
+  .page-wrap { padding: 1.5rem 1rem 3rem; }
+  .stats-strip { flex-direction: column; }
+}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Masters</span>
+    <span class="breadcrumb-sep">›</span>
+    <span>Sports Master</span>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Sports Master</h1>
+      <p>Manage all sports offered at the academy — add, edit or deactivate sports anytime</p>
+    </div>
+  </div>
+
+  <!-- Django Messages as Alerts -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <span class="alert-icon">{% if message.tags == 'success' %}✓{% else %}✕{% endif %}</span>
+        <span>{{ message }}</span>
+        <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Stats Strip -->
+  <div class="stats-strip">
+    <div class="stat-pill">
+      <span class="stat-pill-icon">🏅</span>
+      <div>
+        <div class="stat-pill-num">{{ total }}</div>
+        <div class="stat-pill-label">Total Sports</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-icon">✅</span>
+      <div>
+        <div class="stat-pill-num">{{ active_count }}</div>
+        <div class="stat-pill-label">Active Sports</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-pill-icon">🔒</span>
+      <div>
+        <div class="stat-pill-num">{{ total|add:"-"|add:active_count }}</div>
+        <div class="stat-pill-label">Inactive Sports</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="master-layout">
+
+    <!-- ── ADD / EDIT FORM ── -->
+    <div class="form-card" id="sport-form-card">
+      <div class="form-card-head">
+        <div class="form-card-head-icon">🏸</div>
+        <div>
+          <h2 id="form-title">Add New Sport</h2>
+          <p id="form-subtitle">Fill in the details below</p>
+        </div>
+      </div>
+
+      <form class="form-body" method="POST" action="{% url 'sports_master' %}" id="sport-form">
+        {% csrf_token %}
+        <input type="hidden" name="_method" id="form-method" value="POST">
+        <input type="hidden" name="edit_id"  id="edit-id"    value="">
+
+        <!-- Sport Name -->
+        <div class="field">
+          <label class="field-required" for="sport-name">Sport Name</label>
+          <input type="text" id="sport-name" name="name" placeholder="e.g. Badminton" autocomplete="off" required>
+        </div>
+
+        <!-- Icon Picker -->
+        <div class="field">
+          <label>Icon</label>
+          <input type="hidden" name="icon" id="selected-icon" value="🏸">
+          <div class="icon-grid" id="icon-grid">
+            {% for icon, label in icon_choices %}
+            <div class="icon-option {% if forloop.first %}selected{% endif %}"
+                 data-icon="{{ icon }}" title="{{ label }}"
+                 onclick="selectIcon(this)">{{ icon }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+          <label for="sport-desc">Description <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <textarea id="sport-desc" name="description" placeholder="Brief description of this sport…"></textarea>
+        </div>
+
+        <!-- Active Toggle -->
+        <div class="field">
+          <div class="toggle-row">
+            <span class="toggle-label">Mark as Active</span>
+            <label class="toggle-switch">
+              <input type="checkbox" name="is_active" id="is-active-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <span>＋</span> Add Sport
+        </button>
+        <button type="button" class="cancel-edit-btn" id="cancel-edit-btn" onclick="cancelEdit()">
+          Cancel Edit
+        </button>
+      </form>
+    </div>
+
+    <!-- ── SPORTS LIST ── -->
+    <div class="list-card">
+      <div class="list-card-head">
+        <div>
+          <div class="list-card-title">All Sports</div>
+          <div class="list-card-sub" id="list-sub">{{ total }} sport{{ total|pluralize }} registered</div>
+        </div>
+        <div class="search-box">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search sports…" oninput="filterSports()">
+        </div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="sports-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Sport</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Added On</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sports-tbody">
+            {% for sport in sports %}
+            <tr id="row-{{ sport.pk }}"
+                data-name="{{ sport.name|lower }}"
+                style="animation-delay:{{ forloop.counter0 }}00ms">
+              <td style="color:var(--ink-muted);font-size:12px">{{ forloop.counter }}</td>
+              <td>
+                <div class="sport-name-cell">
+                  <div class="sport-icon-circle">{{ sport.icon }}</div>
+                  <div>
+                    <div class="sport-name-main">{{ sport.name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="sport-desc-preview">
+                  {% if sport.description %}{{ sport.description }}{% else %}<span style="color:var(--ink-faint);font-style:italic">No description</span>{% endif %}
+                </span>
+              </td>
+              <td>
+                <button class="status-badge {% if sport.is_active %}badge-active{% else %}badge-inactive{% endif %}"
+                        id="status-{{ sport.pk }}"
+                        onclick="toggleStatus({{ sport.pk }}, this)"
+                        title="Click to toggle status">
+                  <span class="badge-dot"></span>
+                  <span class="badge-label">{% if sport.is_active %}Active{% else %}Inactive{% endif %}</span>
+                </button>
+              </td>
+              <td class="date-cell">{{ sport.created_at|date:"d M Y" }}</td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-btn-edit"
+                    onclick="loadEdit({{ sport.pk }}, '{{ sport.name|escapejs }}', '{{ sport.icon|escapejs }}', `{{ sport.description|escapejs }}`, {{ sport.is_active|yesno:'true,false' }})">
+                    ✎ Edit
+                  </button>
+                  <button class="act-btn act-btn-delete"
+                    onclick="confirmDelete({{ sport.pk }}, '{{ sport.name|escapejs }}')">
+                    ✕ Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr id="empty-row">
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon">🏸</div>
+                  <div class="empty-title">No sports added yet</div>
+                  <div class="empty-sub">Use the form on the left to add your first sport</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="footer-count">Showing {{ total }} sport{{ total|pluralize }}</span>
+        <span>Pradip Sports Academy — Masters</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Delete Sport?</div>
+    <div class="modal-body">
+      Are you sure you want to delete <strong id="delete-sport-name"></strong>?
+      This action cannot be undone and may affect existing student enrollments.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <form method="POST" id="delete-form" style="margin:0">
+        {% csrf_token %}
+        <button type="submit" class="modal-btn modal-btn-delete">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ── Icon picker ─────────────────────────────── */
+function selectIcon(el) {
+  document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('selected-icon').value = el.dataset.icon;
+}
+
+/* ── Load edit ───────────────────────────────── */
+function loadEdit(pk, name, icon, description, isActive) {
+  // Populate form fields
+  document.getElementById('sport-name').value      = name;
+  document.getElementById('sport-desc').value      = description;
+  document.getElementById('is-active-toggle').checked = isActive;
+  document.getElementById('selected-icon').value   = icon;
+  document.getElementById('edit-id').value         = pk;
+
+  // Highlight correct icon
+  document.querySelectorAll('.icon-option').forEach(o => {
+    o.classList.toggle('selected', o.dataset.icon === icon);
+  });
+
+  // Change form action to edit URL
+  const form = document.getElementById('sport-form');
+  form.action = `/masters/sports/${pk}/edit/`;
+
+  // Update UI
+  document.getElementById('form-title').textContent    = 'Edit Sport';
+  document.getElementById('form-subtitle').textContent = `Editing: ${name}`;
+  document.getElementById('submit-btn').textContent    = '✎  Save Changes';
+  document.getElementById('submit-btn').classList.add('edit-mode');
+  document.getElementById('cancel-edit-btn').style.display = 'block';
+
+  // Scroll to form smoothly
+  document.getElementById('sport-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Cancel edit ─────────────────────────────── */
+function cancelEdit() {
+  document.getElementById('sport-form').reset();
+  document.getElementById('sport-form').action = "{% url 'sports_master' %}";
+  document.getElementById('selected-icon').value = '🏸';
+  document.querySelectorAll('.icon-option').forEach((o, i) => o.classList.toggle('selected', i === 0));
+  document.getElementById('form-title').textContent    = 'Add New Sport';
+  document.getElementById('form-subtitle').textContent = 'Fill in the details below';
+  document.getElementById('submit-btn').textContent    = '＋ Add Sport';
+  document.getElementById('submit-btn').classList.remove('edit-mode');
+  document.getElementById('cancel-edit-btn').style.display = 'none';
+  document.getElementById('edit-id').value = '';
+}
+
+/* ── Delete modal ────────────────────────────── */
+function confirmDelete(pk, name) {
+  document.getElementById('delete-sport-name').textContent = name;
+  document.getElementById('delete-form').action = `/masters/sports/${pk}/delete/`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+}
+document.getElementById('delete-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteModal();
+});
+
+/* ── Toggle status via AJAX ──────────────────── */
+function toggleStatus(pk, btn) {
+  fetch(`/masters/sports/${pk}/toggle/`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json' },
+  })
+  .then(r => r.json())
+  .then(data => {
+    const isActive = data.is_active;
+    btn.className = `status-badge ${isActive ? 'badge-active' : 'badge-inactive'}`;
+    btn.querySelector('.badge-label').textContent = isActive ? 'Active' : 'Inactive';
+    showToast(data.message, isActive ? '✓' : '○');
+  });
+}
+
+/* ── Search / filter ─────────────────────────── */
+function filterSports() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const rows = document.querySelectorAll('#sports-tbody tr[id^="row-"]');
+  let visible = 0;
+  rows.forEach(row => {
+    const match = row.dataset.name.includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('footer-count').textContent = `Showing ${visible} sport${visible !== 1 ? 's' : ''}`;
+}
+
+/* ── Toast ───────────────────────────────────── */
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent  = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ── CSRF helper ─────────────────────────────── */
+function getCookie(name) {
+  let v = null;
+  document.cookie.split(';').forEach(c => {
+    const [k, val] = c.trim().split('=');
+    if (k === name) v = decodeURIComponent(val);
+  });
+  return v;
+}
+
+/* ── Auto-dismiss django alerts after 5s ─────── */
+document.querySelectorAll('.alert').forEach(a => {
+  setTimeout(() => { a.style.opacity='0'; a.style.transition='opacity 0.4s'; setTimeout(()=>a.remove(),400); }, 5000);
+});
+
+/* ── Show toast for django success messages ──── */
+{% if messages %}
+  {% for message in messages %}
+    {% if message.tags == 'success' %}
+      window.addEventListener('DOMContentLoaded', () => showToast('{{ message|escapejs }}', '✓'));
+    {% endif %}
+  {% endfor %}
+{% endif %}
+</script>
+{% endblock %}

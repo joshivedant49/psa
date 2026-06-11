@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% block title %}Admission Confirmed — {{ student.full_name }}{% endblock %}
+{% block sb_students %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap { padding: 2.5rem 2.5rem 4rem; max-width: 900px; }
+.breadcrumb { display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px }
+.breadcrumb a { color:var(--ink-muted);text-decoration:none }
+.breadcrumb a:hover { color:var(--gold) }
+.breadcrumb-sep { color:var(--ink-faint) }
+
+/* ── Success banner ── */
+.success-banner {
+  background:var(--ink);border-radius:var(--radius);padding:2.5rem;
+  display:flex;align-items:center;gap:24px;margin-bottom:2rem;
+  position:relative;overflow:hidden;
+}
+.success-banner::before {
+  content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;
+  border-radius:50%;border:1px solid rgba(196,151,58,.15);
+}
+.success-banner::after {
+  content:'';position:absolute;top:20px;right:60px;width:100px;height:100px;
+  border-radius:50%;border:1px solid rgba(196,151,58,.08);
+}
+.success-tick { width:60px;height:60px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;z-index:1 }
+.success-text { z-index:1 }
+.success-text h2 { font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--cream) }
+.success-text p { font-size:13px;color:rgba(248,244,238,.55);margin-top:6px }
+.success-id { margin-left:auto;text-align:right;z-index:1 }
+.success-id-label { font-size:11px;color:rgba(248,244,238,.4);text-transform:uppercase;letter-spacing:.6px }
+.success-id-val { font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--gold);margin-top:4px }
+
+/* ── Two column layout ── */
+.confirm-grid { display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start }
+
+/* ── Details card ── */
+.details-card { background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden }
+.details-section { border-bottom:1px solid var(--border) }
+.details-section:last-child { border-bottom:none }
+.details-section-head { padding:13px 20px;background:var(--cream);display:flex;align-items:center;gap:8px }
+.details-section-head h3 { font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px }
+.details-grid { padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px }
+.detail-item {}
+.detail-label { font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px }
+.detail-val { font-size:13.5px;font-weight:500;color:var(--ink) }
+.detail-val.tag-val { display:inline-flex;padding:3px 10px;border-radius:20px;font-size:12px }
+
+/* ── Fee summary ── */
+.fee-summary { background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px }
+.fee-summary-head { padding:14px 20px;background:var(--ink);display:flex;align-items:center;gap:8px }
+.fee-summary-head h3 { font-size:13px;font-weight:500;color:var(--gold);font-family:'Playfair Display',serif }
+.fee-row-s { display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px }
+.fee-row-s:last-child { border-bottom:none }
+.fee-row-label-s { color:var(--ink-muted) }
+.fee-row-val-s { font-weight:500;color:var(--ink) }
+.fee-row-s.total-row { background:var(--green-pale) }
+.fee-row-s.total-row .fee-row-label-s { color:var(--green);font-weight:600 }
+.fee-row-s.total-row .fee-row-val-s { font-family:'Playfair Display',serif;font-size:18px;color:var(--green);font-weight:600 }
+.fee-row-s.due-row .fee-row-val-s { color:var(--red) }
+
+/* ── ID Card ── */
+.id-card-wrapper { position:sticky;top:80px }
+.id-card-title { font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between }
+.download-btn { display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .18s }
+.download-btn:hover { background:#2e2a26 }
+
+/* The actual ID card — printed/exported exactly as shown */
+.id-card {
+  width:340px;background:#fff;border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);overflow:hidden;
+  font-family:'DM Sans',sans-serif;
+}
+.id-card-header {
+  background:var(--ink);padding:18px 20px 14px;
+  display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden;
+}
+.id-card-header::after {
+  content:'';position:absolute;top:-20px;right:-20px;width:90px;height:90px;
+  border-radius:50%;border:1px solid rgba(196,151,58,.2);
+}
+.id-card-logo { width:34px;height:34px;border-radius:7px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;z-index:1 }
+.id-card-academy { z-index:1 }
+.id-card-academy-name { font-family:'Playfair Display',serif;font-size:13px;font-weight:500;color:var(--cream) }
+.id-card-academy-sub  { font-size:10px;color:rgba(248,244,238,.5);margin-top:1px }
+.id-card-type { margin-left:auto;z-index:1;background:rgba(196,151,58,.2);border:1px solid rgba(196,151,58,.3);border-radius:4px;padding:2px 8px;font-size:9px;font-weight:600;color:var(--gold-light);letter-spacing:.5px;text-transform:uppercase }
+
+.id-card-body { padding:18px 20px }
+.id-card-student { display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border) }
+.id-card-photo { width:60px;height:60px;border-radius:50%;background:var(--cream-dark);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0 }
+.id-card-photo img { width:100%;height:100%;object-fit:cover }
+.id-card-name { font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink) }
+.id-card-sid  { font-size:11px;color:var(--ink-muted);margin-top:2px }
+.id-card-sport-badge { display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:20px;background:var(--gold-pale);color:var(--amber);font-size:11px;font-weight:500 }
+
+.id-card-fields { display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px }
+.id-field-label { font-size:9.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px }
+.id-field-val   { font-size:11.5px;font-weight:500;color:var(--ink);margin-top:2px }
+
+.id-card-qr-row { display:flex;align-items:center;gap:14px;padding-top:14px;border-top:1px solid var(--border) }
+.id-card-qr { width:70px;height:70px;flex-shrink:0 }
+.id-card-qr-info { flex:1 }
+.id-card-qr-label  { font-size:9px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px }
+.id-card-qr-id     { font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--ink);margin-top:2px }
+.id-card-qr-expiry { font-size:10px;color:var(--ink-muted);margin-top:3px }
+.id-card-qr-expiry strong { color:var(--red) }
+
+.id-card-footer { background:var(--ink);padding:9px 20px;text-align:center;font-size:9px;color:rgba(248,244,238,.4);letter-spacing:.3px }
+
+/* action buttons */
+.action-row { display:flex;gap:12px;margin-top:20px;flex-wrap:wrap }
+.btn { display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .18s;text-decoration:none }
+.btn-outline { background:transparent;border:1px solid var(--border-mid);color:var(--ink-soft) }
+.btn-outline:hover { background:var(--cream-dark) }
+.btn-ink { background:var(--ink);color:var(--gold) }
+.btn-ink:hover { background:#2e2a26 }
+.btn-gold { background:var(--gold);color:var(--ink) }
+.btn-gold:hover { background:#d4a84a }
+
+@media(max-width:900px){.confirm-grid{grid-template-columns:1fr}.id-card-wrapper{position:static}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="#">Students</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Admission Confirmed</span>
+  </div>
+
+  <!-- Success Banner -->
+  <div class="success-banner">
+    <div class="success-tick">✓</div>
+    <div class="success-text">
+      <h2>Admission Confirmed!</h2>
+      <p>{{ student.full_name }} has been successfully enrolled at Pradip Sports Academy.</p>
+    </div>
+    <div class="success-id">
+      <div class="success-id-label">Student ID</div>
+      <div class="success-id-val">{{ student.student_id }}</div>
+    </div>
+  </div>
+
+  <div class="confirm-grid">
+
+    <!-- Left: Details + Fee Summary -->
+    <div>
+
+      <!-- Details Card -->
+      <div class="details-card" style="margin-bottom:20px">
+
+        <div class="details-section">
+          <div class="details-section-head"><h3>👤 Personal Details</h3></div>
+          <div class="details-grid">
+            <div class="detail-item"><div class="detail-label">Full Name</div><div class="detail-val">{{ student.full_name }}</div></div>
+            <div class="detail-item"><div class="detail-label">Date of Birth</div><div class="detail-val">{{ student.dob|date:"d M Y" }}</div></div>
+            <div class="detail-item"><div class="detail-label">Gender</div><div class="detail-val">{{ student.get_gender_display }}</div></div>
+            <div class="detail-item"><div class="detail-label">Blood Group</div><div class="detail-val">{{ student.blood_group }}</div></div>
+            <div class="detail-item"><div class="detail-label">Contact</div><div class="detail-val">{{ student.contact_number }}</div></div>
+            <div class="detail-item"><div class="detail-label">Email</div><div class="detail-val">{{ student.email|default:"—" }}</div></div>
+            <div class="detail-item" style="grid-column:span 2"><div class="detail-label">Address</div><div class="detail-val">{{ student.address }}</div></div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-section-head"><h3>👨‍👩‍👦 Parent / Guardian</h3></div>
+          <div class="details-grid">
+            <div class="detail-item"><div class="detail-label">Name</div><div class="detail-val">{{ student.parent_name }}</div></div>
+            <div class="detail-item"><div class="detail-label">Relation</div><div class="detail-val">{{ student.parent_relation }}</div></div>
+            <div class="detail-item"><div class="detail-label">WhatsApp</div><div class="detail-val">{{ student.parent_whatsapp }}</div></div>
+            <div class="detail-item"><div class="detail-label">Email</div><div class="detail-val">{{ student.parent_email|default:"—" }}</div></div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-section-head"><h3>🏅 Sport Admission</h3></div>
+          <div class="details-grid">
+            <div class="detail-item"><div class="detail-label">Sport</div><div class="detail-val">{{ student.sport.icon }} {{ student.sport.name }}</div></div>
+            <div class="detail-item"><div class="detail-label">Batch</div><div class="detail-val">{{ student.batch.name }}</div></div>
+            <div class="detail-item"><div class="detail-label">Expertise Level</div><div class="detail-val"><span class="tag-val" style="background:{{ student.expertise_level.color_hex }}20;color:{{ student.expertise_level.color_hex }}">{{ student.expertise_level.name }}</span></div></div>
+            <div class="detail-item"><div class="detail-label">Duration</div><div class="detail-val">{{ student.duration.name }}</div></div>
+            <div class="detail-item"><div class="detail-label">Admission Date</div><div class="detail-val">{{ student.admission_date|date:"d M Y" }}</div></div>
+            <div class="detail-item"><div class="detail-label">Expiry Date</div><div class="detail-val" style="color:var(--red)">{{ student.subscription_expiry|date:"d M Y" }}</div></div>
+            {% if student.time_slot %}<div class="detail-item"><div class="detail-label">Time Slot</div><div class="detail-val">{{ student.time_slot }}</div></div>{% endif %}
+          </div>
+        </div>
+
+      </div><!-- /details-card -->
+
+      <!-- Fee Summary -->
+      <div class="fee-summary">
+        <div class="fee-summary-head"><h3>💰 Fee Summary</h3></div>
+        <div class="fee-row-s">
+          <span class="fee-row-label-s">Total Fee</span>
+          <span class="fee-row-val-s">₹{{ student.total_fee|floatformat:0 }}</span>
+        </div>
+        <div class="fee-row-s total-row">
+          <span class="fee-row-label-s">Amount Paid</span>
+          <span class="fee-row-val-s">₹{{ student.fee_paid|floatformat:0 }}</span>
+        </div>
+        {% if student.fee_due > 0 %}
+        <div class="fee-row-s due-row">
+          <span class="fee-row-label-s">Balance Due</span>
+          <span class="fee-row-val-s">₹{{ student.fee_due|floatformat:0 }}</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-row">
+        <a href="{% url 'student_admission' %}" class="btn btn-gold">＋ New Admission</a>
+        <a href="{% url 'home' %}" class="btn btn-outline">← Dashboard</a>
+        <button class="btn btn-ink" onclick="window.print()">🖨 Print Page</button>
+      </div>
+
+    </div>
+
+    <!-- Right: ID Card -->
+    <div class="id-card-wrapper">
+      <div class="id-card-title">
+        Student ID Card
+        <button class="download-btn" onclick="downloadIDCard()">
+          ↓ Download PDF
+        </button>
+      </div>
+
+      <!-- The ID Card (id="id-card" used by jsPDF html) -->
+      <div class="id-card" id="id-card">
+
+        <div class="id-card-header">
+          <div class="id-card-logo">🏅</div>
+          <div class="id-card-academy">
+            <div class="id-card-academy-name">Pradip Sports Academy</div>
+            <div class="id-card-academy-sub">Student Identification Card</div>
+          </div>
+          <div class="id-card-type">Member</div>
+        </div>
+
+        <div class="id-card-body">
+          <div class="id-card-student">
+            <div class="id-card-photo">
+              {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="{{ student.full_name }}">
+              {% else %}
+                {{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}
+              {% endif %}
+            </div>
+            <div>
+              <div class="id-card-name">{{ student.full_name }}</div>
+              <div class="id-card-sid">{{ student.student_id }}</div>
+              <div class="id-card-sport-badge">{{ student.sport.icon }} {{ student.sport.name }}</div>
+            </div>
+          </div>
+
+          <div class="id-card-fields">
+            <div>
+              <div class="id-field-label">Batch</div>
+              <div class="id-field-val">{{ student.batch.name }}</div>
+            </div>
+            <div>
+              <div class="id-field-label">Level</div>
+              <div class="id-field-val">{{ student.expertise_level.name }}</div>
+            </div>
+            <div>
+              <div class="id-field-label">Contact</div>
+              <div class="id-field-val">{{ student.contact_number }}</div>
+            </div>
+            <div>
+              <div class="id-field-label">Blood Group</div>
+              <div class="id-field-val">{{ student.blood_group }}</div>
+            </div>
+            <div>
+              <div class="id-field-label">Enrolled On</div>
+              <div class="id-field-val">{{ student.admission_date|date:"d M Y" }}</div>
+            </div>
+            <div>
+              <div class="id-field-label">Duration</div>
+              <div class="id-field-val">{{ student.duration.name }}</div>
+            </div>
+          </div>
+
+          <div class="id-card-qr-row">
+            <div id="qrcode" class="id-card-qr"></div>
+            <div class="id-card-qr-info">
+              <div class="id-card-qr-label">Scan to verify</div>
+              <div class="id-card-qr-id">{{ student.student_id }}</div>
+              <div class="id-card-qr-expiry">
+                Valid until <strong>{{ student.subscription_expiry|date:"d M Y" }}</strong>
+              </div>
+              {% if student.time_slot %}
+              <div class="id-card-qr-expiry" style="margin-top:3px">🕐 {{ student.time_slot }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="id-card-footer">
+          Pradip Sports Academy · {{ student.student_id }} · Valid until {{ student.subscription_expiry|date:"d M Y" }}
+        </div>
+
+      </div><!-- /id-card -->
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- jsPDF for download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+/* ── Generate QR Code ────────────────────── */
+const studentId  = "{{ student.student_id }}";
+const studentName= "{{ student.full_name|escapejs }}";
+const sport      = "{{ student.sport.name|escapejs }}";
+const expiry     = "{{ student.subscription_expiry|date:'Y-m-d' }}";
+
+//const qrData = `${studentId} | ${studentName} | ${sport} | Valid: {{ student.subscription_expiry|date:"d M Y" }}`;
+const qrData = JSON.stringify({ type: "student", id: studentId });
+
+
+// Draw QR on canvas
+document.addEventListener("DOMContentLoaded", function () {
+
+  new QRCode(document.getElementById("qrcode"), {
+    text: qrData,
+    width: 70,
+    height: 70,
+    colorDark: "#1A1612",
+    colorLight: "#FFFFFF",
+    correctLevel: QRCode.CorrectLevel.L   // L = least dense, fastest scan
+});
+});
+
+/* ── Download ID Card as PDF ─────────────── */
+function downloadIDCard() {
+  const btn = document.querySelector('.download-btn');
+  btn.textContent = '⏳ Generating…';
+  btn.disabled = true;
+
+  const card = document.getElementById('id-card');
+
+  html2canvas(card, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: '#fff',
+    logging: false,
+  }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+
+    const imgData   = canvas.toDataURL('image/jpeg', 0.95);
+    const cardW_px  = canvas.width;
+    const cardH_px  = canvas.height;
+
+    // Convert to mm (96 DPI → mm)
+    const ratio  = 210 / (cardW_px / 3 * (25.4 / 96));  // fit to A4 width
+    const pdfW   = (cardW_px / 3) * (25.4 / 96);
+    const pdfH   = (cardH_px / 3) * (25.4 / 96);
+
+    const doc = new jsPDF({
+      orientation: pdfH > pdfW ? 'portrait' : 'landscape',
+      unit: 'mm',
+      format: [pdfW + 20, pdfH + 30],
+    });
+
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+
+    // Dark background
+    doc.setFillColor(248, 244, 238);
+    doc.rect(0, 0, pageW, pageH, 'F');
+
+    // Centered card image
+    const x = (pageW - pdfW) / 2;
+    const y = (pageH - pdfH) / 2;
+    doc.addImage(imgData, 'JPEG', x, y, pdfW, pdfH);
+
+    // Footer
+    doc.setFontSize(7);
+    doc.setTextColor(138, 132, 128);
+    doc.text('Pradip Sports Academy — Official Student ID Card', pageW/2, pageH - 5, {align:'center'});
+
+    doc.save(`ID-Card-${studentId}.pdf`);
+
+    btn.textContent = '✓ Downloaded!';
+    setTimeout(() => { btn.textContent = '↓ Download PDF'; btn.disabled = false; }, 2500);
+  }).catch(err => {
+    console.error(err);
+    btn.textContent = '↓ Download PDF';
+    btn.disabled = false;
+  });
+}
+</script>
+{% endblock %}

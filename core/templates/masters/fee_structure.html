@@ -1,0 +1,710 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Structure Master — Pradip Sports Academy{% endblock %}
+
+{% block sb_masters_parent %}has-active{% endblock %}
+{% block sb_master_fees %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}
+.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-0.3px;line-height:1.2}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem;animation:slideDown .3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.alert-success{background:var(--green-pale);color:var(--green);border:1px solid rgba(58,122,82,.2)}
+.alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:16px;flex-shrink:0;line-height:1}
+.alert-close:hover{opacity:1}
+
+/* stats */
+.stats-strip{display:flex;gap:14px;margin-bottom:2rem}
+.stat-pill{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;flex:1;transition:box-shadow .2s}
+.stat-pill:hover{box-shadow:var(--shadow-sm)}
+.stat-pill-icon{font-size:22px}
+.stat-pill-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--ink);line-height:1}
+.stat-pill-label{font-size:11.5px;color:var(--ink-muted);margin-top:2px}
+
+/* layout */
+.master-layout{display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start}
+
+/* form card */
+.form-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:sticky;top:80px}
+.form-card-head{padding:18px 22px;border-bottom:1px solid var(--border);background:var(--ink);display:flex;align-items:center;gap:12px}
+.form-card-head-icon{width:36px;height:36px;border-radius:8px;background:rgba(196,151,58,.2);display:flex;align-items:center;justify-content:center;font-size:18px}
+.form-card-head h2{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--cream)}
+.form-card-head p{font-size:11.5px;color:rgba(248,244,238,.5);margin-top:2px}
+.form-body{padding:22px;display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+.field-required::after{content:' *';color:var(--red)}
+.field input,.field select,.field textarea{padding:10px 13px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,151,58,.12);background:#fff}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.field textarea{resize:vertical;min-height:68px}
+.two-col-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* fee preview box */
+.fee-preview{background:var(--gold-pale);border:1px solid rgba(196,151,58,.3);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.fee-preview-label{font-size:12px;color:var(--amber);font-weight:500}
+.fee-preview-amount{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--amber)}
+.fee-preview-original{font-size:11px;color:var(--ink-muted);text-decoration:line-through}
+
+/* toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between}
+.toggle-label{font-size:13px;color:var(--ink-soft)}
+.toggle-switch{position:relative;width:42px;height:24px}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;cursor:pointer;background:var(--cream-deeper);border-radius:24px;border:1px solid var(--border-mid);transition:all .2s}
+.toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:var(--ink-muted);border-radius:50%;transition:all .2s}
+.toggle-switch input:checked+.toggle-slider{background:var(--green);border-color:var(--green)}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px);background:#fff}
+
+/* buttons */
+.btn-row{display:flex;flex-direction:column;gap:8px}
+.submit-btn{width:100%;padding:12px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;border:none;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn:hover{background:#2e2a26}
+.submit-btn.edit-mode{background:var(--blue);color:#fff}
+.submit-btn.edit-mode:hover{background:#235880}
+.cancel-edit-btn{width:100%;padding:10px;border-radius:var(--radius-sm);background:transparent;color:var(--ink-muted);font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--border-mid);cursor:pointer;transition:all .15s;display:none}
+.cancel-edit-btn:hover{background:var(--cream-dark);color:var(--ink)}
+
+/* list card */
+.list-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.list-card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border);background:#FDFCFA;flex-wrap:wrap;gap:10px}
+.list-card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink)}
+.list-card-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.list-head-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px}
+.search-box input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);width:160px}
+.search-box input::placeholder{color:var(--ink-muted)}
+
+/* PDF button */
+.pdf-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius-sm);background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;border:none;cursor:pointer;transition:all .18s}
+.pdf-btn:hover{background:#9e3535}
+.pdf-btn svg{width:14px;height:14px}
+
+/* filter pills */
+.filter-row{display:flex;align-items:center;gap:8px;padding:12px 22px;border-bottom:1px solid var(--border);background:#FDFCFA;flex-wrap:wrap}
+.filter-label{font-size:11px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.filter-select{padding:5px 28px 5px 10px;border-radius:20px;border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer}
+.filter-select:focus{border-color:var(--gold);outline:none}
+
+/* table */
+.fee-table{width:100%;border-collapse:collapse;font-size:13px}
+.fee-table thead th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px;background:#FDFCFA;border-bottom:1px solid var(--border);white-space:nowrap}
+.fee-table thead th:first-child{padding-left:22px}
+.fee-table thead th:last-child{padding-right:22px;text-align:right}
+.fee-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;animation:fadeRow .3s ease both;opacity:0}
+.fee-table tbody tr:last-child{border-bottom:none}
+.fee-table tbody tr:hover{background:#FDFCFA}
+@keyframes fadeRow{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fee-table tbody td{padding:12px 16px;vertical-align:middle}
+.fee-table tbody td:first-child{padding-left:22px}
+.fee-table tbody td:last-child{padding-right:22px;text-align:right}
+
+/* combo cell */
+.combo-cell{display:flex;flex-direction:column;gap:3px}
+.combo-sport{font-weight:500;font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.combo-sport-icon{font-size:16px}
+.combo-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tag{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.tag-batch  {background:var(--blue-pale);color:var(--blue)}
+.tag-level  {color:#fff;font-size:10.5px}
+.tag-dur    {background:var(--gold-pale);color:var(--amber)}
+
+/* fee cell */
+.fee-main{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--ink)}
+.fee-original{font-size:11px;color:var(--ink-muted);text-decoration:line-through}
+.fee-discount{display:inline-flex;padding:2px 7px;border-radius:20px;background:var(--green-pale);color:var(--green);font-size:11px;font-weight:500}
+
+/* status */
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;transition:opacity .15s;border:none;font-family:'DM Sans',sans-serif}
+.status-badge:hover{opacity:.75}
+.badge-active  {background:var(--green-pale);color:var(--green)}
+.badge-inactive{background:var(--cream-dark);color:var(--ink-muted)}
+.badge-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.badge-active .badge-dot  {background:var(--green)}
+.badge-inactive .badge-dot{background:var(--ink-faint)}
+
+.date-cell{font-size:12px;color:var(--ink-muted)}
+.action-group{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.act-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.act-btn:hover{background:var(--cream)}
+.act-btn-edit:hover  {border-color:var(--blue);color:var(--blue);background:var(--blue-pale)}
+.act-btn-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-pale)}
+
+.empty-state{text-align:center;padding:56px 24px;color:var(--ink-muted)}
+.empty-icon{font-size:40px;margin-bottom:14px;opacity:.35}
+.empty-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--ink-soft);margin-bottom:6px}
+.empty-sub{font-size:13px;font-weight:300}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-top:1px solid var(--border);background:#FDFCFA;font-size:12px;color:var(--ink-muted)}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,22,18,.45);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#fff;border-radius:var(--radius);padding:28px 28px 22px;max-width:420px;width:90%;transform:scale(.95);transition:transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.modal-overlay.open .modal-box{transform:scale(1)}
+.modal-icon{font-size:36px;margin-bottom:12px}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.modal-body{font-size:13.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:22px}
+.modal-body strong{color:var(--ink)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-btn{padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .15s}
+.modal-btn-cancel{background:var(--cream-dark);color:var(--ink-soft)}
+.modal-btn-cancel:hover{background:var(--cream-deeper)}
+.modal-btn-delete{background:var(--red);color:#fff}
+.modal-btn-delete:hover{background:#9e3535}
+
+/* toast */
+.toast{position:fixed;bottom:28px;right:28px;z-index:600;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:13px 18px;border-radius:var(--radius);font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:360px}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:all}
+.toast-icon{font-size:16px;flex-shrink:0}
+
+@media(max-width:1200px){.master-layout{grid-template-columns:1fr}.form-card{position:static}}
+@media(max-width:900px){.page-wrap{padding:1.5rem 1rem 3rem}.stats-strip{flex-direction:column}.three-col-fields,.two-col-fields{grid-template-columns:1fr}}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Masters</span>
+    <span class="breadcrumb-sep">›</span>
+    <span>Fee Structure</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1>Fee Structure Master</h1>
+      <p>Define fees per sport, batch type, expertise level and subscription duration</p>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <span class="alert-icon">{% if message.tags == 'success' %}✓{% else %}✕{% endif %}</span>
+        <span>{{ message }}</span>
+        <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="stats-strip">
+    <div class="stat-pill"><span class="stat-pill-icon">💰</span><div><div class="stat-pill-num">{{ total }}</div><div class="stat-pill-label">Fee Entries</div></div></div>
+    <div class="stat-pill"><span class="stat-pill-icon">✅</span><div><div class="stat-pill-num">{{ active_count }}</div><div class="stat-pill-label">Active Entries</div></div></div>
+    <div class="stat-pill"><span class="stat-pill-icon">🏸</span><div><div class="stat-pill-num">{{ sports|length }}</div><div class="stat-pill-label">Sports Configured</div></div></div>
+    <div class="stat-pill"><span class="stat-pill-icon">📋</span><div><div class="stat-pill-num">{{ batches|length }}</div><div class="stat-pill-label">Batch Types</div></div></div>
+  </div>
+
+  <div class="master-layout">
+
+    <!-- ══ FORM ══ -->
+    <div class="form-card" id="form-card">
+      <div class="form-card-head">
+        <div class="form-card-head-icon">💰</div>
+        <div>
+          <h2 id="form-title">Add Fee Entry</h2>
+          <p id="form-subtitle">Select combination and enter amount</p>
+        </div>
+      </div>
+
+      <form class="form-body" method="POST" action="{% url 'fee_structure' %}" id="main-form">
+        {% csrf_token %}
+        <input type="hidden" name="edit_id" id="edit-id" value="">
+
+        <!-- Sport -->
+        <div class="field">
+          <label class="field-required" for="f-sport">Sport</label>
+          <select id="f-sport" name="sport" required>
+            <option value="">— Select Sport —</option>
+            {% for s in sports %}
+            <option value="{{ s.pk }}" data-icon="{{ s.icon }}">{{ s.icon }} {{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Batch + Level side by side -->
+        <div class="two-col-fields">
+          <div class="field">
+            <label class="field-required">Batch</label>
+            <select id="f-batch" name="batch" required>
+              <option value="">— Select Batch —</option>
+              {% for b in batches %}
+              <option value="{{ b.pk }}">{{ b.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-required">Expertise Level</label>
+            <select id="f-level" name="expertise_level" required>
+              <option value="">— Select Level —</option>
+              {% for lv in levels %}
+              <option value="{{ lv.pk }}" data-color="{{ lv.color_hex }}">{{ lv.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="field">
+          <label class="field-required">Duration</label>
+          <select id="f-duration" name="duration" required>
+            <option value="">— Select Duration —</option>
+            {% for d in durations %}
+            <option value="{{ d.pk }}" data-months="{{ d.months }}">{{ d.duration_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Fee + Discount -->
+        <div class="two-col-fields">
+          <div class="field">
+            <label class="field-required">Fee Amount (₹)</label>
+            <input type="number" id="f-fee" name="fee_amount" placeholder="e.g. 2500" min="0" step="0.01" oninput="updatePreview()" required>
+          </div>
+          <div class="field">
+            <label>Discount %</label>
+            <input type="number" id="f-discount" name="discount_pct" placeholder="0" min="0" max="100" step="0.01" value="0" oninput="updatePreview()">
+          </div>
+        </div>
+
+        <!-- Live fee preview -->
+        <div class="fee-preview" id="fee-preview" style="display:none">
+          <div>
+            <div class="fee-preview-label">Payable Amount</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+              <div class="fee-preview-amount" id="preview-final">₹0</div>
+              <div class="fee-preview-original" id="preview-original"></div>
+            </div>
+          </div>
+          <div class="fee-discount" id="preview-disc-badge" style="display:none">0% off</div>
+        </div>
+
+        <!-- Effective date + Notes -->
+        <div class="two-col-fields">
+          <div class="field">
+            <label class="field-required">Effective Date</label>
+            <input type="date" id="f-date" name="effective_date" required>
+          </div>
+          <div class="field">
+            <label>Notes</label>
+            <input type="text" id="f-notes" name="notes" placeholder="Optional remark">
+          </div>
+        </div>
+
+        <!-- Active toggle -->
+        <div class="field">
+          <div class="toggle-row">
+            <span class="toggle-label">Mark as Active</span>
+            <label class="toggle-switch">
+              <input type="checkbox" name="is_active" id="f-active" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="submit-btn" id="submit-btn">＋ Add Fee Entry</button>
+          <button type="button" class="cancel-edit-btn" id="cancel-btn" onclick="cancelEdit()">Cancel Edit</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ══ LIST ══ -->
+    <div class="list-card">
+      <div class="list-card-head">
+        <div>
+          <div class="list-card-title">All Fee Entries</div>
+          <div class="list-card-sub">{{ total }} entr{{ total|pluralize:"y,ies" }} configured</div>
+        </div>
+        <div class="list-head-actions">
+          <div class="search-box">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="search-input" placeholder="Search…" oninput="filterRows()">
+          </div>
+          <button class="pdf-btn" onclick="generatePDF()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-row">
+        <span class="filter-label">Filter</span>
+        <select class="filter-select" id="filter-sport" onchange="filterRows()">
+          <option value="">All Sports</option>
+          {% for s in sports %}<option value="{{ s.name|lower }}">{{ s.icon }} {{ s.name }}</option>{% endfor %}
+        </select>
+        <select class="filter-select" id="filter-batch" onchange="filterRows()">
+          <option value="">All Batches</option>
+          {% for b in batches %}<option value="{{ b.name|lower }}">{{ b.name }}</option>{% endfor %}
+        </select>
+        <select class="filter-select" id="filter-dur" onchange="filterRows()">
+          <option value="">All Durations</option>
+          {% for d in durations %}<option value="{{ d.duration_name|lower }}">{{ d.duration_name }}</option>{% endfor %}
+        </select>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="fee-table" id="fee-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Sport / Batch / Level / Duration</th>
+              <th>Fee</th>
+              <th>Effective Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="main-tbody">
+            {% for f in fees %}
+            <tr id="row-{{ f.pk }}"
+                data-sport="{{ f.sport.name|lower }}"
+                data-batch="{{ f.batch.name|lower }}"
+                data-dur="{{ f.duration.duration_name|lower }}"
+                data-search="{{ f.sport.name|lower }} {{ f.batch.name|lower }} {{ f.expertise_level.name|lower }} {{ f.duration.duration_name|lower }}"
+                style="animation-delay:{{ forloop.counter0 }}0ms">
+              <td style="color:var(--ink-muted);font-size:12px">{{ forloop.counter }}</td>
+              <td>
+                <div class="combo-cell">
+                  <div class="combo-sport">
+                    <span class="combo-sport-icon">{{ f.sport.icon }}</span>
+                    <strong>{{ f.sport.name }}</strong>
+                  </div>
+                  <div class="combo-meta">
+                    <span class="tag tag-batch">{{ f.batch.name }}</span>
+                    <span class="tag tag-level" style="background:{{ f.expertise_level.color_hex }}">{{ f.expertise_level.name }}</span>
+                    <span class="tag tag-dur">{{ f.duration.duration_name }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="fee-main">₹{{ f.discounted_amount|floatformat:0 }}</div>
+                {% if f.discount_pct > 0 %}
+                <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+                  <span class="fee-original">₹{{ f.fee_amount|floatformat:0 }}</span>
+                  <span class="fee-discount">{{ f.discount_pct|floatformat:0 }}% off</span>
+                </div>
+                {% endif %}
+              </td>
+              <td class="date-cell">{{ f.effective_date|date:"d M Y" }}</td>
+              <td>
+                <button class="status-badge {% if f.is_active %}badge-active{% else %}badge-inactive{% endif %}"
+                        id="status-{{ f.pk }}" onclick="toggleStatus({{ f.pk }},this)" title="Click to toggle">
+                  <span class="badge-dot"></span>
+                  <span class="badge-label">{% if f.is_active %}Active{% else %}Inactive{% endif %}</span>
+                </button>
+              </td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-btn-edit" onclick="loadEdit(
+                    {{ f.pk }},{{ f.sport.pk }},'{{ f.sport.name|escapejs }}',
+                    {{ f.batch.pk }},{{ f.expertise_level.pk }},{{ f.duration.pk }},
+                    '{{ f.fee_amount }}','{{ f.discount_pct }}',
+                    '{{ f.effective_date|date:"Y-m-d" }}','{{ f.notes|escapejs }}',
+                    {{ f.is_active|yesno:'true,false' }})">✎ Edit</button>
+                  <button class="act-btn act-btn-delete"
+                    onclick="confirmDelete({{ f.pk }},'{{ f.sport.name|escapejs }} / {{ f.batch.name|escapejs }}')">✕ Delete</button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr id="empty-row">
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon">💰</div>
+                  <div class="empty-title">No fee entries yet</div>
+                  <div class="empty-sub">Use the form on the left to add your first fee configuration</div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="footer-count">Showing {{ total }} entr{{ total|pluralize:"y,ies" }}</span>
+        <span>Pradip Sports Academy — Fee Structure</span>
+      </div>
+    </div>
+
+  </div><!-- /master-layout -->
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Delete Fee Entry?</div>
+    <div class="modal-body">Are you sure you want to delete the fee entry for <strong id="delete-name"></strong>? This cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+      <form method="POST" id="delete-form" style="margin:0">{% csrf_token %}
+        <button type="submit" class="modal-btn modal-btn-delete">Yes, Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-msg"></span></div>
+{% endblock %}
+
+
+{% block extra_js %}
+<!-- jsPDF + AutoTable for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+const ADD_URL   = "{% url 'fee_structure' %}";
+const EDIT_BASE = "/masters/fees/";
+
+/* ── Live fee preview ───────────────────── */
+function updatePreview() {
+  const fee  = parseFloat(document.getElementById('f-fee').value)    || 0;
+  const disc = parseFloat(document.getElementById('f-discount').value) || 0;
+  const prev = document.getElementById('fee-preview');
+  if (!fee) { prev.style.display = 'none'; return; }
+  prev.style.display = 'flex';
+  const final = disc > 0 ? fee * (1 - disc / 100) : fee;
+  document.getElementById('preview-final').textContent = '₹' + Math.round(final).toLocaleString('en-IN');
+  const discBadge = document.getElementById('preview-disc-badge');
+  const origEl    = document.getElementById('preview-original');
+  if (disc > 0) {
+    discBadge.style.display = 'flex';
+    discBadge.textContent   = disc + '% off';
+    origEl.textContent      = '₹' + Math.round(fee).toLocaleString('en-IN');
+  } else {
+    discBadge.style.display = 'none';
+    origEl.textContent      = '';
+  }
+}
+
+/* ── Load edit ───────────────────────────── */
+function loadEdit(pk, sportId, sportName, batchId, levelId, durId, fee, disc, date, notes, active) {
+  document.getElementById('f-sport').value    = sportId;
+  document.getElementById('f-batch').value    = batchId;
+  document.getElementById('f-level').value    = levelId;
+  document.getElementById('f-duration').value = durId;
+  document.getElementById('f-fee').value      = fee;
+  document.getElementById('f-discount').value = disc;
+  document.getElementById('f-date').value     = date;
+  document.getElementById('f-notes').value    = notes;
+  document.getElementById('f-active').checked = active;
+  document.getElementById('edit-id').value    = pk;
+  document.getElementById('main-form').action = `${EDIT_BASE}${pk}/edit/`;
+  document.getElementById('form-title').textContent    = 'Edit Fee Entry';
+  document.getElementById('form-subtitle').textContent = `Editing: ${sportName}`;
+  document.getElementById('submit-btn').textContent    = '✎  Save Changes';
+  document.getElementById('submit-btn').classList.add('edit-mode');
+  document.getElementById('cancel-btn').style.display  = 'block';
+  document.getElementById('form-card').scrollIntoView({behavior:'smooth',block:'start'});
+  updatePreview();
+}
+
+/* ── Cancel edit ─────────────────────────── */
+function cancelEdit() {
+  document.getElementById('main-form').reset();
+  document.getElementById('main-form').action = ADD_URL;
+  document.getElementById('edit-id').value = '';
+  document.getElementById('form-title').textContent    = 'Add Fee Entry';
+  document.getElementById('form-subtitle').textContent = 'Select combination and enter amount';
+  document.getElementById('submit-btn').textContent    = '＋ Add Fee Entry';
+  document.getElementById('submit-btn').classList.remove('edit-mode');
+  document.getElementById('cancel-btn').style.display  = 'none';
+  document.getElementById('fee-preview').style.display = 'none';
+}
+
+/* ── Delete ──────────────────────────────── */
+function confirmDelete(pk, label) {
+  document.getElementById('delete-name').textContent = label;
+  document.getElementById('delete-form').action = `${EDIT_BASE}${pk}/delete/`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('delete-modal').classList.remove('open'); }
+document.getElementById('delete-modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+/* ── Toggle status ───────────────────────── */
+function toggleStatus(pk, btn) {
+  fetch(`${EDIT_BASE}${pk}/toggle/`, {
+    method:'POST', headers:{'X-CSRFToken':getCookie('csrftoken')}
+  }).then(r=>r.json()).then(d => {
+    btn.className = `status-badge ${d.is_active?'badge-active':'badge-inactive'}`;
+    btn.querySelector('.badge-label').textContent = d.is_active ? 'Active' : 'Inactive';
+    showToast(d.message);
+  });
+}
+
+/* ── Search + filter ─────────────────────── */
+function filterRows() {
+  const q      = document.getElementById('search-input').value.toLowerCase();
+  const sport  = document.getElementById('filter-sport').value;
+  const batch  = document.getElementById('filter-batch').value;
+  const dur    = document.getElementById('filter-dur').value;
+  let n = 0;
+  document.querySelectorAll('#main-tbody tr[id^="row-"]').forEach(r => {
+    const match =
+      (!q     || r.dataset.search.includes(q))  &&
+      (!sport || r.dataset.sport === sport)      &&
+      (!batch || r.dataset.batch === batch)      &&
+      (!dur   || r.dataset.dur   === dur);
+    r.style.display = match ? '' : 'none';
+    if (match) n++;
+  });
+  document.getElementById('footer-count').textContent = `Showing ${n} entr${n===1?'y':'ies'}`;
+}
+
+/* ── PDF Generation ──────────────────────── */
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+  const pageW = doc.internal.pageSize.getWidth();
+  const today = new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'});
+
+  // ── Header ─────────────────────────────
+  doc.setFillColor(26, 22, 18);
+  doc.rect(0, 0, pageW, 22, 'F');
+  doc.setTextColor(196, 151, 58);
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text('PRADIP SPORTS ACADEMY', 14, 10);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(200, 195, 188);
+  doc.text('Fee Structure — Confidential', 14, 16);
+  doc.setTextColor(160, 155, 148);
+  doc.text(`Generated: ${today}`, pageW - 14, 16, {align:'right'});
+
+  // ── Collect visible rows ────────────────
+  const rows = [];
+  const sportGroups = {};
+
+  document.querySelectorAll('#main-tbody tr[id^="row-"]:not([style*="display: none"])').forEach(tr => {
+    const cells = tr.querySelectorAll('td');
+    if (cells.length < 6) return;
+
+    const comboCell   = cells[1];
+    const sportName   = comboCell.querySelector('.combo-sport strong')?.textContent?.trim() || '';
+    const tags        = comboCell.querySelectorAll('.tag');
+    const batchName   = tags[0]?.textContent?.trim() || '';
+    const levelName   = tags[1]?.textContent?.trim() || '';
+    const durName     = tags[2]?.textContent?.trim() || '';
+    const feeMain     = cells[2].querySelector('.fee-main')?.textContent?.trim() || '';
+    const feeOrig     = cells[2].querySelector('.fee-original')?.textContent?.trim() || '';
+    const discBadge   = cells[2].querySelector('.fee-discount')?.textContent?.trim() || '';
+    const effDate     = cells[3]?.textContent?.trim() || '';
+    const status      = cells[4].querySelector('.badge-label')?.textContent?.trim() || '';
+
+    if (!sportGroups[sportName]) sportGroups[sportName] = [];
+    sportGroups[sportName].push([batchName, levelName, durName, feeMain, feeOrig||feeMain, discBadge||'—', effDate, status]);
+  });
+
+  if (!Object.keys(sportGroups).length) {
+    showToast('No visible rows to export.', '⚠');
+    return;
+  }
+
+  let yPos = 30;
+
+  Object.entries(sportGroups).forEach(([sport, rows]) => {
+    // ── Sport heading ─────────────────────
+    if (yPos > 170) { doc.addPage(); yPos = 20; }
+
+    doc.setFillColor(248, 244, 238);
+    doc.roundedRect(14, yPos, pageW - 28, 8, 2, 2, 'F');
+    doc.setTextColor(26, 22, 18);
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    doc.text(sport, 20, yPos + 5.5);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(138, 132, 128);
+    doc.text(`${rows.length} entr${rows.length===1?'y':'ies'}`, pageW - 14, yPos + 5.5, {align:'right'});
+    yPos += 11;
+
+    // ── Table ────────────────────────────
+    doc.autoTable({
+      startY: yPos,
+      head: [['Batch', 'Expertise Level', 'Duration', 'Fee (Payable)', 'Original Fee', 'Discount', 'Effective Date', 'Status']],
+      body: rows,
+      margin: { left: 14, right: 14 },
+      styles: { fontSize: 8.5, cellPadding: 3.5, font: 'helvetica', textColor: [26,22,18] },
+      headStyles: { fillColor: [26,22,18], textColor: [196,151,58], fontStyle:'bold', fontSize:8 },
+      alternateRowStyles: { fillColor: [252, 250, 248] },
+      columnStyles: {
+        0: { cellWidth: 32 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 24 },
+        3: { cellWidth: 26, fontStyle:'bold' },
+        4: { cellWidth: 24, textColor:[138,132,128] },
+        5: { cellWidth: 18, textColor:[58,122,82] },
+        6: { cellWidth: 28 },
+        7: { cellWidth: 18 },
+      },
+      didParseCell: (data) => {
+        if (data.section==='body' && data.column.index===7) {
+          data.cell.styles.textColor = data.cell.raw==='Active' ? [58,122,82] : [138,132,128];
+          data.cell.styles.fontStyle = 'bold';
+        }
+      },
+    });
+
+    yPos = doc.lastAutoTable.finalY + 10;
+  });
+
+  // ── Footer on each page ───────────────
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7.5);
+    doc.setTextColor(160,155,148);
+    doc.text('Pradip Sports Academy — Fee Structure', 14, doc.internal.pageSize.getHeight()-6);
+    doc.text(`Page ${i} of ${totalPages}`, pageW-14, doc.internal.pageSize.getHeight()-6, {align:'right'});
+  }
+
+  doc.save(`fee-structure-${new Date().toISOString().slice(0,10)}.pdf`);
+  showToast('PDF downloaded successfully!', '📄');
+}
+
+/* ── Toast ───────────────────────────────── */
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent  = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ── CSRF ────────────────────────────────── */
+function getCookie(n) {
+  let v=null; document.cookie.split(';').forEach(c=>{const[k,val]=c.trim().split('=');if(k===n)v=decodeURIComponent(val);}); return v;
+}
+
+/* ── Auto-dismiss alerts ─────────────────── */
+document.querySelectorAll('.alert').forEach(a => {
+  setTimeout(()=>{ a.style.opacity='0'; a.style.transition='opacity .4s'; setTimeout(()=>a.remove(),400); }, 5000);
+});
+
+/* ── Set today as default effective date ──── */
+document.getElementById('f-date').valueAsDate = new Date();
+
+{% if messages %}{% for message in messages %}{% if message.tags == 'success' %}
+window.addEventListener('DOMContentLoaded',()=>showToast('{{ message|escapejs }}'));
+{% endif %}{% endfor %}{% endif %}
+</script>
+{% endblock %}

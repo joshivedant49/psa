@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}Renew Membership — {{ student.full_name }}{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+
+.student-banner{display:flex;align-items:center;gap:16px;padding:18px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px}
+.s-avatar-lg{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;background:var(--gold-pale);color:var(--amber);flex-shrink:0}
+.s-meta-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:var(--ink)}
+.s-meta-sub{font-size:12px;color:var(--ink-muted);margin-top:3px}
+.expired-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:500;background:var(--red-pale);color:var(--red);margin-left:10px}
+
+.form-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.form-card-head{padding:16px 22px;border-bottom:1px solid var(--border);background:#FDFCFA}
+.form-card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink)}
+.form-card-body{padding:22px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px}
+.form-group select,.form-group input{padding:9px 12px;border:1px solid var(--border-mid);border-radius:var(--radius-sm);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none}
+.form-group select:focus,.form-group input:focus{border-color:var(--gold)}
+
+/* Status radio cards */
+.status-options{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
+.status-option{flex:1;min-width:160px}
+.status-option input[type=radio]{display:none}
+.status-option label{display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid var(--border-mid);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.status-option input[type=radio]:checked + label.opt-active{border-color:var(--green);background:var(--green-pale);color:var(--green)}
+.status-option input[type=radio]:checked + label.opt-suspended{border-color:var(--amber);background:var(--gold-pale);color:var(--amber)}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-active{background:var(--green)}
+.dot-suspended{background:var(--amber)}
+.status-desc{font-size:11px;color:var(--ink-muted);margin-top:2px;font-weight:400}
+
+.fee-box{background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;margin-top:16px;display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+.fee-item{display:flex;flex-direction:column;gap:3px}
+.fee-label{font-size:11px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px}
+.fee-value{font-size:18px;font-weight:600;color:var(--ink)}
+.fee-due-val{color:var(--red)}
+.fee-clear-val{color:var(--green)}
+
+.btn-row{display:flex;gap:10px;margin-top:24px;align-items:center}
+.btn-primary{padding:10px 24px;background:var(--ink);color:var(--gold);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary:hover{background:#2e2a26}
+.btn-secondary{padding:10px 20px;background:#fff;color:var(--ink-soft);border:1px solid var(--border-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s}
+.btn-secondary:hover{background:var(--cream)}
+.hidden{display:none}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="{% url 'student_list' %}">Students</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="{% url 'student_detail' student.pk %}">{{ student.full_name }}</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Renew Membership</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1>Renew Membership</h1>
+      <p>Update subscription plan, record payment, and confirm the student's new status</p>
+    </div>
+  </div>
+
+  <!-- Student identity banner -->
+  <div class="student-banner">
+    <div class="s-avatar-lg">{{ student.initials }}</div>
+    <div>
+      <div class="s-meta-name">
+        {{ student.full_name }}
+        <span class="expired-badge">
+          {% if student.status == 'expired' %}⛔ Expired{% else %}⏸ Suspended{% endif %}
+        </span>
+      </div>
+      <div class="s-meta-sub">
+        {{ student.student_id }} &nbsp;·&nbsp;
+        {{ student.sport.icon }} {{ student.sport.name }} &nbsp;·&nbsp;
+        Last expiry: {{ student.subscription_expiry|date:"d M Y" }}
+        {% if student.days_until_expiry < 0 %}
+          ({{ student.days_until_expiry|stringformat:"d"|slice:"1:" }} days ago)
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for msg in messages %}
+      <div style="padding:12px 18px;margin-bottom:16px;border-radius:var(--radius-sm);
+        background:{% if 'error' in msg.tags %}var(--red-pale){% else %}var(--green-pale){% endif %};
+        color:{% if 'error' in msg.tags %}var(--red){% else %}var(--green){% endif %};
+        border:1px solid {% if 'error' in msg.tags %}var(--red){% else %}var(--green){% endif %};
+        font-size:13px">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- ── 1. Subscription Details ─────────────────────────────── -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-title">📋 Renewed Subscription Details</div>
+      </div>
+      <div class="form-card-body">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Sport (cannot change)</label>
+            <input type="text" value="{{ student.sport.icon }} {{ student.sport.name }}" disabled
+                   style="background:var(--cream-dark);color:var(--ink-muted);cursor:not-allowed">
+          </div>
+
+          <div class="form-group">
+            <label>Batch *</label>
+            <select name="batch" id="id_batch" required>
+              {% for b in batches %}
+                <option value="{{ b.pk }}" {% if b.pk == student.batch.pk %}selected{% endif %}>
+                  {{ b.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Expertise Level *</label>
+            <select name="expertise_level" id="id_level" required>
+              {% for lv in levels %}
+                <option value="{{ lv.pk }}" {% if lv.pk == student.expertise_level.pk %}selected{% endif %}>
+                  {{ lv.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Duration *</label>
+            <select name="duration" id="id_duration" required>
+              {% for d in durations %}
+                <option value="{{ d.pk }}" {% if d.pk == student.duration.pk %}selected{% endif %}>
+                  {{ d.duration_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Renewal Start Date *</label>
+            <input type="date" name="start_date" id="id_start_date" value="{{ today }}" required>
+            <span style="font-size:11px;color:var(--ink-muted);margin-top:2px">
+              Expiry will be calculated automatically from this date
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Assigned Coach</label>
+            <select name="assigned_coach">
+              <option value="">— Keep current coach —</option>
+              {% for c in coaches %}
+                <option value="{{ c.pk }}"
+                  {% if student.assigned_coach and c.pk == student.assigned_coach.pk %}selected{% endif %}>
+                  {{ c.full_name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Calculated expiry preview -->
+        <div id="expiry-preview" style="display:none;margin-top:14px;padding:10px 16px;
+             background:var(--green-pale);border-radius:var(--radius-sm);
+             font-size:13px;color:var(--green);font-weight:500">
+          📅 New subscription will run until: <span id="expiry-date-label">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. Fee & Payment ────────────────────────────────────── -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-title">💳 Fee &amp; Payment</div>
+      </div>
+      <div class="form-card-body">
+
+        <input type="hidden" name="fee_id" id="id_fee_id"
+               value="{% if prefill_fee %}{{ prefill_fee.pk }}{% endif %}">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Total Fee (auto-fetched)</label>
+            <input type="text" id="id_total_fee_display"
+                   value="{% if prefill_fee %}₹{{ prefill_fee.discounted_amount }}{% else %}—{% endif %}"
+                   disabled style="background:var(--cream-dark);color:var(--ink-muted);cursor:not-allowed">
+          </div>
+          <div class="form-group">
+            <label>Amount Paid Now (₹) *</label>
+            <input type="number" name="fee_paid" id="id_fee_paid"
+                   min="0" step="0.01" required
+                   value="{% if prefill_fee %}{{ prefill_fee.discounted_amount }}{% else %}0{% endif %}">
+          </div>
+        </div>
+
+        <div class="fee-box" id="fee-summary"
+             {% if not prefill_fee %}style="display:none"{% endif %}>
+          <div class="fee-item">
+            <span class="fee-label">Total Fee</span>
+            <span class="fee-value" id="fs-total">
+              {% if prefill_fee %}₹{{ prefill_fee.discounted_amount }}{% else %}₹0{% endif %}
+            </span>
+          </div>
+          <div class="fee-item">
+            <span class="fee-label">Paid Now</span>
+            <span class="fee-value" id="fs-paid">
+              {% if prefill_fee %}₹{{ prefill_fee.discounted_amount }}{% else %}₹0{% endif %}
+            </span>
+          </div>
+          <div class="fee-item">
+            <span class="fee-label">Balance Due</span>
+            <span class="fee-value fee-due-val" id="fs-due">₹0.00</span>
+          </div>
+          {% if prefill_fee and prefill_fee.discount_pct > 0 %}
+          <div class="fee-item">
+            <span class="fee-label">Discount Applied</span>
+            <span class="fee-value" style="color:var(--green)">{{ prefill_fee.discount_pct }}%</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <div id="fee-not-found" class="{% if prefill_fee %}hidden{% endif %}"
+             style="margin-top:14px;padding:12px 16px;background:var(--red-pale);
+                    color:var(--red);border-radius:var(--radius-sm);font-size:13px">
+          ⚠️ No active fee structure found for this combination. Enter the amount manually or
+          <a href="{% url 'fee_structure' %}" style="color:var(--red);font-weight:600">
+            set up a fee structure
+          </a> first.
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 3. Status Confirmation ─────────────────────────────── -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-title">✅ Confirm Student Status After Renewal</div>
+      </div>
+      <div class="form-card-body">
+        <p style="font-size:13px;color:var(--ink-muted);margin-bottom:16px">
+          Choose the status to apply once this renewal is saved.
+          Only set to <strong>Active</strong> once you're satisfied the payment and plan are confirmed.
+        </p>
+        <div class="status-options">
+          <div class="status-option">
+            <input type="radio" name="status" id="status_active" value="active" checked>
+            <label for="status_active" class="opt-active">
+              <span class="status-dot dot-active"></span>
+              <span>
+                Active
+                <span class="status-desc">Subscription is live, student can train</span>
+              </span>
+            </label>
+          </div>
+          <div class="status-option">
+            <input type="radio" name="status" id="status_suspended" value="suspended">
+            <label for="status_suspended" class="opt-suspended">
+              <span class="status-dot dot-suspended"></span>
+              <span>
+                Suspended
+                <span class="status-desc">Renewal recorded but not yet activated</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="submit" class="btn-primary">🔄 Confirm Renewal</button>
+      <a href="{% url 'student_detail' student.pk %}" class="btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+const sportId = "{{ student.sport.pk }}";
+let currentTotalFee = {% if prefill_fee %}{{ prefill_fee.discounted_amount }}{% else %}0{% endif %};
+
+// ── Fetch fee when batch/level/duration changes ──────────────────
+function fetchFee() {
+  const batch    = document.getElementById('id_batch').value;
+  const level    = document.getElementById('id_level').value;
+  const duration = document.getElementById('id_duration').value;
+  if (!batch || !level || !duration) return;
+
+  fetch(`/students/get-fee/?sport=${sportId}&batch=${batch}&level=${level}&duration=${duration}`)
+    .then(r => r.json())
+    .then(data => {
+      const summary  = document.getElementById('fee-summary');
+      const notFound = document.getElementById('fee-not-found');
+      if (data.found) {
+        currentTotalFee = data.discounted_amount;
+        document.getElementById('id_fee_id').value           = data.fee_id;
+        document.getElementById('id_total_fee_display').value = '₹' + data.discounted_amount.toFixed(2);
+        document.getElementById('id_fee_paid').value          = data.discounted_amount.toFixed(2);
+        document.getElementById('fs-total').textContent       = '₹' + data.discounted_amount.toFixed(2);
+        document.getElementById('fs-paid').textContent        = '₹' + data.discounted_amount.toFixed(2);
+        document.getElementById('fs-due').textContent         = '₹0.00';
+        document.getElementById('fs-due').className           = 'fee-value fee-clear-val';
+        summary.style.display  = 'flex';
+        notFound.style.display = 'none';
+      } else {
+        currentTotalFee = 0;
+        document.getElementById('id_fee_id').value            = '';
+        document.getElementById('id_total_fee_display').value = '—';
+        summary.style.display  = 'none';
+        notFound.style.display = 'block';
+      }
+    });
+
+  // Also refresh the expiry preview when duration changes
+  updateExpiryPreview();
+}
+
+// ── Expiry date preview ──────────────────────────────────────────
+function updateExpiryPreview() {
+  const startVal   = document.getElementById('id_start_date').value;
+  const durationEl = document.getElementById('id_duration');
+  const selectedText = durationEl.options[durationEl.selectedIndex]?.text || '';
+  const months     = parseInt(selectedText);   // e.g. "3 Months" → 3
+  if (!startVal || isNaN(months)) {
+    document.getElementById('expiry-preview').style.display = 'none';
+    return;
+  }
+  const start  = new Date(startVal);
+  start.setMonth(start.getMonth() + months);
+  const label  = start.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  document.getElementById('expiry-date-label').textContent = label;
+  document.getElementById('expiry-preview').style.display  = 'block';
+}
+
+['id_batch','id_level','id_duration'].forEach(id =>
+  document.getElementById(id).addEventListener('change', fetchFee)
+);
+document.getElementById('id_start_date').addEventListener('change', updateExpiryPreview);
+
+// ── Live due recalculation ───────────────────────────────────────
+document.getElementById('id_fee_paid').addEventListener('input', function () {
+  const paid = parseFloat(this.value) || 0;
+  const due  = Math.max(0, currentTotalFee - paid);
+  document.getElementById('fs-paid').textContent = '₹' + paid.toFixed(2);
+  document.getElementById('fs-due').textContent  = '₹' + due.toFixed(2);
+  document.getElementById('fs-due').className =
+    due > 0 ? 'fee-value fee-due-val' : 'fee-value fee-clear-val';
+});
+
+// ── Init expiry preview on load ──────────────────────────────────
+updateExpiryPreview();
+</script>
+{% endblock %}

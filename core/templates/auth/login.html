@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Pradip Sports Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#F8F4EE;min-height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased}
+.login-wrap{width:100%;max-width:420px;padding:24px}
+.brand{text-align:center;margin-bottom:2rem}
+.brand-mark{width:56px;height:56px;background:#1A1612;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 24px rgba(26,22,18,.2)}
+.brand-mark svg{width:26px;height:26px}
+.brand-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#1A1612;letter-spacing:.2px}
+.brand-sub{font-size:13px;color:#8A8480;margin-top:4px;font-weight:300}
+.card{background:#fff;border:1px solid rgba(26,22,18,.1);border-radius:16px;padding:36px 32px;box-shadow:0 4px 24px rgba(26,22,18,.06)}
+.card h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:#1A1612;margin-bottom:6px}
+.card p{font-size:13px;color:#8A8480;margin-bottom:28px;font-weight:300}
+.field{margin-bottom:18px;display:flex;flex-direction:column;gap:7px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:#4A4540;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:11px 14px;border-radius:8px;border:1px solid rgba(26,22,18,.14);background:#F8F4EE;font-family:'DM Sans',sans-serif;font-size:13.5px;color:#1A1612;outline:none;transition:border-color .15s,box-shadow .15s}
+.field input:focus{border-color:#C4973A;box-shadow:0 0 0 3px rgba(196,151,58,.12);background:#fff}
+.field-error-msg{display:block;font-size:11.5px;color:#B84040;margin-top:4px;font-weight:500;animation:errFadeIn .2s ease}
+.field-invalid label{color:#B84040!important}
+.field-invalid input{border-color:#B84040!important;box-shadow:0 0 0 3px rgba(184,64,64,.10)!important}
+.field-valid input{border-color:#3A7A52!important;box-shadow:0 0 0 3px rgba(58,122,82,.08)!important}
+@keyframes errFadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:44px}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8A8480;padding:4px}
+.pw-toggle:hover{color:#1A1612}
+.btn-login{width:100%;padding:13px;border-radius:8px;background:#1A1612;color:#C4973A;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;border:none;cursor:pointer;transition:all .18s;margin-top:8px}
+.btn-login:hover{background:#2e2a26}
+.btn-login:disabled{opacity:.6;cursor:not-allowed}
+.alert{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:18px;background:#F7EAEA;color:#B84040;border:1px solid rgba(184,64,64,.18);animation:slideDown .3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.alert-icon{font-size:15px;flex-shrink:0}
+.divider{text-align:center;font-size:11.5px;color:#C4BFB8;margin:22px 0;position:relative}
+.divider::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(26,22,18,.08)}
+.divider span{background:#fff;padding:0 12px;position:relative}
+.footer-note{text-align:center;font-size:12px;color:#8A8480;margin-top:20px}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake .4s ease}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="#C4973A"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5v-9l6 4.5-6 4.5z"/></svg>
+    </div>
+    <div class="brand-name">Pradip Sports Academy</div>
+    <div class="brand-sub">Management System</div>
+  </div>
+
+  <div class="card">
+    <h2>Welcome back</h2>
+    <p>Sign in to access your dashboard</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert"><span class="modal-error show">✕</span><span>{{ message }}</span></div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" id="login-form" novalidate>
+      {% csrf_token %}
+
+      <div class="field" id="field-username">
+        <label for="username">Username <span style="color:#B84040">*</span></label>
+        <input type="text" id="username" name="username"
+               value="{{ request.POST.username|default:'' }}"
+               placeholder="Enter your username"
+               autocomplete="username"
+               minlength="3" maxlength="60" required>
+      </div>
+
+      <div class="field" id="field-password">
+        <label for="password">Password <span style="color:#B84040">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="password" name="password"
+                 placeholder="Enter your password"
+                 autocomplete="current-password"
+                 minlength="6" required>
+          <button type="button" class="pw-toggle" onclick="togglePw('password')" title="Show/hide">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" id="login-btn">Sign In →</button>
+    </form>
+
+    <div class="divider"><span>Pradip Sports Academy</span></div>
+    <div class="footer-note">Contact your administrator for access credentials</div>
+  </div>
+</div>
+
+<script>
+function togglePw(id) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+document.getElementById('login-form').addEventListener('submit', function(e) {
+  let ok = true;
+
+  function fieldErr(fieldId, inputId, msg) {
+    const wrap = document.getElementById(fieldId);
+    const inp  = document.getElementById(inputId);
+    if (!inp.value.trim()) {
+      wrap.classList.add('field-invalid');
+      let em = wrap.querySelector('.field-error-msg');
+      if (!em) { em = document.createElement('span'); em.className = 'field-error-msg'; inp.insertAdjacentElement('afterend', em); }
+      em.textContent = msg; ok = false;
+      return true;
+    } else {
+      wrap.classList.remove('field-invalid');
+      const em = wrap.querySelector('.field-error-msg'); if (em) em.remove();
+    }
+    return false;
+  }
+
+  fieldErr('field-username', 'username', 'Username is required.');
+  fieldErr('field-password', 'password', 'Password is required.');
+
+  if (!ok) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+    btn.addEventListener('animationend', () => btn.classList.remove('shake'), { once: true });
+  }
+});
+
+// Live clear on input
+['username','password'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    const wrap = this.closest('.field');
+    if (this.value.trim()) {
+      wrap.classList.remove('field-invalid');
+      const em = wrap.querySelector('.field-error-msg'); if (em) em.remove();
+    }
+  });
+});
+</script>
+</body>
+</html>

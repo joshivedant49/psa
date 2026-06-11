@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Edit Coach{% else %}Add Coach{% endif %} — Pradip Sports Academy{% endblock %}
+{% block sb_coaches %}active{% endblock %}
+{% block nav_staff %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem;max-width:960px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.alert{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem;animation:slideDown .3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
+.alert-icon{font-size:16px;flex-shrink:0}.alert-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:16px}
+
+/* ── Section cards ── */
+.section-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.section-head{padding:16px 24px;background:var(--ink);display:flex;align-items:center;gap:12px}
+.section-head-icon{width:36px;height:36px;border-radius:8px;background:rgba(196,151,58,.2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.section-head h2{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--cream)}
+.section-head p{font-size:11.5px;color:rgba(248,244,238,.45);margin-top:2px}
+.section-body{padding:26px 24px}
+
+/* ── Fields ── */
+.field-grid{display:grid;gap:20px}
+.col-2{grid-template-columns:1fr 1fr}.col-3{grid-template-columns:1fr 1fr 1fr}
+.col-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:11.5px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+.req::after{content:' *';color:var(--red)}
+.field input,.field select,.field textarea{padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,151,58,.12);background:#fff}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.field textarea{resize:vertical;min-height:80px}
+.field-hint{font-size:11.5px;color:var(--ink-muted);margin-top:3px}
+
+/* Photo upload */
+.photo-upload{display:flex;align-items:center;gap:16px}
+.photo-preview{width:80px;height:80px;border-radius:50%;background:var(--cream-dark);border:2px dashed var(--border-mid);display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color .15s}
+.photo-preview:hover{border-color:var(--gold)}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-label{font-size:13px;color:var(--ink-soft)}.photo-sub{font-size:11.5px;color:var(--ink-muted);margin-top:3px}
+
+/* Multi-select checkboxes (sports + levels) */
+.checkbox-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.checkbox-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all .15s;user-select:none}
+.checkbox-item:hover{border-color:var(--gold);background:var(--gold-pale)}
+.checkbox-item.checked{border-color:var(--gold);background:var(--gold-pale)}
+.checkbox-item input[type=checkbox]{display:none}
+.checkbox-icon{font-size:16px;flex-shrink:0}
+.checkbox-label{font-size:12.5px;font-weight:500;color:var(--ink)}
+.checkbox-check{margin-left:auto;width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-mid);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.checkbox-item.checked .checkbox-check{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+
+/* Level checkbox */
+.level-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all .15s}
+.level-chip:hover{border-color:var(--border-mid);background:#fff}
+.level-chip.checked{border-color:var(--ink);background:#fff}
+.level-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.level-name{font-size:12.5px;font-weight:500;color:var(--ink)}
+.level-check{margin-left:auto;font-size:13px;opacity:0;transition:opacity .15s}
+.level-chip.checked .level-check{opacity:1;color:var(--green)}
+
+/* Salary preview */
+.salary-preview{background:var(--gold-pale);border:1px solid rgba(196,151,58,.25);border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.salary-preview-label{font-size:12px;color:var(--amber);font-weight:500}
+.salary-preview-val{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--amber)}
+
+/* File upload */
+.file-upload{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);border:1px dashed var(--border-mid);background:var(--cream);cursor:pointer;transition:all .15s}
+.file-upload:hover{border-color:var(--gold);background:var(--gold-pale)}
+.file-upload input[type=file]{display:none}
+.file-upload-label{font-size:13px;color:var(--ink-soft)}
+.file-upload-sub{font-size:11.5px;color:var(--ink-muted)}
+
+/* Bottom action bar */
+.action-bar{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all .18s;text-decoration:none}
+.btn-ghost{background:var(--cream-dark);color:var(--ink-soft)}.btn-ghost:hover{background:var(--cream-deeper)}
+.btn-ink{background:var(--ink);color:var(--gold)}.btn-ink:hover{background:#2e2a26}
+.btn-gold{background:var(--gold);color:var(--ink)}.btn-gold:hover{background:#d4a84a}
+
+@media(max-width:700px){.col-2,.col-3{grid-template-columns:1fr}.checkbox-grid{grid-template-columns:1fr 1fr}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
+    <a href="{% url 'coach_list' %}">Coaches</a><span class="breadcrumb-sep">›</span>
+    <span>{% if is_edit %}Edit {{ coach.full_name }}{% else %}Add New Coach{% endif %}</span>
+  </div>
+  <div class="page-header">
+    <h1>{% if is_edit %}Edit Coach{% else %}Add New Coach{% endif %}</h1>
+    <p>{% if is_edit %}Update coach profile and assignments{% else %}Register a new coach at the academy{% endif %}</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-error">
+        <span class="alert-icon">✕</span><span>{{ message }}</span>
+        <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data" id="coach-form">
+    {% csrf_token %}
+
+    <!-- ══ SECTION 1: Personal ══ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">👤</div>
+        <div><h2>Personal Details</h2><p>Basic information about the coach</p></div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid col-2">
+
+          <div class="field">
+            <label class="req">First Name</label>
+            <input type="text" name="first_name" value="{{ coach.first_name|default:'' }}" placeholder="e.g. Rajesh" required>
+          </div>
+          <div class="field">
+            <label class="req">Last Name</label>
+            <input type="text" name="last_name" value="{{ coach.last_name|default:'' }}" placeholder="e.g. Kumar" required>
+          </div>
+
+          <div class="field">
+            <label>Date of Birth</label>
+            <input type="date" name="dob" value="{{ coach.dob|date:'Y-m-d'|default:'' }}">
+          </div>
+          <div class="field">
+            <label class="req">Gender</label>
+            <select name="gender" required>
+              <option value="">— Select —</option>
+              <option value="M" {% if coach.gender == 'M' %}selected{% endif %}>Male</option>
+              <option value="F" {% if coach.gender == 'F' %}selected{% endif %}>Female</option>
+              <option value="O" {% if coach.gender == 'O' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="req">Contact Number</label>
+            <input type="tel" name="contact_number" value="{{ coach.contact_number|default:'' }}" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="field">
+            <label>WhatsApp Number</label>
+            <input type="tel" name="whatsapp_number" value="{{ coach.whatsapp_number|default:'' }}" placeholder="Same as contact or different">
+          </div>
+
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" name="email" value="{{ coach.email|default:'' }}" placeholder="coach@email.com">
+          </div>
+          <div class="field">
+            <label>Photo</label>
+            <div class="photo-upload">
+              <div class="photo-preview" id="photo-preview" onclick="document.getElementById('photo-input').click()">
+                {% if coach.photo %}<img src="{{ coach.photo.url }}" alt="photo">{% else %}📷{% endif %}
+              </div>
+              <div>
+                <div class="photo-label">Click to upload photo</div>
+                <div class="photo-sub">JPG, PNG · max 2MB</div>
+                <input type="file" name="photo" id="photo-input" accept="image/*" onchange="previewPhoto(this)">
+              </div>
+            </div>
+          </div>
+
+          <div class="field col-full">
+            <label>Address</label>
+            <textarea name="address" placeholder="Residential address…">{{ coach.address|default:'' }}</textarea>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 2: Professional ══ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">🏅</div>
+        <div><h2>Professional Details</h2><p>Sports, qualifications and employment</p></div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid col-2">
+
+          <!-- Sports coached (multi-select) -->
+          <div class="field col-full">
+            <label>Sports Coached</label>
+            <div class="checkbox-grid" id="sports-grid">
+              {% for s in sports %}
+              <div class="checkbox-item {% if is_edit and s in coach.sports_coached.all %}checked{% endif %}"
+                   onclick="toggleCheck(this, 'sports_coached', '{{ s.pk }}')">
+                <input type="checkbox" name="sports_coached" value="{{ s.pk }}"
+                  {% if is_edit and s in coach.sports_coached.all %}checked{% endif %}>
+                <span class="checkbox-icon">{{ s.icon }}</span>
+                <span class="checkbox-label">{{ s.name }}</span>
+                <span class="checkbox-check">✓</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Expertise levels -->
+          <div class="field col-full">
+            <label>Levels Handled</label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px" id="levels-grid">
+              {% for lv in levels %}
+              <div class="level-chip {% if is_edit and lv in coach.expertise_levels.all %}checked{% endif %}"
+                   onclick="toggleLevel(this, '{{ lv.pk }}')">
+                <input type="checkbox" name="expertise_levels" value="{{ lv.pk }}"
+                  {% if is_edit and lv in coach.expertise_levels.all %}checked{% endif %} style="display:none">
+                <span class="level-dot" style="background:{{ lv.color_hex }}"></span>
+                <span class="level-name">{{ lv.name }}</span>
+                <span class="level-check">✓</span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="field col-full">
+            <label>Qualification / Certifications</label>
+            <input type="text" name="qualification" value="{{ coach.qualification|default:'' }}"
+              placeholder="e.g. National Level Player, B.P.Ed, SAI Certified Coach">
+          </div>
+
+          <div class="field">
+            <label>Experience (years)</label>
+            <input type="number" name="experience_years" value="{{ coach.experience_years|default:0 }}" min="0" max="50">
+          </div>
+          <div class="field">
+            <label class="req">Joining Date</label>
+            <input type="date" name="joining_date" value="{{ coach.joining_date|date:'Y-m-d'|default:'' }}" id="joining-date" required>
+          </div>
+
+          <div class="field">
+            <label class="req">Employment Type</label>
+            <select name="employment_type">
+              {% for val, lbl in employment_choices %}
+              <option value="{{ val }}" {% if coach.employment_type == val %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {% if is_edit %}
+          <div class="field">
+            <label>Status</label>
+            <select name="status">
+              {% for val, lbl in coach.STATUS_CHOICES %}
+              <option value="{{ val }}" {% if coach.status == val %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 3: Salary ══ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">💰</div>
+        <div><h2>Salary Details</h2><p>Compensation structure</p></div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid col-2">
+          <div class="field">
+            <label>Salary Type</label>
+            <select name="salary_type" id="sal-type" onchange="updateSalaryLabel()">
+              {% for val, lbl in salary_choices %}
+              <option value="{{ val }}" {% if coach.salary_type == val %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label>Amount (₹)</label>
+            <input type="number" name="salary_amount" id="sal-amount" value="{{ coach.salary_amount|default:0 }}"
+              min="0" step="0.01" placeholder="0.00" oninput="updateSalaryLabel()">
+          </div>
+          <div class="col-full" id="salary-preview-wrap">
+            <div class="salary-preview">
+              <span class="salary-preview-label" id="sal-label">Monthly Salary</span>
+              <span class="salary-preview-val" id="sal-val">₹0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 4: Emergency Contact ══ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">🆘</div>
+        <div><h2>Emergency Contact</h2><p>Person to contact in case of emergency</p></div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid col-3">
+          <div class="field">
+            <label>Contact Name</label>
+            <input type="text" name="emergency_name" value="{{ coach.emergency_name|default:'' }}" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" name="emergency_phone" value="{{ coach.emergency_phone|default:'' }}" placeholder="+91 …">
+          </div>
+          <div class="field">
+            <label>Relation</label>
+            <input type="text" name="emergency_relation" value="{{ coach.emergency_relation|default:'' }}" placeholder="e.g. Spouse, Parent">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECTION 5: Documents ══ -->
+    <div class="section-card">
+      <div class="section-head">
+        <div class="section-head-icon">📄</div>
+        <div><h2>Documents</h2><p>ID proof and coaching certificates (optional)</p></div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid col-2">
+          <div class="field">
+            <label>ID Proof</label>
+            <div class="file-upload" onclick="document.getElementById('id-proof-input').click()">
+              <span style="font-size:20px">🪪</span>
+              <div>
+                <div class="file-upload-label" id="id-proof-name">
+                  {% if is_edit and coach.id_proof %}{{ coach.id_proof.name|cut:"coaches/docs/" }}{% else %}Click to upload Aadhaar / PAN / Passport{% endif %}
+                </div>
+                <div class="file-upload-sub">PDF, JPG, PNG · max 5MB</div>
+              </div>
+              <input type="file" name="id_proof" id="id-proof-input" accept=".pdf,.jpg,.jpeg,.png"
+                onchange="document.getElementById('id-proof-name').textContent = this.files[0]?.name || 'No file selected'">
+            </div>
+          </div>
+          <div class="field">
+            <label>Coaching Certificate</label>
+            <div class="file-upload" onclick="document.getElementById('cert-input').click()">
+              <span style="font-size:20px">📜</span>
+              <div>
+                <div class="file-upload-label" id="cert-name">
+                  {% if is_edit and coach.certificate %}{{ coach.certificate.name|cut:"coaches/docs/" }}{% else %}Click to upload coaching certificate{% endif %}
+                </div>
+                <div class="file-upload-sub">PDF, JPG, PNG · max 5MB</div>
+              </div>
+              <input type="file" name="certificate" id="cert-input" accept=".pdf,.jpg,.jpeg,.png"
+                onchange="document.getElementById('cert-name').textContent = this.files[0]?.name || 'No file selected'">
+            </div>
+          </div>
+          <div class="field col-full">
+            <label>Admin Notes</label>
+            <textarea name="notes" placeholder="Internal notes about this coach…">{{ coach.notes|default:'' }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <a href="{% url 'coach_list' %}" class="btn btn-ghost">← Cancel</a>
+      <button type="submit" class="btn btn-ink">
+        {% if is_edit %}✎ Save Changes{% else %}＋ Add Coach{% endif %}
+      </button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Set today as default joining date if adding
+{% if not is_edit %}
+document.getElementById('joining-date').valueAsDate = new Date();
+{% endif %}
+
+// Photo preview
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const p = document.getElementById('photo-preview');
+    p.innerHTML = `<img src="${e.target.result}" alt="photo">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// Sport multi-select toggle
+function toggleCheck(el, name, val) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  cb.checked = el.classList.contains('checked');
+}
+
+// Level toggle
+function toggleLevel(el, val) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  cb.checked = el.classList.contains('checked');
+}
+
+// Salary preview
+const salLabels = { fixed:'Monthly Salary', per_batch:'Per Batch Amount', hourly:'Hourly Rate' };
+function updateSalaryLabel() {
+  const type = document.getElementById('sal-type').value;
+  const amt  = parseFloat(document.getElementById('sal-amount').value) || 0;
+  document.getElementById('sal-label').textContent = salLabels[type] || 'Salary';
+  document.getElementById('sal-val').textContent   = '₹' + amt.toLocaleString('en-IN');
+}
+updateSalaryLabel();
+</script>
+{% endblock %}

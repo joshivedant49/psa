@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Notifications — Sports Academy{% endblock %}
+{% block sb_notifications %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:500;color:var(--ink);letter-spacing:-.3px;line-height:1.2}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:2rem}
+.summary-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s,transform .2s;cursor:pointer;position:relative;overflow:hidden}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.summary-card.danger::before{background:var(--red)}.summary-card.warn::before{background:var(--amber)}.summary-card.info::before{background:var(--blue)}
+.summary-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}.summary-card.active-card{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.summary-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.summary-card.danger .summary-icon{background:var(--red-pale)}.summary-card.warn .summary-icon{background:var(--amber-pale)}.summary-card.info .summary-icon{background:var(--blue-pale)}
+.summary-meta{flex:1}
+.summary-label{font-size:11.5px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.summary-count{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;line-height:1}
+.summary-card.danger .summary-count{color:var(--red)}.summary-card.warn .summary-count{color:var(--amber)}.summary-card.info .summary-count{color:var(--blue)}
+.summary-sub{font-size:11.5px;color:var(--ink-muted);margin-top:3px;font-weight:300}
+.section{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);background:#FDFCFA}
+.tabs{display:flex}
+.tab{padding:16px 22px;font-size:13px;font-weight:400;color:var(--ink-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;display:flex;align-items:center;gap:8px;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--ink)}.tab.active{color:var(--ink);font-weight:500}
+.tab.active.danger{border-bottom-color:var(--red)}.tab.active.warn{border-bottom-color:var(--amber)}.tab.active.info{border-bottom-color:var(--blue)}
+.tab-badge{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;line-height:1.4}
+.tab.danger .tab-badge{background:var(--red-pale);color:var(--red)}.tab.warn .tab-badge{background:var(--amber-pale);color:var(--amber)}.tab.info .tab-badge{background:var(--blue-pale);color:var(--blue)}
+.section-actions{display:flex;align-items:center;gap:10px}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px}
+.search-box input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);width:160px}
+.search-box input::placeholder{color:var(--ink-muted)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:11px 18px;text-align:left;font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px;background:#FDFCFA;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th:first-child{padding-left:24px}thead th:last-child{padding-right:24px;text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;animation:fadeRow .35s ease forwards;opacity:0}
+tbody tr:last-child{border-bottom:none}tbody tr:hover{background:#FDFCFA}
+@keyframes fadeRow{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+tbody td{padding:14px 18px;vertical-align:middle;color:var(--ink)}
+tbody td:first-child{padding-left:24px}tbody td:last-child{padding-right:24px;text-align:right}
+.avatar-cell{display:flex;align-items:center;gap:11px}
+.avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:var(--gold-pale);color:var(--amber)}
+.name-block .name{font-weight:500;font-size:13.5px;color:var(--ink)}.name-block .sid{font-size:11px;color:var(--ink-muted);margin-top:1px}
+.sport-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500;background:var(--gold-pale);color:var(--amber)}
+.plan-chip{display:inline-flex;padding:3px 9px;border-radius:5px;border:1px solid var(--border-strong);font-size:11.5px;color:var(--ink-soft);background:var(--cream)}
+.expiry-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;font-size:12px;font-weight:500}
+.exp-today{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.15)}
+.exp-week{background:var(--amber-pale);color:var(--amber);border:1px solid rgba(196,122,48,.15)}
+.exp-month{background:var(--blue-pale);color:var(--blue);border:1px solid rgba(46,107,158,.15)}
+.notify-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border-strong);background:#fff;color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .15s}
+.notify-btn:hover{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.slot-text{font-size:12.5px;color:var(--ink-soft)}.parent-text{font-size:12.5px;color:var(--ink-soft);font-weight:500}.parent-phone{font-size:11px;color:var(--ink-muted);margin-top:2px}
+.empty-state{text-align:center;padding:60px 24px;color:var(--ink-muted);font-size:13.5px}.empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-top:1px solid var(--border);background:#FDFCFA;font-size:12px;color:var(--ink-muted)}
+.tab-content{display:none}.tab-content.active{display:block}
+@media(max-width:900px){.page-wrap{padding:1.5rem 1rem 3rem}.summary-row{grid-template-columns:1fr 1fr}.section-actions{display:none}}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span><span>Notifications</span>
+  </div>
+  <div class="page-header">
+    <div>
+      <h1>Subscription Expiry Alerts</h1>
+      <p>Students whose plans are expiring — review and send renewal reminders</p>
+    </div>
+    <button class="btn btn-gold" onclick="notifyAll()">✦ Notify All Expiring</button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-row">
+    <div class="summary-card danger" onclick="setTab('today')">
+      <div class="summary-icon">⚠️</div>
+      <div class="summary-meta">
+        <div class="summary-label">Due Today</div>
+        <div class="summary-count">{{ count_today }}</div>
+        <div class="summary-sub">Immediate action needed</div>
+      </div>
+    </div>
+    <div class="summary-card warn" onclick="setTab('week')">
+      <div class="summary-icon">📅</div>
+      <div class="summary-meta">
+        <div class="summary-label">Due This Week</div>
+        <div class="summary-count">{{ count_week }}</div>
+        <div class="summary-sub">Within the next 7 days</div>
+      </div>
+    </div>
+    <div class="summary-card info" onclick="setTab('month')">
+      <div class="summary-icon">🗓️</div>
+      <div class="summary-meta">
+        <div class="summary-label">Due This Month</div>
+        <div class="summary-count">{{ count_month }}</div>
+        <div class="summary-sub">Within the next 30 days</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table section -->
+  <div class="section">
+    <div class="section-header">
+      <div class="tabs">
+        <div class="tab danger active" id="tab-today" onclick="setTab('today')">
+          Due Today <span class="tab-badge">{{ count_today }}</span>
+        </div>
+        <div class="tab warn" id="tab-week" onclick="setTab('week')">
+          Due This Week <span class="tab-badge">{{ count_week }}</span>
+        </div>
+        <div class="tab info" id="tab-month" onclick="setTab('month')">
+          Due This Month <span class="tab-badge">{{ count_month }}</span>
+        </div>
+      </div>
+      <div class="section-actions">
+        <div class="search-box">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="search-input" placeholder="Search student…" oninput="filterRows()">
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY -->
+    <div class="tab-content active" id="content-today">
+      {% include "notifications/_table.html" with students=due_today tab_type="today" %}
+    </div>
+    <!-- WEEK -->
+    <div class="tab-content" id="content-week">
+      {% include "notifications/_table.html" with students=due_week tab_type="week" %}
+    </div>
+    <!-- MONTH -->
+    <div class="tab-content" id="content-month">
+      {% include "notifications/_table.html" with students=due_month tab_type="month" %}
+    </div>
+
+    <div class="table-footer">
+      <span id="footer-count">—</span>
+      <span>Sports Academy Management System</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:28px;right:28px;z-index:600;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--cream);padding:13px 18px;border-radius:12px;font-size:13px;box-shadow:0 8px 28px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:340px;font-family:DM Sans,sans-serif">
+  <span id="toast-icon">✓</span><span id="toast-msg"></span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentTab = 'today';
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('content-' + tab).classList.add('active');
+  document.querySelectorAll('.summary-card').forEach(c => c.classList.remove('active-card'));
+  updateFooter();
+}
+function updateFooter() {
+  const rows = document.querySelectorAll('#content-' + currentTab + ' tr[data-search]:not([style*="display: none"])');
+  document.getElementById('footer-count').textContent = `Showing ${rows.length} student${rows.length !== 1 ? 's' : ''}`;
+}
+function filterRows() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  document.querySelectorAll('tr[data-search]').forEach(r => {
+    r.style.display = r.dataset.search.includes(q) ? '' : 'none';
+  });
+  updateFooter();
+}
+function sendWhatsApp(name, sport, phone) {
+  const clean = phone.replace(/\D/g, '');
+  const msg = encodeURIComponent(`Hello! This is a reminder from Sports Academy. The ${sport} subscription for *${name}* is expiring soon. Kindly renew to continue uninterrupted training. Thank you! 🏅`);
+  window.open(`https://wa.me/${clean}?text=${msg}`, '_blank');
+}
+function notifyAll() {
+  showToast('Reminders would be sent via WhatsApp to all expiring students.', '📱');
+}
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.style.transform = 'translateY(0)'; t.style.opacity = '1';
+  setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3500);
+}
+updateFooter();
+</script>
+{% endblock %}

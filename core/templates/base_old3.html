@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Sports Academy{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:         #F8F4EE;
+  --cream-dark:    #EDE8DF;
+  --cream-deeper:  #E3DDD3;
+  --ink:           #1A1612;
+  --ink-soft:      #4A4540;
+  --ink-muted:     #8A8480;
+  --ink-faint:     #C4BFB8;
+  --gold:          #C4973A;
+  --gold-light:    #F0DFB8;
+  --gold-pale:     #FAF3E2;
+  --red:           #B84040;
+  --red-pale:      #F7EAEA;
+  --amber:         #C47A30;
+  --amber-pale:    #FDF0E2;
+  --blue:          #2E6B9E;
+  --blue-pale:     #E8F1F8;
+  --green:         #3A7A52;
+  --green-pale:    #E8F4EE;
+  --purple:        #6A3DAA;
+  --purple-pale:   #F0EBF8;
+  --border:        rgba(26,22,18,0.10);
+  --border-mid:    rgba(26,22,18,0.14);
+  --border-strong: rgba(26,22,18,0.20);
+  --radius:        12px;
+  --radius-sm:     7px;
+  --radius-lg:     18px;
+  --shadow-sm:     0 2px 12px rgba(26,22,18,0.06);
+  --shadow-md:     0 6px 28px rgba(26,22,18,0.09);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════
+   TOPBAR
+══════════════════════════════ */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: var(--ink);
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.topbar-brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+.brand-mark {
+  width: 32px; height: 32px;
+  background: var(--gold); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.brand-mark svg { width: 17px; height: 17px; }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 500;
+  color: var(--cream); letter-spacing: 0.2px;
+}
+.topbar-nav { display: flex; align-items: center; gap: 4px; }
+.nav-link {
+  padding: 6px 14px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 400;
+  color: rgba(248,244,238,0.55);
+  text-decoration: none; transition: all 0.15s;
+}
+.nav-link:hover { color: var(--cream); background: rgba(255,255,255,0.07); }
+.nav-link.active { color: var(--gold); background: rgba(196,151,58,0.12); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.notif-bell {
+  position: relative; width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); cursor: pointer;
+  color: rgba(248,244,238,0.55); transition: all 0.15s;
+}
+.notif-bell:hover { color: var(--cream); background: rgba(255,255,255,0.07); }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--red); border-radius: 50%;
+  border: 1.5px solid var(--ink);
+}
+.topbar-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: var(--ink); cursor: pointer;
+}
+
+/* ══════════════════════════════
+   LAYOUT
+══════════════════════════════ */
+.layout { display: flex; min-height: 100vh; padding-top: 58px; }
+
+/* ══════════════════════════════
+   SIDEBAR
+══════════════════════════════ */
+.sidebar {
+  width: 230px; flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid var(--border);
+  position: fixed; top: 58px; bottom: 0; left: 0;
+  overflow-y: auto; padding: 1.5rem 0;
+  display: flex; flex-direction: column;
+}
+.sidebar-section { margin-bottom: 2rem; }
+.sidebar-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink-faint);
+  padding: 0 20px; margin-bottom: 6px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 20px; font-size: 13px; font-weight: 400;
+  color: var(--ink-soft); text-decoration: none; cursor: pointer;
+  transition: all 0.15s; border-left: 3px solid transparent;
+}
+.sidebar-item:hover { background: var(--cream); color: var(--ink); }
+.sidebar-item.active {
+  background: var(--gold-pale); color: var(--ink);
+  font-weight: 500; border-left-color: var(--gold);
+}
+.sidebar-item .s-icon {
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.sidebar-badge {
+  margin-left: auto; font-size: 10.5px; font-weight: 600;
+  background: var(--red-pale); color: var(--red);
+  padding: 2px 7px; border-radius: 20px;
+}
+.sidebar-badge.gold { background: var(--gold-pale); color: var(--amber); }
+.sidebar-footer {
+  margin-top: auto; padding: 1rem 20px;
+  border-top: 1px solid var(--border);
+}
+.sidebar-user { display: flex; align-items: center; gap: 10px; }
+.sidebar-user-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: var(--ink); flex-shrink: 0;
+}
+.sidebar-user-name { font-weight: 500; font-size: 12.5px; color: var(--ink); }
+.sidebar-user-role { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
+
+/* ══════════════════════════════
+   MAIN
+══════════════════════════════ */
+.main { margin-left: 230px; flex: 1; min-height: calc(100vh - 58px); display: flex; flex-direction: column; }
+.main-content { flex: 1; }
+
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+.footer {
+  margin-left: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  padding: 18px 2.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left {
+  display: flex; align-items: center; gap: 10px;
+}
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px; font-weight: 500; color: var(--ink);
+}
+.footer-sep { color: var(--ink-faint); font-size: 12px; }
+.footer-copy { font-size: 12px; color: var(--ink-muted); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a {
+  font-size: 12px; color: var(--ink-muted);
+  text-decoration: none; transition: color 0.15s;
+}
+.footer-links a:hover { color: var(--gold); }
+
+/* ══════════════════════════════
+   SHARED BUTTON STYLES
+══════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; border: none;
+  transition: all 0.18s; text-decoration: none;
+}
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: #d4a84a; }
+.btn-ghost {
+  background: rgba(255,255,255,0.08);
+  color: rgba(248,244,238,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.13); }
+.btn-outline-ink {
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--ink-soft);
+}
+.btn-outline-ink:hover { background: var(--cream-dark); }
+
+/* ══════════════════════════════
+   SIDEBAR SUBMENU (Masters)
+══════════════════════════════ */
+.sidebar-item-parent {
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 20px; font-size: 13px; font-weight: 400;
+  color: var(--ink-soft); cursor: pointer;
+  transition: all 0.15s; border-left: 3px solid transparent;
+  user-select: none; list-style: none;
+}
+.sidebar-item-parent:hover { background: var(--cream); color: var(--ink); }
+.sidebar-item-parent.open  { color: var(--ink); font-weight: 500; background: var(--cream); }
+.sidebar-item-parent.has-active {
+  color: var(--ink); font-weight: 500;
+  border-left-color: var(--gold); background: var(--gold-pale);
+}
+.sidebar-chevron {
+  margin-left: auto;
+  width: 14px; height: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.22s ease;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+.sidebar-item-parent.open .sidebar-chevron { transform: rotate(90deg); }
+.sidebar-submenu {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--cream);
+  border-left: 3px solid var(--border-mid);
+  margin-left: 0;
+}
+.sidebar-submenu.open { max-height: 400px; }
+.sidebar-subitem {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 20px 8px 36px;
+  font-size: 12.5px; font-weight: 400;
+  color: var(--ink-muted); text-decoration: none;
+  transition: all 0.13s; border-left: none;
+}
+.sidebar-subitem:hover { color: var(--ink); background: var(--cream-dark); }
+.sidebar-subitem.active {
+  color: var(--ink); font-weight: 500;
+  background: var(--gold-pale); color: var(--amber);
+}
+.subitem-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--ink-faint); flex-shrink: 0;
+  transition: background 0.13s;
+}
+.sidebar-subitem:hover .subitem-dot  { background: var(--ink-muted); }
+.sidebar-subitem.active .subitem-dot { background: var(--gold); }
+
+/* ══════════════════════════════
+   RESPONSIVE
+══════════════════════════════ */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .topbar { padding: 0 1.2rem; }
+  .topbar-nav { display: none; }
+  .footer { padding: 14px 1.2rem; }
+  .footer-links { display: none; }
+}
+
+{% block extra_css %}{% endblock %}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     TOPBAR
+═══════════════════════════════════════ -->
+<header class="topbar">
+  <a class="topbar-brand" href="{% url 'home' %}">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="#1A1612" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5v-9l6 4.5-6 4.5z"/>
+      </svg>
+    </div>
+    <span class="brand-name">Sports Academy</span>
+  </a>
+
+  <nav class="topbar-nav">
+    <a href="{% url 'home' %}"          class="nav-link {% block nav_home %}{% endblock %}">Dashboard</a>
+    <a href="#"                          class="nav-link {% block nav_students %}{% endblock %}">Students</a>
+    <a href="#"                          class="nav-link {% block nav_batches %}{% endblock %}">Batches</a>
+    <a href="#"                          class="nav-link {% block nav_payments %}{% endblock %}">Payments</a>
+    <a href="#"                          class="nav-link {% block nav_staff %}{% endblock %}">Staff</a>
+    <a href="#"                          class="nav-link {% block nav_reports %}{% endblock %}">Reports</a>
+  </nav>
+
+  <div class="topbar-right">
+    <a href="{% url 'notifications' %}" class="notif-bell">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <div class="notif-dot"></div>
+    </a>
+    <div class="topbar-avatar">SA</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     LAYOUT WRAPPER
+═══════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- ═══════════════════════
+       SIDEBAR
+  ═══════════════════════ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Main</div>
+      <a class="sidebar-item {% block sb_home %}{% endblock %}"     href="{% url 'home' %}">
+        <span class="s-icon">⊞</span> Dashboard
+      </a>
+      <a class="sidebar-item {% block sb_students %}{% endblock %}" href="#">
+        <span class="s-icon">👤</span> Students
+        <span class="sidebar-badge gold">248</span>
+      </a>
+      <a class="sidebar-item {% block sb_batches %}{% endblock %}"  href="#">
+        <span class="s-icon">🏃</span> Batches
+      </a>
+      <a class="sidebar-item {% block sb_slots %}{% endblock %}"    href="#">
+        <span class="s-icon">🕐</span> Time Slots
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Finance</div>
+      <a class="sidebar-item {% block sb_payments %}{% endblock %}" href="#">
+        <span class="s-icon">💳</span> Payments
+      </a>
+      <a class="sidebar-item {% block sb_invoices %}{% endblock %}" href="#">
+        <span class="s-icon">📄</span> Invoices
+      </a>
+      <a class="sidebar-item {% block sb_staff %}{% endblock %}"    href="#">
+        <span class="s-icon">👥</span> Staff & Payroll
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Operations</div>
+      <a class="sidebar-item {% block sb_notifications %}{% endblock %}" href="{% url 'notifications' %}">
+        <span class="s-icon">🔔</span> Notifications
+        <span class="sidebar-badge">7</span>
+      </a>
+      <a class="sidebar-item {% block sb_attendance %}{% endblock %}"    href="#">
+        <span class="s-icon">📅</span> Attendance
+      </a>
+      <a class="sidebar-item {% block sb_reports %}{% endblock %}"       href="#">
+        <span class="s-icon">📊</span> Reports
+      </a>
+      <a class="sidebar-item {% block sb_settings %}{% endblock %}"      href="#">
+        <span class="s-icon">⚙️</span> Settings
+      </a>
+    </div>
+
+    <!-- ── Masters ── -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Configuration</div>
+
+      <div class="sidebar-item-parent {% block sb_masters_parent %}{% endblock %}"
+           id="masters-toggle" onclick="toggleMasters()">
+        <span class="s-icon">🗂️</span>
+        Masters
+        <span class="sidebar-chevron">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </span>
+      </div>
+
+      <div class="sidebar-submenu" id="masters-submenu">
+
+        {% comment %} <a class="sidebar-subitem {% block sb_master_sports %}{% endblock %}" href="#"> {% endcomment %}
+        <a class="sidebar-subitem {% block sb_master_sports %}{% endblock %}" href="{% url 'sports_master' %}">
+          <span class="subitem-dot"></span> Sports Master
+        </a>
+
+        <a class="sidebar-subitem {% block sb_master_batch %}{% endblock %}" href="#">
+          <span class="subitem-dot"></span> Batch Master
+        </a>
+
+        <a class="sidebar-subitem {% block sb_master_level %}{% endblock %}" href="#">
+          <span class="subitem-dot"></span> Expertise Level Master
+        </a>
+
+        <a class="sidebar-subitem {% block sb_master_timeslot %}{% endblock %}" href="#">
+          <span class="subitem-dot"></span> Time Slot Master
+        </a>
+
+        <a class="sidebar-subitem {% block sb_master_duration %}{% endblock %}" href="#">
+          <span class="subitem-dot"></span> Duration Master
+        </a>
+
+        <a class="sidebar-subitem {% block sb_master_binding %}{% endblock %}" href="#">
+          <span class="subitem-dot"></span> Level → Slot & Weekday Binding
+        </a>
+
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-av">SA</div>
+        <div>
+          <div class="sidebar-user-name">Super Admin</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════
+       MAIN CONTENT
+  ═══════════════════════ -->
+  <main class="main">
+    <div class="main-content">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-left">
+        <span class="footer-brand">Sports Academy</span>
+        <span class="footer-sep">·</span>
+        <span class="footer-copy">© 2026 All rights reserved</span>
+      </div>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Support</a>
+      </div>
+    </footer>
+  </main>
+
+</div>
+
+{% block extra_js %}{% endblock %}
+
+<script>
+(function() {
+  const toggle  = document.getElementById('masters-toggle');
+  const submenu = document.getElementById('masters-submenu');
+  if (!toggle || !submenu) return;
+
+  // Auto-open if any subitem is active (set by child template)
+  const hasActive = submenu.querySelector('.sidebar-subitem.active');
+  if (hasActive) {
+    toggle.classList.add('open', 'has-active');
+    submenu.classList.add('open');
+  }
+
+  window.toggleMasters = function() {
+    const isOpen = submenu.classList.contains('open');
+    submenu.classList.toggle('open', !isOpen);
+    toggle.classList.toggle('open', !isOpen);
+    if (hasActive) toggle.classList.add('has-active');
+  };
+
+  // Keep open state in sessionStorage so it survives page navigation
+  const STORAGE_KEY = 'sa_masters_open';
+  if (!hasActive && sessionStorage.getItem(STORAGE_KEY) === '1') {
+    toggle.classList.add('open');
+    submenu.classList.add('open');
+  }
+  const origToggle = window.toggleMasters;
+  window.toggleMasters = function() {
+    origToggle();
+    sessionStorage.setItem(STORAGE_KEY, submenu.classList.contains('open') ? '1' : '0');
+  };
+})();
+</script>
+
+</body>
+</html>

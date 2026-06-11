@@ -1,0 +1,1053 @@
+{% extends "base.html" %}
+{% block title %}Enquiry Dashboard — Pradip Sports Academy{% endblock %}
+{% block sb_enquiries %}active{% endblock %}
+{% block nav_enquiries %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --gold: #C9912A;
+    --gold-light: #E8B84B;
+    --gold-pale: rgba(201,145,42,0.10);
+    --green-wa: #25D366;
+    --green-wa-dark: #1BA84F;
+    --surface: #FAFAF9;
+    --surface-2: #F4F2EE;
+    --border: rgba(0,0,0,0.08);
+    --border-m: rgba(0,0,0,0.18);
+    --text: #1A1814;
+    --text-dim: #5A5650;
+    --text-muted: #9A9690;
+    --radius: 8px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  /* ── Page wrapper ── */
+  .eq-page {
+    padding: 28px 36px 60px;
+    background: #F7F5F1;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .eq-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .eq-header-left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+  }
+  .eq-header-left p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* ── Back button — properly styled ── */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-m);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-back:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-pale);
+    text-decoration: none;
+  }
+  .btn-back svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* ── Stat cards ── */
+  .eq-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .eq-stat {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .eq-stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .eq-stat.s-total::before   { background: #C9912A; }
+  .eq-stat.s-new::before     { background: #1a73e8; }
+  .eq-stat.s-pending::before { background: #f57c00; }
+  .eq-stat.s-done::before    { background: #1e8e3e; }
+
+  .eq-stat-num {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .s-total .eq-stat-num   { color: #C9912A; }
+  .s-new .eq-stat-num     { color: #1a73e8; }
+  .s-pending .eq-stat-num { color: #f57c00; }
+  .s-done .eq-stat-num    { color: #1e8e3e; }
+
+  .eq-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  /* ── Panel ── */
+  .eq-panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* ── Filters bar ── */
+  .eq-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    background: var(--surface-2);
+  }
+  .eq-filters-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 2px;
+    flex-shrink: 0;
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: 1px solid var(--border-m);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .filter-chip:hover { border-color: var(--gold); color: var(--gold); text-decoration: none; }
+  .filter-chip.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .filter-chip .chip-count {
+    background: rgba(0,0,0,0.12);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .filter-chip.active .chip-count { background: rgba(255,255,255,0.25); }
+
+  .filter-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border-m);
+    margin: 0 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── Search box — fixed with visible border ── */
+  .eq-search {
+    margin-left: auto;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .eq-search input {
+    padding: 7px 14px 7px 34px;
+    border: 1.5px solid var(--border-m);     /* visible border */
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    width: 210px;
+    transition: border-color 0.2s, width 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .eq-search input:focus {
+    border-color: var(--gold);
+    width: 250px;
+    box-shadow: 0 0 0 3px rgba(201,145,42,0.12);
+  }
+  .eq-search input::placeholder { color: var(--text-muted); }
+  .eq-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+  }
+  .eq-search-icon svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* ── Toolbar ── */
+  .eq-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    flex-wrap: wrap;
+  }
+  .select-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+  .select-all-wrap input[type="checkbox"] {
+    accent-color: var(--gold);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  .toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-m);
+    background: #fff;
+    color: var(--text-dim);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-action:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+  .btn-action:disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
+  .btn-action.btn-done {
+    border-color: rgba(30,142,62,0.35);
+    color: #1e8e3e;
+    background: rgba(30,142,62,0.05);
+  }
+  .btn-action.btn-done:hover { background: rgba(30,142,62,0.12); border-color: #1e8e3e; }
+
+  .selected-count {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 600;
+    padding: 0 2px;
+    min-width: 20px;
+  }
+
+  /* ── Show-all toggle ── */
+  .show-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 34px;
+    height: 19px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { display: none; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #D1CBC3;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: var(--gold); }
+  .toggle-thumb {
+    position: absolute;
+    top: 2.5px; left: 2.5px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    pointer-events: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(15px); }
+
+  /* ── Table ── */
+  .eq-table-wrap { overflow-x: auto; }
+  .eq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .eq-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .eq-table thead th.th-check {
+    width: 44px;
+    text-align: center;
+    padding-left: 16px;
+  }
+  .eq-table thead th.th-actions {
+    width: 130px;
+    text-align: center;
+  }
+
+  .eq-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s ease;
+  }
+  .eq-table tbody tr:last-child { border-bottom: none; }
+  .eq-table tbody tr:hover { background: #FDFBF8; }
+  .eq-table tbody tr.selected { background: rgba(201,145,42,0.05); }
+  .eq-table tbody tr.responded {
+    opacity: 0.45;
+    background: var(--surface);
+  }
+
+  .eq-table td {
+    padding: 12px 14px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .eq-table td.td-check {
+    text-align: center;
+    padding-left: 16px;
+  }
+  .eq-table td.td-check input[type="checkbox"] {
+    accent-color: var(--gold);
+    width: 15px; height: 15px;
+    cursor: pointer;
+  }
+
+  /* Cell types */
+  .td-name { font-weight: 600; color: var(--text); line-height: 1.3; }
+  .td-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .td-phone a { color: var(--text); text-decoration: none; }
+  .td-phone a:hover { color: var(--gold); text-decoration: underline; }
+
+  /* Status badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .badge-new       { background: #E8F0FE; color: #1557b0; }
+  .badge-new::before { background: #1a73e8; }
+  .badge-contacted { background: #FFF3E0; color: #b94400; }
+  .badge-contacted::before { background: #f57c00; }
+  .badge-enrolled  { background: #E6F4EA; color: #0d652d; }
+  .badge-enrolled::before { background: #1e8e3e; }
+  .badge-closed    { background: #F1F3F4; color: #5f6368; }
+  .badge-closed::before { background: #9aa0a6; }
+
+  /* WA status */
+  .wa-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .wa-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .wa-sent { color: #0d652d; }
+  .wa-sent::before { background: #1e8e3e; }
+  .wa-pending { color: #b94400; }
+  .wa-pending::before { background: #f57c00; }
+
+  /* ── WhatsApp button — fixed icon visibility ── */
+  .td-actions { text-align: center; }
+
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: var(--green-wa);
+    color: #12a05d;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .btn-wa:hover {
+    background: var(--green-wa-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(37,211,102,0.35);
+    color: #12a05d;
+    text-decoration: none;
+  }
+  /* Icon inside WA button */
+  .btn-wa .wa-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    display: block;        /* was hidden due to SVG fill not set */
+    fill: #12a05d;
+  }
+  .btn-wa .wa-label { line-height: 1; }
+
+  /* Resend variant */
+  .btn-wa.btn-wa-resend {
+    background: transparent;
+    color: #1e8e3e;
+    border: 1px solid rgba(37,211,102,0.45);
+  }
+  .btn-wa.btn-wa-resend:hover {
+    background: rgba(37,211,102,0.1);
+    transform: translateY(-1px);
+    box-shadow: none;
+  }
+  .btn-wa.btn-wa-resend .wa-icon { fill: #1e8e3e; }
+
+  /* ── Empty state ── */
+  .eq-empty {
+    padding: 64px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .eq-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.35; }
+  .eq-empty-title { font-size: 15px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; }
+  .eq-empty-sub { font-size: 13px; }
+
+  /* ── Footer / Pagination ── */
+  .eq-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--surface);
+  }
+  .eq-pagination { display: flex; gap: 4px; }
+  .eq-pagination a, .eq-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border-m);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: none;
+    background: #fff;
+    transition: all 0.15s;
+  }
+  .eq-pagination a:hover { border-color: var(--gold); color: var(--gold); }
+  .eq-pagination span.current { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+  /* ── Toast ── */
+  .eq-toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    padding: 12px 18px;
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    max-width: 340px;
+    pointer-events: none;
+  }
+  .eq-toast.show { transform: translateY(0); opacity: 1; }
+  .eq-toast.success { background: #1e8e3e; }
+  .eq-toast.error   { background: #c62828; }
+  .eq-toast.info    { background: #1565c0; }
+
+  /* ── Sort arrows ── */
+  .th-sort { cursor: pointer; user-select: none; }
+  .th-sort:hover { color: var(--gold); }
+  .sort-arrow { margin-left: 4px; opacity: 0.35; font-size: 9px; }
+  .sort-arrow.active { opacity: 1; color: var(--gold); }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .eq-page { padding: 20px 20px 40px; }
+    .eq-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .eq-stats { grid-template-columns: 1fr 1fr; }
+    .toolbar-actions { flex-wrap: wrap; }
+    .show-all-wrap { margin-left: 0; }
+  }
+.btn-wa .wa-icon path {
+  fill: #12a05d;
+}
+.btn-wa.btn-wa-resend .wa-icon path {
+  fill: #1e8e3e;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eq-page">
+
+  <!-- HEADER -->
+  <div class="eq-header">
+    <div class="eq-header-left">
+      <h1>🏆 Enquiry Dashboard</h1>
+      <p>Pradip Sports Academy · All student enquiries in one place</p>
+    </div>
+    <a href="{% url 'admin:index' %}" class="btn-back">
+      <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 10H3M3 10l5-5M3 10l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      Back to Admin
+    </a>
+  </div>
+
+  <!-- STATS -->
+  <div class="eq-stats">
+    <div class="eq-stat s-total">
+      <div class="eq-stat-num">{{ total_count }}</div>
+      <div class="eq-stat-label">Total Enquiries</div>
+    </div>
+    <div class="eq-stat s-new">
+      <div class="eq-stat-num">{{ new_count }}</div>
+      <div class="eq-stat-label">New (Unread)</div>
+    </div>
+    <div class="eq-stat s-pending">
+      <div class="eq-stat-num">{{ pending_count }}</div>
+      <div class="eq-stat-label">Contacted</div>
+    </div>
+    <div class="eq-stat s-done">
+      <div class="eq-stat-num">{{ done_count }}</div>
+      <div class="eq-stat-label">Enrolled / Closed</div>
+    </div>
+  </div>
+
+  <!-- MAIN PANEL -->
+  <div class="eq-panel">
+
+    <!-- FILTERS -->
+    <div class="eq-filters">
+      <span class="eq-filters-label">Filter:</span>
+
+      <a href="?status=" class="filter-chip {% if not request.GET.status %}active{% endif %}">
+        All <span class="chip-count">{{ total_count }}</span>
+      </a>
+      <a href="?status=new" class="filter-chip {% if request.GET.status == 'new' %}active{% endif %}">
+        New <span class="chip-count">{{ new_count }}</span>
+      </a>
+      <a href="?status=contacted" class="filter-chip {% if request.GET.status == 'contacted' %}active{% endif %}">
+        Contacted <span class="chip-count">{{ pending_count }}</span>
+      </a>
+      <a href="?status=enrolled" class="filter-chip {% if request.GET.status == 'enrolled' %}active{% endif %}">
+        Enrolled <span class="chip-count">{{ enrolled_count }}</span>
+      </a>
+      <a href="?status=closed" class="filter-chip {% if request.GET.status == 'closed' %}active{% endif %}">
+        Closed <span class="chip-count">{{ closed_count }}</span>
+      </a>
+
+      {% if sports_list %}
+      <div class="filter-sep"></div>
+      {% for sport in sports_list %}
+      <a href="?sport={{ sport }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}"
+         class="filter-chip {% if request.GET.sport == sport %}active{% endif %}">
+        {{ sport }}
+      </a>
+      {% endfor %}
+      {% endif %}
+
+      <!-- Search — with proper SVG icon instead of text char -->
+      <div class="eq-search">
+        <span class="eq-search-icon">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="5.5"/><line x1="13" y1="13" x2="18" y2="18"/>
+          </svg>
+        </span>
+        <input type="text" id="searchInput" placeholder="Search name, phone, sport…" value="{{ request.GET.q|default:'' }}">
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="eq-toolbar">
+      <div class="select-all-wrap">
+        <input type="checkbox" id="selectAll" title="Select all visible rows">
+        <span id="selectedLabel" style="font-size:13px;color:var(--text-dim);">Select all</span>
+      </div>
+      <span class="selected-count" id="selectedCount"></span>
+
+      <div class="toolbar-actions">
+        <button class="btn-action btn-done" id="btnMarkResponded" disabled onclick="bulkMarkResponded()">
+          ✓ Mark as Responded
+        </button>
+        <button class="btn-action" id="btnMarkContacted" disabled onclick="bulkMarkStatus('contacted')">
+          📞 Mark Contacted
+        </button>
+        <button class="btn-action" id="btnBulkWA" disabled onclick="bulkWhatsApp()">
+          📲 Send WA to Selected
+        </button>
+      </div>
+
+      <div class="show-all-wrap">
+        <span>Show responded</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="showAllToggle" {% if show_all %}checked{% endif %} onchange="toggleShowAll(this)">
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="eq-table-wrap">
+      <table class="eq-table" id="enquiryTable">
+        <thead>
+          <tr>
+            <th class="th-check"></th>
+            <th class="th-sort" onclick="sortTable(1)"># <span class="sort-arrow">↕</span></th>
+            <th class="th-sort" onclick="sortTable(2)">Name <span class="sort-arrow">↕</span></th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th class="th-sort" onclick="sortTable(5)">Sport <span class="sort-arrow">↕</span></th>
+            <th style="text-align:center;">Age</th>
+            <th>Message</th>
+            <th class="th-sort" onclick="sortTable(8)">Status <span class="sort-arrow">↕</span></th>
+            <th>WhatsApp</th>
+            <th class="th-sort" onclick="sortTable(10)">Received <span class="sort-arrow">↕</span></th>
+            <th class="th-actions">Notify</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for enquiry in enquiries %}
+          <tr
+            class="{% if enquiry.status == 'closed' %}responded{% endif %}"
+            data-id="{{ enquiry.id }}"
+            data-status="{{ enquiry.status }}"
+          >
+            <td class="td-check">
+              <input type="checkbox" class="row-check" value="{{ enquiry.id }}">
+            </td>
+            <td style="color:var(--text-muted);font-size:12px;font-weight:500;">{{ forloop.counter }}</td>
+            <td>
+              <div class="td-name">{{ enquiry.full_name }}</div>
+              <div class="td-sub">ID #{{ enquiry.id }}</div>
+            </td>
+            <td class="td-phone">
+              <a href="tel:{{ enquiry.phone }}">{{ enquiry.phone }}</a>
+            </td>
+            <td>
+              {% if enquiry.email %}
+                <a href="mailto:{{ enquiry.email }}" style="color:var(--text-dim);text-decoration:none;font-size:12px;">{{ enquiry.email }}</a>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>{{ enquiry.sport|default:"—" }}</td>
+            <td style="text-align:center;">{{ enquiry.age|default:"—" }}</td>
+            <td style="max-width:180px;">
+              {% if enquiry.message %}
+                <span title="{{ enquiry.message }}"
+                      style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;font-size:12px;color:var(--text-dim);">
+                  {{ enquiry.message }}
+                </span>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge badge-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span>
+            </td>
+            <td>
+              {% if enquiry.whatsapp_sent %}
+                <span class="wa-badge wa-sent">Sent</span>
+              {% else %}
+                <span class="wa-badge wa-pending">Pending</span>
+              {% endif %}
+            </td>
+            <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">
+              {{ enquiry.created_at|date:"d M Y" }}<br>
+              <span style="font-size:11px;">{{ enquiry.created_at|time:"h:i A" }}</span>
+            </td>
+            <td class="td-actions">
+              <button
+                class="btn-wa {% if enquiry.whatsapp_sent %}btn-wa-resend{% endif %}"
+                onclick="openWhatsApp(
+                  '{{ enquiry.phone|escapejs }}',
+                  '{{ enquiry.full_name|escapejs }}',
+                  '{{ enquiry.sport|default:''|escapejs }}',
+                  '{{ enquiry.id }}'
+                )">
+                <svg class="wa-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                <span class="wa-label">{% if enquiry.whatsapp_sent %}Resend{% else %}Send WA{% endif %}</span>
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="12">
+              <div class="eq-empty">
+                <div class="eq-empty-icon">📭</div>
+                <div class="eq-empty-title">No enquiries found</div>
+                <div class="eq-empty-sub">Try adjusting the filters or check back later.</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER / PAGINATION -->
+    <div class="eq-footer">
+      <span>Showing <strong>{{ enquiries|length }}</strong> of <strong>{{ total_count }}</strong> enquiries</span>
+      {% if is_paginated %}
+      <div class="eq-pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}&{{ query_string }}">‹</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          {% if num == page_obj.number %}
+            <span class="current">{{ num }}</span>
+          {% elif num|add:"-2" <= page_obj.number and page_obj.number <= num|add:"2" %}
+            <a href="?page={{ num }}&{{ query_string }}">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}&{{ query_string }}">›</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div><!-- /.eq-panel -->
+
+</div><!-- /.eq-page -->
+
+<!-- TOAST -->
+<div class="eq-toast" id="toast"></div>
+
+<script>
+const CSRF = '{{ csrf_token }}';
+
+// ── Toast ─────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'eq-toast ' + type + ' show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Client-side search ────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#tableBody tr[data-id]').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+  updateSelectedCount();
+});
+
+// ── Checkbox logic ────────────────────────────────────────────
+document.getElementById('selectAll').addEventListener('change', function () {
+  document.querySelectorAll('.row-check').forEach(cb => {
+    if (cb.closest('tr').style.display !== 'none') cb.checked = this.checked;
+  });
+  updateSelectedCount();
+});
+
+document.querySelectorAll('.row-check').forEach(cb => {
+  cb.addEventListener('change', updateSelectedCount);
+});
+
+function getSelected() {
+  return [...document.querySelectorAll('.row-check:checked')].map(cb => cb.value);
+}
+
+function updateSelectedCount() {
+  const ids = getSelected();
+  const n = ids.length;
+  document.getElementById('selectedCount').textContent = n > 0 ? n + ' selected' : '';
+  document.getElementById('selectedLabel').textContent = n > 0 ? n + ' selected' : 'Select all';
+  ['btnMarkResponded', 'btnMarkContacted', 'btnBulkWA'].forEach(id => {
+    document.getElementById(id).disabled = n === 0;
+  });
+}
+
+// ── Show-responded toggle ─────────────────────────────────────
+function toggleShowAll(el) {
+  const url = new URL(window.location.href);
+  el.checked ? url.searchParams.set('show_all', '1') : url.searchParams.delete('show_all');
+  window.location.href = url.toString();
+}
+
+// ── Bulk: mark responded ──────────────────────────────────────
+function bulkMarkResponded() {
+  const ids = getSelected();
+  if (!ids.length) return;
+  const word = ids.length === 1 ? 'enquiry' : 'enquiries';
+  if (!confirm('Mark ' + ids.length + ' ' + word + ' as Responded?\nThey will be hidden from the default view.')) return;
+
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'mark_responded', ids }),
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast('✓ ' + d.count + ' ' + (d.count === 1 ? 'enquiry' : 'enquiries') + ' marked as responded');
+      ids.forEach(id => {
+        const row = document.querySelector('tr[data-id="' + id + '"]');
+        if (!row) return;
+        const badge = row.querySelector('.badge');
+        if (badge) { badge.className = 'badge badge-closed'; badge.textContent = 'Closed'; }
+        row.classList.add('responded');
+        if (!document.getElementById('showAllToggle').checked) {
+          setTimeout(() => row.style.display = 'none', 900);
+        }
+      });
+      document.getElementById('selectAll').checked = false;
+      updateSelectedCount();
+    } else {
+      showToast('Something went wrong. Please try again.', 'error');
+    }
+  })
+  .catch(() => showToast('Network error. Please try again.', 'error'));
+}
+
+// ── Bulk: mark status ─────────────────────────────────────────
+function bulkMarkStatus(status) {
+  const ids = getSelected();
+  if (!ids.length) return;
+
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'mark_status', ids, status }),
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast('✓ ' + d.count + ' ' + (d.count === 1 ? 'enquiry' : 'enquiries') + ' marked as ' + status);
+      ids.forEach(id => {
+        const badge = document.querySelector('tr[data-id="' + id + '"] .badge');
+        if (badge) {
+          badge.className = 'badge badge-' + status;
+          badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        }
+      });
+      document.getElementById('selectAll').checked = false;
+      updateSelectedCount();
+    }
+  })
+  .catch(() => showToast('Network error.', 'error'));
+}
+
+// ── Bulk: WhatsApp — opens wa.me tab for each selected row ───
+function bulkWhatsApp() {
+  const ids = getSelected();
+  if (!ids.length) return;
+  const word = ids.length === 1 ? 'enquiry' : 'enquiries';
+
+  // Warn if many tabs — browsers may block popups beyond 1
+  const tooMany = ids.length > 3;
+  const confirmMsg = tooMany
+    ? 'Open ' + ids.length + ' WhatsApp tabs? Your browser may block multiple popups.\n\nTip: select fewer at a time, or use the individual Send WA button.'
+    : 'Open WhatsApp for ' + ids.length + ' ' + word + '?';
+  if (!confirm(confirmMsg)) return;
+
+  ids.forEach((id, i) => {
+    const row = document.querySelector('tr[data-id="' + id + '"]');
+    if (!row) return;
+
+    // Pull data from the row cells
+    const phone = row.querySelector('.td-phone a') ? row.querySelector('.td-phone a').textContent.trim() : '';
+    const name  = row.querySelector('.td-name') ? row.querySelector('.td-name').textContent.trim() : '';
+    const sport = row.cells[5] ? row.cells[5].textContent.trim() : '';
+
+    // Stagger tab opens slightly so browser doesn't block all at once
+    setTimeout(() => {
+      openWhatsApp(phone, name, sport === '—' ? '' : sport, id);
+    }, i * 600);
+  });
+}
+
+// ── Single WhatsApp — opens wa.me with pre-filled message ────
+function openWhatsApp(rawPhone, name, sport, enquiryId) {
+  // Normalise phone: strip spaces, dashes, brackets; ensure starts with country code
+  let phone = rawPhone.replace(/[\s\-().+]/g, '');
+  // If it starts with 0, replace with India country code (adjust if needed)
+  if (phone.startsWith('0')) phone = '91' + phone.slice(1);
+  // If it doesn't start with a country code (no leading digits > 10), prepend 91
+  if (phone.length === 10) phone = '91' + phone;
+
+  const message =
+    'Hello ' + name + '! 👋\n\n' +
+    'Thank you for your enquiry at *Pradip Sports Academy*' +
+    (sport ? ' for *' + sport + '*' : '') + '.\n\n' +
+    'We have received your enquiry (Ref #' + enquiryId + ') and our team will get in touch with you shortly to discuss the details.\n\n' +
+    'Meanwhile, feel free to reach out to us at any time.\n\n' +
+    '🏆 *Pradip Sports Academy*\n' +
+    '📍 Near Vastrapur Lake, Ahmedabad\n' +
+    '🕐 Mon–Sat: 6 AM – 9 PM\n' +
+    '📞 +91 98765 43210';
+
+  const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+  window.open(url, '_blank', 'noopener,noreferrer');
+
+  // Mark as sent in DB silently (best-effort, no blocking)
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'send_whatsapp', ids: [enquiryId] }),
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      // Update WA badge in the row
+      const waCell = document.querySelector('tr[data-id="' + enquiryId + '"] .wa-badge');
+      if (waCell) { waCell.className = 'wa-badge wa-sent'; waCell.textContent = 'Sent'; }
+      const waLabel = document.querySelector('tr[data-id="' + enquiryId + '"] .btn-wa .wa-label');
+      if (waLabel) waLabel.textContent = 'Resend';
+      const waBtn = document.querySelector('tr[data-id="' + enquiryId + '"] .btn-wa');
+      if (waBtn) waBtn.classList.add('btn-wa-resend');
+      showToast('📲 WhatsApp opened for ' + name, 'info');
+    }
+  })
+  .catch(() => {}); // silently ignore — WA tab already opened
+}
+
+// ── Sort table ────────────────────────────────────────────────
+let sortCol = -1, sortDir = 1;
+function sortTable(col) {
+  const tbody = document.getElementById('tableBody');
+  const rows  = [...tbody.querySelectorAll('tr[data-id]')];
+  sortDir = (sortCol === col) ? sortDir * -1 : 1;
+  sortCol = col;
+
+  rows.sort((a, b) => {
+    const av = (a.cells[col] ? a.cells[col].textContent.trim() : '');
+    const bv = (b.cells[col] ? b.cells[col].textContent.trim() : '');
+    return av.localeCompare(bv, undefined, { numeric: true }) * sortDir;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+
+  document.querySelectorAll('.sort-arrow').forEach(el => el.classList.remove('active'));
+  const sortHeaders = document.querySelectorAll('.th-sort');
+  const headerIndex = [1, 2, 5, 8, 10].indexOf(col);
+  if (headerIndex >= 0 && sortHeaders[headerIndex]) {
+    sortHeaders[headerIndex].querySelector('.sort-arrow').classList.add('active');
+  }
+}
+</script>
+{% endblock %}

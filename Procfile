@@ -1,0 +1,1 @@
+web: gunicorn SportsAcademy.wsgi:application

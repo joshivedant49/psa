@@ -1,0 +1,494 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard—Pradip Sports Academy{% endblock %}
+
+{% block nav_home %}active{% endblock %}
+{% block sb_home %}active{% endblock %}
+
+{% block extra_css %}
+.hero {
+  background: var(--ink);
+  padding: 3rem 2.5rem 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
+}
+.hero-bg-pattern {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 80% 50%, rgba(196,151,58,0.12) 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, rgba(196,151,58,0.06) 0%, transparent 45%);
+  pointer-events: none;
+}
+.hero-lines { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.hero-lines::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 380px; height: 380px; border-radius: 50%;
+  border: 1px solid rgba(196,151,58,0.15);
+}
+.hero-lines::after {
+  content: '';
+  position: absolute; top: 20px; right: 60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  border: 1px solid rgba(196,151,58,0.08);
+}
+.hero-inner { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; }
+.hero-text { max-width: 520px; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(196,151,58,0.15); border: 1px solid rgba(196,151,58,0.25);
+  border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;
+  font-size: 11px; font-weight: 500; color: var(--gold-light); letter-spacing: 0.5px;
+}
+.hero-eyebrow-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+.hero h2 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 500; color: var(--cream); line-height: 1.25; letter-spacing: -0.3px; }
+.hero h2 em { font-style: italic; color: var(--gold-light); }
+.hero-sub { font-size: 13.5px; color: rgba(248,244,238,0.5); margin-top: 10px; font-weight: 300; line-height: 1.6; }
+.hero-actions { display: flex; gap: 10px; margin-top: 22px; }
+.hero-stats {
+  display: flex;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius); overflow: hidden; margin-top: 2.5rem;
+  position: relative; z-index: 2;
+}
+.hero-stat { flex: 1; padding: 18px 22px; border-right: 1px solid rgba(255,255,255,0.07); text-align: center; }
+.hero-stat:last-child { border-right: none; }
+.hero-stat-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: var(--cream); line-height: 1; }
+.hero-stat-num span { color: var(--gold); font-size: 18px; }
+.hero-stat-label { font-size: 11px; color: rgba(248,244,238,0.4); margin-top: 5px; letter-spacing: 0.3px; }
+
+.body-pad { padding: 2rem 2.5rem 3rem; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 2.5rem; }
+.kpi-card {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px 20px 18px; position: relative; overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+.kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; border-radius: 0 0 var(--radius) var(--radius); }
+.kpi-card.c-gold::after { background: var(--gold); }
+.kpi-card.c-green::after { background: var(--green); }
+.kpi-card.c-red::after { background: var(--red); }
+.kpi-card.c-blue::after { background: var(--blue); }
+.kpi-card:nth-child(1){animation-delay:.05s} .kpi-card:nth-child(2){animation-delay:.10s}
+.kpi-card:nth-child(3){animation-delay:.15s} .kpi-card:nth-child(4){animation-delay:.20s}
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.kpi-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.kpi-icon { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.kpi-card.c-red .kpi-icon   { background: var(--red-pale); }
+.kpi-card.c-amber .kpi-icon { background: var(--amber-pale); }
+.kpi-card.c-green .kpi-icon { background: var(--green-pale); }
+.kpi-card.c-blue .kpi-icon  { background: var(--blue-pale); }
+.kpi-trend { font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 20px; display: flex; align-items: center; gap: 3px; }
+.trend-up   { background: var(--green-pale); color: var(--green); }
+.trend-down { background: var(--red-pale);   color: var(--red);   }
+.kpi-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 600; color: var(--ink); line-height: 1; }
+.kpi-label { font-size: 12px; color: var(--ink-muted); margin-top: 5px; font-weight: 300; }
+
+.two-col   { display: grid; grid-template-columns: 1fr 380px; gap: 20px; margin-bottom: 2.5rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 300px; gap: 20px; }
+
+.card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); background: #FDFCFA; }
+.card-head-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: var(--ink); }
+.card-head-sub   { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; font-weight: 300; }
+
+.alert-list {}
+.alert-item { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid var(--border); transition: background 0.12s; cursor: pointer; }
+.alert-item:last-child { border-bottom: none; }
+.alert-item:hover { background: #FDFCFA; }
+.alert-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.alert-info { flex: 1; min-width: 0; }
+.alert-name { font-weight: 500; font-size: 13px; color: var(--ink); }
+.alert-meta { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+.alert-right { text-align: right; flex-shrink: 0; }
+.alert-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+.badge-today { background: var(--red-pale);   color: var(--red);   }
+.badge-week  { background: var(--amber-pale); color: var(--amber); }
+.alert-days  { font-size: 10.5px; color: var(--ink-muted); margin-top: 3px; }
+
+.sp { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.sp-badminton { background: var(--green-pale);  color: var(--green);  }
+.sp-tennis    { background: #EEF2FD;            color: #3B5CB8;        }
+.sp-football  { background: var(--amber-pale);  color: var(--amber);  }
+.sp-skating   { background: var(--purple-pale); color: var(--purple); }
+.sp-chess     { background: var(--blue-pale);   color: var(--blue);   }
+
+.sport-list {}
+.sport-row { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid var(--border); }
+.sport-row:last-child { border-bottom: none; }
+.sport-emoji { font-size: 22px; width: 38px; text-align: center; flex-shrink: 0; }
+.sport-info { flex: 1; }
+.sport-name { font-weight: 500; font-size: 13px; color: var(--ink); }
+.sport-bar-wrap { height: 5px; background: var(--cream-dark); border-radius: 10px; margin-top: 6px; overflow: hidden; }
+.sport-bar { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.sport-nums { text-align: right; }
+.sport-count { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; color: var(--ink); }
+.sport-pct   { font-size: 11px; color: var(--ink-muted); }
+
+.activity-list {}
+.act-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+.act-item:last-child { border-bottom: none; }
+.act-dot-wrap { padding-top: 4px; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; }
+.act-text { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+.act-text strong { color: var(--ink); font-weight: 500; }
+.act-time { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
+
+.renew-list {}
+.renew-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--border); }
+.renew-item:last-child { border-bottom: none; }
+.renew-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.renew-name  { font-size: 12.5px; font-weight: 500; color: var(--ink); }
+.renew-sport { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
+.renew-days  { margin-left: auto; font-size: 11.5px; font-weight: 500; padding: 3px 8px; border-radius: 20px; }
+
+.quick-actions { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.qa-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--cream); border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+.qa-btn:hover { background: var(--cream-dark); border-color: var(--border-mid); transform: translateX(3px); }
+.qa-icon  { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.qa-label { font-size: 13px; font-weight: 500; color: var(--ink); }
+.qa-sub   { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
+.qa-arrow { margin-left: auto; color: var(--ink-faint); font-size: 16px; }
+
+@media (max-width: 1100px) {
+  .three-col { grid-template-columns: 1fr 1fr; }
+  .three-col > *:last-child { grid-column: span 2; }
+}
+@media (max-width: 900px) {
+  .kpi-grid  { grid-template-columns: repeat(2, 1fr); }
+  .two-col   { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+  .three-col > *:last-child { grid-column: auto; }
+  .hero { padding: 2rem 1.2rem 0; }
+  .body-pad { padding: 1.5rem 1.2rem 3rem; }
+}
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        Live Dashboard · <span id="hero-date"></span>
+      </div>
+      <h2>Good morning,<br><em>Welcome back</em> to the Pradip Sports Academy.</h2>
+      <p class="hero-sub">
+        You have <strong style="color:var(--gold-light)">3 subscriptions expiring today</strong>
+        and 4 pending payments. Here's your full overview.
+      </p>
+      <div class="hero-actions">
+        <a href="{% url 'notifications' %}" class="btn btn-gold">View Alerts</a>
+        <a href="#" class="btn btn-ghost">+ Enrol Student</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">{{ total_students|default:"248" }}<span>+</span></div>
+      <div class="hero-stat-label">Active Students</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">5</div>
+      <div class="hero-stat-label">Sports Offered</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">{{ total_batches|default:"12" }}</div>
+      <div class="hero-stat-label">Active Batches</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">₹2.4<span>L</span></div>
+      <div class="hero-stat-label">Revenue This Month</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">94<span>%</span></div>
+      <div class="hero-stat-label">Renewal Rate</div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-pad">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid" style="margin-top:2rem">
+    <div class="kpi-card c-red">
+      <div class="kpi-top">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-trend trend-down">▲ 3 new</div>
+      </div>
+      <div class="kpi-num">{{ expiring_week|default:"7" }}</div>
+      <div class="kpi-label">Expiring This Week</div>
+    </div>
+    <div class="kpi-card c-amber" style="--amber-accent:var(--amber)">
+      <div class="kpi-top">
+        <div class="kpi-icon" style="background:var(--amber-pale)">💰</div>
+        <div class="kpi-trend trend-down">4 pending</div>
+      </div>
+      <div class="kpi-num">₹{{ pending_dues|default:"18,400" }}</div>
+      <div class="kpi-label">Pending Dues</div>
+    </div>
+    <div class="kpi-card c-green">
+      <div class="kpi-top">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-trend trend-up">↑ 12%</div>
+      </div>
+      <div class="kpi-num">{{ active_subs|default:"231" }}</div>
+      <div class="kpi-label">Active Subscriptions</div>
+    </div>
+    <div class="kpi-card c-blue">
+      <div class="kpi-top">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-trend trend-up">↑ 6%</div>
+      </div>
+      <div class="kpi-num">89%</div>
+      <div class="kpi-label">Avg. Attendance Rate</div>
+    </div>
+  </div>
+
+  <!-- TWO COL -->
+  <div class="two-col">
+
+    <!-- Expiry Alerts -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-head-title">Subscription Expiry Alerts</div>
+          <div class="card-head-sub">Students requiring immediate renewal attention</div>
+        </div>
+        <a href="{% url 'notifications' %}" class="btn btn-outline-ink" style="font-size:12px;padding:7px 14px;">View All →</a>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item">
+          <div class="alert-avatar" style="background:#E8F4EE;color:#3A7A52">AM</div>
+          <div class="alert-info">
+            <div class="alert-name">Arjun Mehta <span class="sp sp-badminton">Badminton</span></div>
+            <div class="alert-meta">SA001 · Regular · 6:00–7:00 AM · Parent: Ramesh Mehta</div>
+          </div>
+          <div class="alert-right">
+            <div class="alert-badge badge-today">⚑ Today</div>
+            <div class="alert-days">Expires today</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-avatar" style="background:#EEEDFE;color:#4A3CAA">PS</div>
+          <div class="alert-info">
+            <div class="alert-name">Priya Sharma <span class="sp sp-tennis">Tennis</span></div>
+            <div class="alert-meta">SA007 · Alternate · 7:00–8:00 AM · Parent: Suresh Sharma</div>
+          </div>
+          <div class="alert-right">
+            <div class="alert-badge badge-today">⚑ Today</div>
+            <div class="alert-days">Expires today</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-avatar" style="background:#FAECE7;color:#993C1D">DP</div>
+          <div class="alert-info">
+            <div class="alert-name">Dev Patel <span class="sp sp-chess">Chess</span></div>
+            <div class="alert-meta">SA015 · Day-based · 5:00–6:00 PM · Parent: Nilesh Patel</div>
+          </div>
+          <div class="alert-right">
+            <div class="alert-badge badge-today">⚑ Today</div>
+            <div class="alert-days">Expires today</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-avatar" style="background:#FAEEDA;color:#854F0B">KI</div>
+          <div class="alert-info">
+            <div class="alert-name">Kavya Iyer <span class="sp sp-football">Football</span></div>
+            <div class="alert-meta">SA022 · Regular · 4:00–5:00 PM · Parent: Rajan Iyer</div>
+          </div>
+          <div class="alert-right">
+            <div class="alert-badge badge-week">◷ In 2 days</div>
+            <div class="alert-days">Apr 15, 2026</div>
+          </div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-avatar" style="background:#F0EBF8;color:#6A3DAA">RD</div>
+          <div class="alert-info">
+            <div class="alert-name">Rohan Desai <span class="sp sp-skating">Skating</span></div>
+            <div class="alert-meta">SA031 · Regular · 6:00–7:00 AM · Parent: Bharat Desai</div>
+          </div>
+          <div class="alert-right">
+            <div class="alert-badge badge-week">◷ In 3 days</div>
+            <div class="alert-days">Apr 16, 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sport Breakdown -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-head-title">Sport-wise Enrolment</div>
+          <div class="card-head-sub">Total {{ total_students|default:"248" }} active students</div>
+        </div>
+      </div>
+      <div class="sport-list">
+        <div class="sport-row">
+          <div class="sport-emoji">🏸</div>
+          <div class="sport-info">
+            <div class="sport-name">Badminton</div>
+            <div class="sport-bar-wrap"><div class="sport-bar" style="width:0%;background:var(--green)" data-width="72%"></div></div>
+          </div>
+          <div class="sport-nums"><div class="sport-count">72</div><div class="sport-pct">29%</div></div>
+        </div>
+        <div class="sport-row">
+          <div class="sport-emoji">🎾</div>
+          <div class="sport-info">
+            <div class="sport-name">Tennis</div>
+            <div class="sport-bar-wrap"><div class="sport-bar" style="width:0%;background:#3B5CB8" data-width="58%"></div></div>
+          </div>
+          <div class="sport-nums"><div class="sport-count">58</div><div class="sport-pct">23%</div></div>
+        </div>
+        <div class="sport-row">
+          <div class="sport-emoji">⚽</div>
+          <div class="sport-info">
+            <div class="sport-name">Football</div>
+            <div class="sport-bar-wrap"><div class="sport-bar" style="width:0%;background:var(--amber)" data-width="55%"></div></div>
+          </div>
+          <div class="sport-nums"><div class="sport-count">55</div><div class="sport-pct">22%</div></div>
+        </div>
+        <div class="sport-row">
+          <div class="sport-emoji">⛸️</div>
+          <div class="sport-info">
+            <div class="sport-name">Skating</div>
+            <div class="sport-bar-wrap"><div class="sport-bar" style="width:0%;background:var(--purple)" data-width="37%"></div></div>
+          </div>
+          <div class="sport-nums"><div class="sport-count">37</div><div class="sport-pct">15%</div></div>
+        </div>
+        <div class="sport-row">
+          <div class="sport-emoji">♟️</div>
+          <div class="sport-info">
+            <div class="sport-name">Chess</div>
+            <div class="sport-bar-wrap"><div class="sport-bar" style="width:0%;background:var(--blue)" data-width="26%"></div></div>
+          </div>
+          <div class="sport-nums"><div class="sport-count">26</div><div class="sport-pct">11%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREE COL -->
+  <div class="three-col">
+
+    <!-- Recent Activity -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-head-title">Recent Activity</div>
+          <div class="card-head-sub">Latest system events</div>
+        </div>
+      </div>
+      <div class="activity-list">
+        <div class="act-item">
+          <div class="act-dot-wrap"><div class="act-dot" style="background:var(--green)"></div></div>
+          <div>
+            <div class="act-text"><strong>Sneha Kapoor</strong> renewed her Badminton subscription for 3 months.</div>
+            <div class="act-time">2 hours ago</div>
+          </div>
+        </div>
+        <div class="act-item">
+          <div class="act-dot-wrap"><div class="act-dot" style="background:var(--blue)"></div></div>
+          <div>
+            <div class="act-text"><strong>Rahul Tiwari</strong> was enrolled in Football · Beginner · 6:00 AM slot.</div>
+            <div class="act-time">4 hours ago</div>
+          </div>
+        </div>
+        <div class="act-item">
+          <div class="act-dot-wrap"><div class="act-dot" style="background:var(--amber)"></div></div>
+          <div>
+            <div class="act-text"><strong>₹4,500</strong> payment received from Mehta family (SA001) via UPI.</div>
+            <div class="act-time">Yesterday, 6:14 PM</div>
+          </div>
+        </div>
+        <div class="act-item">
+          <div class="act-dot-wrap"><div class="act-dot" style="background:var(--red)"></div></div>
+          <div>
+            <div class="act-text"><strong>3 WhatsApp reminders</strong> sent for subscriptions expiring today.</div>
+            <div class="act-time">Today, 8:00 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Renewals -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-head-title">Upcoming Renewals</div>
+          <div class="card-head-sub">Next 7 days</div>
+        </div>
+      </div>
+      <div class="renew-list">
+        <div class="renew-item">
+          <div class="renew-avatar" style="background:#FAEEDA;color:#854F0B">KI</div>
+          <div><div class="renew-name">Kavya Iyer</div><div class="renew-sport">Football · Regular</div></div>
+          <div class="renew-days" style="background:var(--amber-pale);color:var(--amber)">2d</div>
+        </div>
+        <div class="renew-item">
+          <div class="renew-avatar" style="background:#F0EBF8;color:#6A3DAA">RD</div>
+          <div><div class="renew-name">Rohan Desai</div><div class="renew-sport">Skating · Regular</div></div>
+          <div class="renew-days" style="background:var(--amber-pale);color:var(--amber)">3d</div>
+        </div>
+        <div class="renew-item">
+          <div class="renew-avatar" style="background:#E8F4EE;color:#3A7A52">AJ</div>
+          <div><div class="renew-name">Ananya Joshi</div><div class="renew-sport">Badminton · Alternate</div></div>
+          <div class="renew-days" style="background:var(--amber-pale);color:var(--amber)">4d</div>
+        </div>
+        <div class="renew-item">
+          <div class="renew-avatar" style="background:#EEF2FD;color:#3B5CB8">SR</div>
+          <div><div class="renew-name">Siddharth Rao</div><div class="renew-sport">Tennis · Regular</div></div>
+          <div class="renew-days" style="background:var(--amber-pale);color:var(--amber)">5d</div>
+        </div>
+        <div class="renew-item">
+          <div class="renew-avatar" style="background:#E8F1F8;color:#2E6B9E">IN</div>
+          <div><div class="renew-name">Isha Nair</div><div class="renew-sport">Chess · Day-based</div></div>
+          <div class="renew-days" style="background:var(--blue-pale);color:var(--blue)">6d</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <div class="card-head-title">Quick Actions</div>
+          <div class="card-head-sub">Common tasks</div>
+        </div>
+      </div>
+      <div class="quick-actions">
+        <a class="qa-btn" href="#"><div class="qa-icon" style="background:var(--gold-pale)">👤</div><div><div class="qa-label">Enrol New Student</div><div class="qa-sub">Add & assign sport</div></div><span class="qa-arrow">›</span></a>
+        <a class="qa-btn" href="#"><div class="qa-icon" style="background:var(--green-pale)">💳</div><div><div class="qa-label">Record Payment</div><div class="qa-sub">Cash / UPI / Online</div></div><span class="qa-arrow">›</span></a>
+        <a class="qa-btn" href="{% url 'notifications' %}"><div class="qa-icon" style="background:var(--red-pale)">🔔</div><div><div class="qa-label">Send Reminders</div><div class="qa-sub">WhatsApp expiry alerts</div></div><span class="qa-arrow">›</span></a>
+        <a class="qa-btn" href="#"><div class="qa-icon" style="background:var(--blue-pale)">📋</div><div><div class="qa-label">Mark Attendance</div><div class="qa-sub">Today's batches</div></div><span class="qa-arrow">›</span></a>
+        <a class="qa-btn" href="#"><div class="qa-icon" style="background:var(--purple-pale)">📊</div><div><div class="qa-label">View Reports</div><div class="qa-sub">Revenue & attendance</div></div><span class="qa-arrow">›</span></a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const now = new Date();
+  document.getElementById('hero-date').textContent = now.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'long', year:'numeric'});
+  setTimeout(() => {
+    document.querySelectorAll('.sport-bar[data-width]').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 300);
+</script>
+{% endblock %}

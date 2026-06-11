@@ -1,0 +1,1172 @@
+{% extends "base.html" %}
+{% block title %}Payment Records — Pradip Sports Academy{% endblock %}
+{% block sb_payments %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:1.8rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+
+/* ── Summary cards ── */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.sum-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:all .15s}
+.sum-card:hover{transform:translateY(-2px);box-shadow:0 4px 18px rgba(0,0,0,.07)}
+.sum-card-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.sum-card-icon{font-size:22px;margin-bottom:8px;display:block}
+.sum-label{font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px}
+.sum-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--ink);line-height:1;margin-bottom:4px}
+.sum-val.green{color:var(--green)}
+.sum-val.red{color:var(--red)}
+.sum-val.amber{color:var(--amber)}
+.sum-sub{font-size:11px;color:var(--ink-muted)}
+.sum-pct-bar{margin-top:10px;height:4px;background:var(--cream-dark);border-radius:2px;overflow:hidden}
+.sum-pct-fill{height:100%;border-radius:2px;transition:width .6s ease}
+
+/* ── Filters ── */
+.filter-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.filter-card-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:#FDFCFA;cursor:pointer;user-select:none}
+.filter-card-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px}
+.filter-toggle-icon{font-size:11px;color:var(--ink-muted);transition:transform .2s}
+.filter-toggle-icon.open{transform:rotate(180deg)}
+.filter-body{padding:18px 20px}
+.filter-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.filter-group{display:flex;flex-direction:column;gap:5px;min-width:160px}
+.filter-group.wide{min-width:200px}
+.flbl{font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.fsel,.finp{padding:8px 28px 8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;width:100%}
+.finp{appearance:auto;background-image:none;padding-right:12px}
+.fsel:focus,.finp:focus{border-color:var(--gold);outline:none}
+.filter-actions{display:flex;align-items:flex-end;gap:8px;margin-left:auto}
+.btn-filter{padding:8px 18px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-apply{background:var(--ink);color:var(--gold)}
+.btn-apply:hover{background:#2a2825}
+.btn-clear{background:var(--cream);color:var(--ink-soft);border:1px solid var(--border-mid)}
+.btn-clear:hover{background:var(--cream-dark)}
+.active-filters{display:flex;flex-wrap:wrap;gap:7px;padding:10px 20px;border-top:1px solid var(--border);background:#FDFCFA}
+.af-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;background:var(--gold-pale);color:var(--amber);border:1px solid rgba(201,145,42,.2)}
+.af-x{background:none;border:none;cursor:pointer;color:var(--amber);font-size:13px;padding:0;line-height:1}
+
+/* ── Main table card ── */
+.list-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.list-card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:#FDFCFA;flex-wrap:wrap;gap:10px}
+.list-card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink)}
+.list-card-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.head-right{display:flex;align-items:center;gap:10px}
+.srch-box{display:flex;align-items:center;gap:7px;background:var(--cream);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 13px}
+.srch-box input{border:none;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);width:160px}
+.srch-box input::placeholder{color:var(--ink-muted)}
+
+/* ── Table ── */
+.pay-table{width:100%;border-collapse:collapse;font-size:13px}
+.pay-table thead th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px;background:#FDFCFA;border-bottom:1px solid var(--border);white-space:nowrap}
+.pay-table thead th.r{text-align:right}
+.pay-table thead th.c{text-align:center}
+.pay-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s;animation:fadeRow .3s ease both;opacity:0}
+.pay-table tbody tr:last-child{border-bottom:none}
+.pay-table tbody tr:hover{background:#FDFBF7}
+@keyframes fadeRow{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.pay-table tbody td{padding:11px 14px;vertical-align:middle}
+.pay-table tbody td.r{text-align:right}
+.pay-table tbody td.c{text-align:center}
+
+.st-cell{display:flex;align-items:center;gap:10px}
+.st-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold-light))}
+.st-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.st-name{font-weight:500;font-size:13px;color:var(--ink)}
+.st-id{font-size:10.5px;color:var(--ink-muted);margin-top:1px}
+
+.sport-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500;background:var(--gold-pale);color:var(--amber)}
+.batch-tag{font-size:11.5px;color:var(--ink-soft)}
+.level-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;flex-shrink:0}
+
+.fee-total{font-size:13px;font-weight:500;color:var(--ink)}
+.fee-paid{font-size:13.5px;font-weight:600;color:var(--green)}
+.fee-due{font-size:13.5px;font-weight:700}
+.fee-due.has-due{color:var(--red)}
+.fee-due.cleared{color:var(--green)}
+.fee-bar-wrap{margin-top:4px}
+.fee-bar-bg{height:3px;background:var(--cream-dark);border-radius:2px;overflow:hidden;width:80px}
+.fee-bar-fill{height:100%;border-radius:2px}
+
+.pay-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.pb-paid{background:var(--green-pale);color:var(--green)}
+.pb-partial{background:var(--amber-pale);color:var(--amber)}
+.pb-unpaid{background:var(--red-pale);color:var(--red)}
+
+.exp-date{font-size:12.5px;font-weight:500}
+.exp-ok{color:var(--ink-soft)}
+.exp-warn{color:var(--amber)}
+.exp-danger{color:var(--red)}
+.exp-days{font-size:10.5px;margin-top:2px}
+
+.contact-val{font-size:12.5px;color:var(--ink-soft)}
+.contact-parent{font-size:11px;color:var(--ink-muted);margin-top:1px}
+
+.ag{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.ab{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius-sm);font-size:11.5px;font-weight:500;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;white-space:nowrap}
+.ab:hover{background:var(--cream)}
+.ab-wa{background:#25D366;color:#fff;border-color:#25D366}
+.ab-wa:hover{background:#1ebe5d;border-color:#1ebe5d}
+.ab-view:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-pale)}
+.ab-pay{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.ab-pay:hover{background:#2a2825;color:var(--gold-light)}
+
+.empty-state{text-align:center;padding:56px 24px;color:var(--ink-muted)}
+.empty-icon{font-size:40px;margin-bottom:14px;opacity:.35}
+.empty-title{font-family:'Playfair Display',serif;font-size:16px;color:var(--ink-soft);margin-bottom:6px}
+.tbl-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border);background:#FDFCFA;font-size:12px;color:var(--ink-muted);flex-wrap:wrap;gap:8px}
+.tbl-foot-totals{display:flex;gap:24px}
+.tft-item{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.tft-label{font-size:9.5px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.tft-val{font-size:13px;font-weight:600}
+
+/* ═══════════════════════════════════════════
+   PAYMENT DRAWER
+═══════════════════════════════════════════ */
+.pay-drawer-ov{position:fixed;inset:0;background:rgba(20,18,16,.5);backdrop-filter:blur(6px);z-index:8000;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.pay-drawer-ov.open{opacity:1;pointer-events:all}
+.pay-drawer{position:fixed;top:0;right:0;bottom:0;width:480px;max-width:100vw;background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.14);z-index:8001;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .38s cubic-bezier(.32,0,.15,1);overflow:hidden}
+.pay-drawer-ov.open .pay-drawer{transform:translateX(0)}
+
+.pd-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);background:var(--ink);flex-shrink:0;position:relative}
+.pd-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+.pd-close{position:absolute;top:16px;right:18px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:all .15s}
+.pd-close:hover{background:rgba(255,255,255,.2);color:#fff}
+.pd-student-row{display:flex;align-items:center;gap:12px}
+.pd-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--ink);flex-shrink:0}
+.pd-name{font-size:15px;font-weight:600;color:#fff;line-height:1.2}
+.pd-meta{font-size:11.5px;color:rgba(255,255,255,.55);margin-top:2px}
+
+.pd-fee-bar{display:flex;gap:0;margin-top:14px;border-radius:6px;overflow:hidden;height:6px;background:rgba(255,255,255,.12)}
+.pd-fee-bar-paid{background:var(--green);transition:width .5s ease}
+.pd-fee-bar-due{background:var(--red);transition:width .5s ease}
+.pd-fee-nums{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:rgba(255,255,255,.55)}
+.pd-fee-num-val{font-weight:600}
+.pd-fee-num-val.green{color:#4ade80}
+.pd-fee-num-val.amber{color:var(--gold-light)}
+.pd-fee-num-val.red{color:#f87171}
+
+.pd-body{flex:1;overflow-y:auto;padding:0}
+.pd-body::-webkit-scrollbar{width:3px}
+.pd-body::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px}
+
+.pd-section{padding:20px 24px;border-bottom:1px solid var(--border)}
+.pd-section-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+
+.pf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-group{display:flex;flex-direction:column;gap:5px}
+.pf-group.full{grid-column:1/-1}
+.pf-label{font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.pf-input,.pf-select{padding:9px 12px;border:1.5px solid var(--border-mid);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s,background .2s,box-shadow .2s;width:100%}
+.pf-input:focus,.pf-select:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,145,42,.1)}
+.pf-input.amount-input{font-size:18px;font-family:'Playfair Display',serif;font-weight:600;color:var(--green);padding-left:28px;background:#fff;border-color:rgba(58,122,82,.3)}
+.pf-input.amount-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(58,122,82,.08)}
+.amount-wrap{position:relative}
+.amount-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;font-weight:600;color:var(--green);pointer-events:none}
+
+.quick-amounts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.qa-chip{padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:500;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);cursor:pointer;transition:all .15s}
+.qa-chip:hover{border-color:var(--gold);color:var(--amber);background:var(--gold-pale)}
+.qa-chip.full-due{border-color:rgba(58,122,82,.4);color:var(--green);background:var(--green-pale)}
+.qa-chip.full-due:hover{background:var(--green);color:#fff}
+
+.btn-record-pay{width:100%;padding:13px;border-radius:var(--radius-sm);border:none;background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.2px}
+.btn-record-pay:hover{background:#2a2825;transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.btn-record-pay:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+.pf-hint{font-size:11px;color:var(--ink-muted);margin-top:4px}
+.pf-hint.err{color:var(--red)}
+.pf-hint.ok{color:var(--green)}
+
+.pay-hist-list{display:flex;flex-direction:column;gap:0}
+.pay-hist-item{display:flex;align-items:flex-start;gap:12px;padding:14px 24px;border-bottom:1px solid var(--border);transition:background .1s;animation:fadeRow .3s ease both}
+.pay-hist-item:last-child{border-bottom:none}
+.pay-hist-item:hover{background:#FDFBF7}
+
+.phi-dot-wrap{display:flex;flex-direction:column;align-items:center;padding-top:3px;flex-shrink:0}
+.phi-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.phi-dot.cash{background:var(--green-pale);color:var(--green)}
+.phi-dot.online{background:var(--blue-pale);color:var(--blue)}
+.phi-dot.cheque{background:var(--amber-pale);color:var(--amber)}
+.phi-dot.upi{background:#EDE7F6;color:#5E35B1}
+.phi-dot.other{background:var(--cream-dark);color:var(--ink-muted)}
+
+.phi-body{flex:1}
+.phi-top{display:flex;align-items:center;justify-content:space-between}
+.phi-amount{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--green)}
+.phi-date{font-size:11px;color:var(--ink-muted)}
+.phi-method{font-size:11.5px;color:var(--ink-soft);margin-top:3px}
+.phi-note{font-size:11px;color:var(--ink-muted);margin-top:2px;font-style:italic}
+.phi-ref{font-size:10.5px;color:var(--ink-faint);margin-top:2px}
+.phi-by{font-size:10px;color:var(--ink-faint);margin-top:2px}
+
+.no-history{text-align:center;padding:32px 20px;color:var(--ink-muted)}
+.no-history-icon{font-size:28px;opacity:.3;margin-bottom:8px}
+.no-history-text{font-size:12.5px}
+
+.drawer-loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--ink-muted);font-size:13px}
+.spin{width:18px;height:18px;border:2px solid var(--border-mid);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════
+   WHATSAPP MODAL
+═══════════════════════════════════════════ */
+.wa-modal-ov{position:fixed;inset:0;background:rgba(30,28,26,.55);backdrop-filter:blur(8px);z-index:9000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.wa-modal-ov.open{opacity:1;pointer-events:all}
+.wa-modal{background:#fff;border:1px solid var(--border-mid);border-radius:16px;padding:28px 28px 24px;width:100%;max-width:480px;position:relative;transform:translateY(16px) scale(.97);transition:all .35s cubic-bezier(.34,1.56,.64,1);overflow:hidden}
+.wa-modal-ov.open .wa-modal{transform:translateY(0) scale(1)}
+.wa-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#25D366,#1ebe5d)}
+.wm-close{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;background:var(--cream);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-muted)}
+.wm-close:hover{background:var(--cream-dark)}
+.wm-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.wm-icon{width:44px;height:44px;border-radius:12px;background:#25D366;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.wm-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:500;color:var(--ink)}
+.wm-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.wa-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.wa-chip{padding:5px 12px;border-radius:20px;font-size:11.5px;cursor:pointer;border:1px solid var(--border-mid);background:#fff;color:var(--ink-soft);transition:all .15s}
+.wa-chip:hover,.wa-chip.active{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.wa-textarea{width:100%;border:1px solid var(--border-mid);border-radius:var(--radius-sm);padding:11px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);resize:vertical;min-height:120px;outline:none;transition:border-color .2s;line-height:1.6;box-sizing:border-box}
+.wa-textarea:focus{border-color:#25D366;background:#fff}
+.wm-actions{display:flex;gap:10px;margin-top:14px}
+.btn-wa-send{flex:1;padding:12px;border-radius:8px;background:#25D366;color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;text-decoration:none}
+.btn-wa-send:hover{background:#1ebe5d}
+.btn-wa-copy{padding:12px 16px;border-radius:8px;background:var(--cream);color:var(--ink-soft);border:1px solid var(--border-mid);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-wa-copy:hover{background:var(--cream-dark)}
+.wm-note{font-size:11px;color:var(--ink-muted);text-align:center;margin-top:10px}
+
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;z-index:99999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast-ok{background:var(--green);color:#fff}
+.toast-err{background:var(--red);color:#fff}
+.toast-info{background:var(--ink);color:var(--gold)}
+
+@media(max-width:900px){
+  .page-wrap{padding:1.5rem 1rem 3rem}
+  .sum-grid{grid-template-columns:1fr 1fr}
+  .filter-row{flex-direction:column}
+  .filter-group{min-width:100%}
+  .pay-drawer{width:100vw}
+  .pf-grid{grid-template-columns:1fr}
+}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Payments</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1>💳 Payment Records</h1>
+      <p>Student-wise fee payment status, dues and subscription details</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="{% url 'report_pdf' %}?report_type=fee" target="_blank"
+         style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-sm);background:var(--red);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;text-decoration:none;transition:all .15s"
+         onmouseover="this.style.background='#a33636'" onmouseout="this.style.background='var(--red)'">
+        📄 Export PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="sum-grid">
+    <div class="sum-card">
+      <div class="sum-card-bar" style="background:linear-gradient(90deg,var(--green),var(--gold))"></div>
+      <span class="sum-card-icon">👥</span>
+      <div class="sum-label">Total Students</div>
+      <div class="sum-val">{{ total_students }}</div>
+      <div class="sum-sub">{{ active_students }} active · {{ expired_students }} expired</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-bar" style="background:var(--ink)"></div>
+      <span class="sum-card-icon">💰</span>
+      <div class="sum-label">Total Fees</div>
+      <div class="sum-val">₹{{ total_fee|floatformat:0 }}</div>
+      <div class="sum-sub">across all students</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-bar" style="background:var(--green)"></div>
+      <span class="sum-card-icon">✅</span>
+      <div class="sum-label">Total Collected</div>
+      <div class="sum-val green">₹{{ total_paid|floatformat:0 }}</div>
+      <div class="sum-sub">{{ collection_pct }}% of total</div>
+      <div class="sum-pct-bar">
+        <div class="sum-pct-fill" style="width:{{ collection_pct }}%;background:var(--green)"></div>
+      </div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-card-bar" style="background:var(--red)"></div>
+      <span class="sum-card-icon">⚠️</span>
+      <div class="sum-label">Total Outstanding</div>
+      <div class="sum-val {% if total_due > 0 %}red{% else %}green{% endif %}">₹{{ total_due|floatformat:0 }}</div>
+      <div class="sum-sub">{{ due_students_count }} student{{ due_students_count|pluralize }} with dues</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-card">
+    <div class="filter-card-head" onclick="toggleFilters()">
+      <div class="filter-card-title">
+        🔽 Filters
+        {% if active_filter_count %}
+          <span style="padding:2px 8px;border-radius:20px;background:var(--green-pale);color:var(--green);font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif">{{ active_filter_count }} active</span>
+        {% endif %}
+      </div>
+      <span class="filter-toggle-icon" id="filterIcon">▼</span>
+    </div>
+    <div id="filterBody" style="display:none">
+      <form method="GET" id="filter-form">
+        <div class="filter-body">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label class="flbl">Sport</label>
+              <select name="sport" class="fsel">
+                <option value="">All Sports</option>
+                {% for s in sports %}<option value="{{ s.pk }}" {% if sel_sport == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.icon }} {{ s.name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Batch</label>
+              <select name="batch" class="fsel">
+                <option value="">All Batches</option>
+                {% for b in batches %}<option value="{{ b.pk }}" {% if sel_batch == b.pk|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Expertise Level</label>
+              <select name="expertise" class="fsel">
+                <option value="">All Levels</option>
+                {% for l in levels %}<option value="{{ l.pk }}" {% if sel_expertise == l.pk|stringformat:"s" %}selected{% endif %}>{{ l.name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Coach</label>
+              <select name="coach" class="fsel">
+                <option value="">All Coaches</option>
+                {% for c in coaches %}<option value="{{ c.pk }}" {% if sel_coach == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.full_name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Payment Status</label>
+              <select name="pay_status" class="fsel">
+                <option value="">All</option>
+                <option value="paid"    {% if sel_pay_status == 'paid'    %}selected{% endif %}>✅ Fully Paid</option>
+                <option value="partial" {% if sel_pay_status == 'partial' %}selected{% endif %}>🔶 Partial</option>
+                <option value="unpaid"  {% if sel_pay_status == 'unpaid'  %}selected{% endif %}>❌ Unpaid</option>
+                <option value="has_due" {% if sel_pay_status == 'has_due' %}selected{% endif %}>⚠ Has Due</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Student Status</label>
+              <select name="status" class="fsel">
+                <option value="">All</option>
+                <option value="active"    {% if sel_status == 'active'    %}selected{% endif %}>✓ Active</option>
+                <option value="expired"   {% if sel_status == 'expired'   %}selected{% endif %}>✗ Expired</option>
+                <option value="suspended" {% if sel_status == 'suspended' %}selected{% endif %}>⚠ Suspended</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Expiry Within</label>
+              <select name="expiry_within" class="fsel">
+                <option value="">Any</option>
+                <option value="7"  {% if sel_expiry == '7'  %}selected{% endif %}>Next 7 days</option>
+                <option value="15" {% if sel_expiry == '15' %}selected{% endif %}>Next 15 days</option>
+                <option value="30" {% if sel_expiry == '30' %}selected{% endif %}>Next 30 days</option>
+                <option value="0"  {% if sel_expiry == '0'  %}selected{% endif %}>Already expired</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="flbl">Due Amount ≥ ₹</label>
+              <input type="number" name="due_min" class="finp fsel" placeholder="0" min="0" value="{{ sel_due_min }}">
+            </div>
+            <div class="filter-actions">
+              <button type="submit" class="btn-filter btn-apply">Apply Filters</button>
+              <a href="{% url 'payment_records' %}" class="btn-filter btn-clear" style="text-decoration:none;text-align:center">Clear</a>
+            </div>
+          </div>
+        </div>
+
+        {% if active_filter_count %}
+        <div class="active-filters">
+          {% if sel_sport     %}<span class="af-chip">Sport: {{ sel_sport_name }}     <button type="button" class="af-x" onclick="clearFilter('sport')">×</button></span>{% endif %}
+          {% if sel_batch     %}<span class="af-chip">Batch: {{ sel_batch_name }}     <button type="button" class="af-x" onclick="clearFilter('batch')">×</button></span>{% endif %}
+          {% if sel_expertise %}<span class="af-chip">Level: {{ sel_expertise_name }} <button type="button" class="af-x" onclick="clearFilter('expertise')">×</button></span>{% endif %}
+          {% if sel_coach     %}<span class="af-chip">Coach: {{ sel_coach_name }}     <button type="button" class="af-x" onclick="clearFilter('coach')">×</button></span>{% endif %}
+          {% if sel_pay_status%}<span class="af-chip">Payment: {{ sel_pay_status|title }}<button type="button" class="af-x" onclick="clearFilter('pay_status')">×</button></span>{% endif %}
+          {% if sel_status    %}<span class="af-chip">Status: {{ sel_status|title }}  <button type="button" class="af-x" onclick="clearFilter('status')">×</button></span>{% endif %}
+          {% if sel_expiry    %}<span class="af-chip">Expiry: {% if sel_expiry == '0' %}Expired{% else %}Next {{ sel_expiry }}d{% endif %}<button type="button" class="af-x" onclick="clearFilter('expiry_within')">×</button></span>{% endif %}
+          {% if sel_due_min   %}<span class="af-chip">Due ≥ ₹{{ sel_due_min }}        <button type="button" class="af-x" onclick="clearFilter('due_min')">×</button></span>{% endif %}
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Main table -->
+  <div class="list-card">
+    <div class="list-card-head">
+      <div>
+        <div class="list-card-title">Payment Records</div>
+        <div class="list-card-sub">{{ students|length }} student{{ students|length|pluralize }}</div>
+      </div>
+      <div class="head-right">
+        <div class="srch-box">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="liveSearch" placeholder="Search name, ID, phone…" oninput="liveSearch(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="pay-table" id="payTable">
+        <thead>
+          <tr>
+            <th style="padding-left:20px">#</th>
+            <th>Student</th>
+            <th>Sport / Batch</th>
+            <th>Duration</th>
+            <th>Contact</th>
+            <th class="r">Total Fee</th>
+            <th class="r">Paid</th>
+            <th class="r">Due</th>
+            <th class="c">Pay Status</th>
+            <th>Subscription</th>
+            <th style="text-align:right;padding-right:20px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="payBody">
+          {% for s in students %}
+          <tr style="animation-delay:{{ forloop.counter0 }}0ms"
+              data-name="{{ s.full_name|lower }}"
+              data-id="{{ s.student_id|lower }}"
+              data-phone="{{ s.contact_number }}"
+              id="row-{{ s.pk }}">
+
+            <td style="color:var(--ink-muted);font-size:12px;padding-left:20px">{{ forloop.counter }}</td>
+
+            <td>
+              <div class="st-cell">
+                <div class="st-av">
+                  {% if s.photo %}<img src="{{ s.photo.url }}" alt="">
+                  {% else %}{{ s.initials }}{% endif %}
+                </div>
+                <div>
+                  <div class="st-name">{{ s.full_name }}</div>
+                  <div class="st-id">{{ s.student_id }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="sport-tag">{{ s.sport.icon }} {{ s.sport.name }}</span>
+              <div class="batch-tag" style="margin-top:4px">{{ s.batch.name }}</div>
+              <div style="display:flex;align-items:center;margin-top:2px">
+                <span class="level-dot" style="background:{{ s.expertise_level.color_hex }}"></span>
+                <span style="font-size:11px;color:var(--ink-muted)">{{ s.expertise_level.name }}</span>
+              </div>
+            </td>
+
+            <td>
+              <span style="font-size:12.5px;color:var(--ink-soft)">{{ s.duration.duration_name }}</span>
+              {% if s.time_slot %}
+              <div style="font-size:11px;color:var(--ink-muted);margin-top:2px">🕐 {{ s.time_slot }}</div>
+              {% endif %}
+            </td>
+
+            <td>
+              <div class="contact-val"><a href="tel:{{ s.contact_number }}" style="color:var(--ink);text-decoration:none">{{ s.contact_number }}</a></div>
+              <div class="contact-parent">{{ s.parent_name }}</div>
+            </td>
+
+            <td class="r"><div class="fee-total">₹{{ s.total_fee|floatformat:0 }}</div></td>
+
+            <!-- Paid cell — has id so JS can update it -->
+            <td class="r" id="paid-cell-{{ s.pk }}">
+              <div class="fee-paid">₹{{ s.fee_paid|floatformat:0 }}</div>
+              {% if s.total_fee > 0 %}
+              <div class="fee-bar-wrap">
+                <div class="fee-bar-bg" style="margin-left:auto">
+                  <div class="fee-bar-fill" style="width:{% widthratio s.fee_paid s.total_fee 100 %}%;background:{% if s.fee_due == 0 %}var(--green){% elif s.fee_paid > 0 %}var(--amber){% else %}var(--red){% endif %}"></div>
+                </div>
+              </div>
+              {% endif %}
+            </td>
+
+            <!-- Due cell — has id so JS can update it -->
+            <td class="r" id="due-cell-{{ s.pk }}">
+              <div class="fee-due {% if s.fee_due > 0 %}has-due{% else %}cleared{% endif %}">
+                {% if s.fee_due > 0 %}₹{{ s.fee_due|floatformat:0 }}{% else %}✓ Cleared{% endif %}
+              </div>
+            </td>
+
+            <!-- Badge cell — has id so JS can update it -->
+            <td class="c" id="badge-cell-{{ s.pk }}">
+              {% if s.fee_due == 0 and s.total_fee > 0 %}
+                <span class="pay-badge pb-paid">✓ Paid</span>
+              {% elif s.fee_paid == 0 %}
+                <span class="pay-badge pb-unpaid">✗ Unpaid</span>
+              {% else %}
+                <span class="pay-badge pb-partial">◑ Partial</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <div class="exp-date {% if s.days_until_expiry <= 0 %}exp-danger{% elif s.days_until_expiry <= 15 %}exp-warn{% else %}exp-ok{% endif %}">
+                {{ s.subscription_expiry|date:"d M Y" }}
+              </div>
+              <div class="exp-days" style="color:{% if s.days_until_expiry <= 0 %}var(--red){% elif s.days_until_expiry <= 15 %}var(--amber){% else %}var(--ink-muted){% endif %}">
+                {% if s.days_until_expiry < 0 %}Expired {{ s.days_until_expiry|stringformat:"d"|slice:"1:" }}d ago
+                {% elif s.days_until_expiry == 0 %}⚠ Expires today
+                {% else %}{{ s.days_until_expiry }}d remaining{% endif %}
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-faint);margin-top:2px">From {{ s.subscription_start|date:"d M Y" }}</div>
+            </td>
+
+            <td style="padding-right:20px">
+              <div class="ag">
+                <button class="ab ab-pay"
+                  onclick="openPayDrawer(
+                    {{ s.pk }},
+                    '{{ s.full_name|escapejs }}',
+                    '{{ s.student_id }}',
+                    '{{ s.sport.name|escapejs }}',
+                    {{ s.total_fee|floatformat:0 }},
+                    {{ s.fee_paid|floatformat:0 }},
+                    {{ s.fee_due|floatformat:0 }},
+                    '{{ s.initials|escapejs }}'
+                  )"
+                  title="Record Payment">
+                  💰 Pay
+                </button>
+                <button class="ab ab-wa"
+                  onclick="openWA(
+                    '{{ s.full_name|escapejs }}',
+                    '{{ s.parent_whatsapp|escapejs }}',
+                    '{{ s.parent_name|escapejs }}',
+                    '{{ s.sport.name|escapejs }}',
+                    '{{ s.student_id }}',
+                    {{ s.fee_due|floatformat:0 }},
+                    {{ s.total_fee|floatformat:0 }},
+                    '{{ s.subscription_expiry|date:"d M Y" }}',
+                    {{ s.days_until_expiry }}
+                  )"
+                  title="WhatsApp {{ s.parent_name }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  Notify
+                </button>
+                <a class="ab ab-view" href="{% url 'student_detail' s.pk %}">👁 View</a>
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr><td colspan="11">
+            <div class="empty-state">
+              <div class="empty-icon">💳</div>
+              <div class="empty-title">No payment records found</div>
+              <p style="font-size:13px;font-weight:300">
+                {% if active_filter_count %}
+                  Try adjusting your filters or <a href="{% url 'payment_records' %}" style="color:var(--gold)">clear all filters</a>
+                {% else %}
+                  Student payment records will appear here once students are admitted.
+                {% endif %}
+              </p>
+            </div>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if students %}
+    <div class="tbl-foot">
+      <span>{{ students|length }} student{{ students|length|pluralize }}</span>
+      <div class="tbl-foot-totals">
+        <div class="tft-item">
+          <span class="tft-label">Total Fee</span>
+          <span class="tft-val">₹{{ total_fee|floatformat:0 }}</span>
+        </div>
+        <div class="tft-item">
+          <span class="tft-label">Collected</span>
+          <span class="tft-val" style="color:var(--green)">₹{{ total_paid|floatformat:0 }}</span>
+        </div>
+        <div class="tft-item">
+          <span class="tft-label">Outstanding</span>
+          <span class="tft-val" style="color:{% if total_due > 0 %}var(--red){% else %}var(--green){% endif %}">₹{{ total_due|floatformat:0 }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</div><!-- /page-wrap -->
+
+
+<!-- ═══ PAYMENT DRAWER ═══ -->
+<div class="pay-drawer-ov" id="payDrawerOv" onclick="if(event.target===this)closePayDrawer()">
+  <div class="pay-drawer" id="payDrawer">
+
+    <div class="pd-header">
+      <button class="pd-close" onclick="closePayDrawer()">✕</button>
+      <div class="pd-student-row">
+        <div class="pd-av" id="pd-av">—</div>
+        <div>
+          <div class="pd-name" id="pd-name">Student Name</div>
+          <div class="pd-meta" id="pd-meta">ID · Sport</div>
+        </div>
+      </div>
+      <div class="pd-fee-bar" style="margin-top:14px">
+        <div class="pd-fee-bar-paid" id="pd-bar-paid" style="width:0%"></div>
+        <div class="pd-fee-bar-due"  id="pd-bar-due"  style="width:100%"></div>
+      </div>
+      <div class="pd-fee-nums">
+        <span>Paid: <span class="pd-fee-num-val green" id="pd-num-paid">₹0</span></span>
+        <span>Due: <span class="pd-fee-num-val red" id="pd-num-due">₹0</span></span>
+        <span>Total: <span class="pd-fee-num-val amber" id="pd-num-total">₹0</span></span>
+      </div>
+    </div>
+
+    <div class="pd-body" id="pd-body">
+
+      <!-- Record Payment -->
+      <div class="pd-section">
+        <div class="pd-section-title">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Record New Payment
+        </div>
+
+        <div class="pf-grid">
+          <div class="pf-group full">
+            <label class="pf-label">Amount Received *</label>
+            <div class="amount-wrap">
+              <span class="amount-prefix">₹</span>
+              <input type="number" class="pf-input amount-input" id="pf-amount"
+                     placeholder="0" min="1" step="1"
+                     oninput="onAmountInput(this)">
+            </div>
+            <div class="quick-amounts" id="quick-amounts"></div>
+            <div class="pf-hint" id="pf-amount-hint"></div>
+          </div>
+
+          <div class="pf-group">
+            <label class="pf-label">Payment Mode *</label>
+            <select class="pf-select" id="pf-mode" onchange="onModeChange(this)">
+              <option value="">Select mode</option>
+              <option value="cash">💵 Cash</option>
+              <option value="upi">📱 UPI</option>
+              <option value="online">🌐 Online Transfer</option>
+              <option value="cheque">📝 Cheque</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="pf-group">
+            <label class="pf-label">Payment Date *</label>
+            <input type="date" class="pf-input" id="pf-date">
+          </div>
+
+          <div class="pf-group full" id="pf-ref-group" style="display:none">
+            <label class="pf-label">Reference / Transaction ID</label>
+            <input type="text" class="pf-input" id="pf-ref" placeholder="UTR / Cheque no. / Transaction ID">
+          </div>
+
+          <div class="pf-group full">
+            <label class="pf-label">Note <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <input type="text" class="pf-input" id="pf-note" placeholder="e.g. Partial payment for May batch">
+          </div>
+        </div>
+
+        <button class="btn-record-pay" id="btn-record-pay" onclick="submitPayment()" disabled>
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+          Record Payment
+        </button>
+      </div>
+
+      <!-- Payment History -->
+      <div class="pd-section" style="border-bottom:none;padding-bottom:8px">
+        <div class="pd-section-title">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Payment History
+        </div>
+      </div>
+
+      <div id="pd-history-wrap">
+        <div class="drawer-loading">
+          <div class="spin"></div>
+          Loading history…
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ WHATSAPP MODAL ═══ -->
+<div class="wa-modal-ov" id="waOv" onclick="if(event.target===this)closeWA()">
+  <div class="wa-modal">
+    <button class="wm-close" onclick="closeWA()">✕</button>
+    <div class="wm-header">
+      <div class="wm-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </div>
+      <div>
+        <div class="wm-title" id="wm-title">Notify Parent</div>
+        <div class="wm-sub" id="wm-sub">Select a template and send</div>
+      </div>
+    </div>
+    <div class="wa-chips">
+      <button class="wa-chip" onclick="setTpl('fee',this)">💸 Fee Reminder</button>
+      <button class="wa-chip" onclick="setTpl('expiry',this)">⏰ Expiry Reminder</button>
+      <button class="wa-chip" onclick="setTpl('both',this)">🔔 Fee + Expiry</button>
+      <button class="wa-chip" onclick="setTpl('renewal',this)">🔄 Renewal Request</button>
+      <button class="wa-chip" onclick="setTpl('custom',this)">✏️ Custom</button>
+    </div>
+    <textarea class="wa-textarea" id="waMsg" placeholder="Select a template or type a custom message…" oninput="updateWALink()"></textarea>
+    <div class="wm-actions">
+      <a class="btn-wa-send" id="waLink" href="#" target="_blank" onclick="return beforeSend(event)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Open WhatsApp
+      </a>
+      <button class="btn-wa-copy" onclick="copyMsg()">📋 Copy</button>
+    </div>
+    <div class="wm-note" id="wm-sending-to">Sending to: —</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// ─── Constants injected from Django ─────────────────────────
+const CSRF            = '{{ csrf_token }}';
+const URL_RECORD_PAY  = '{% url "record_payment" %}';
+const URL_PAY_HISTORY = '/payments/history/';   // + pk + /
+
+/* ─── Filter toggle ─────────────────────────────────────────── */
+{% if active_filter_count %}
+document.getElementById('filterBody').style.display = 'block';
+document.getElementById('filterIcon').classList.add('open');
+{% endif %}
+
+function toggleFilters() {
+  const b = document.getElementById('filterBody');
+  const i = document.getElementById('filterIcon');
+  const open = b.style.display !== 'none';
+  b.style.display = open ? 'none' : 'block';
+  i.classList.toggle('open', !open);
+}
+
+function clearFilter(name) {
+  const url = new URL(window.location.href);
+  url.searchParams.delete(name);
+  window.location = url.toString();
+}
+
+/* ─── Live search ───────────────────────────────────────────── */
+function liveSearch(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('#payBody tr[data-name]').forEach(row => {
+    const match = !q ||
+      row.dataset.name.includes(q)  ||
+      row.dataset.id.includes(q)    ||
+      row.dataset.phone.includes(q);
+    row.style.display = match ? '' : 'none';
+  });
+}
+
+/* ═════════════════════════════════════════════════════════════
+   PAYMENT DRAWER
+═════════════════════════════════════════════════════════════ */
+let pdData = {};
+
+// Keeps live paid/due values after a payment is recorded this session.
+// Keyed by student pk so reopening the drawer always shows current figures.
+const feeCache = {};
+
+function openPayDrawer(pk, name, studentId, sport, total, paid, due, initials) {
+  // If we recorded a payment this session, use the cached fresh values
+  // instead of the stale values baked into the onclick at page-load time.
+  if (feeCache[pk]) {
+    paid = feeCache[pk].paid;
+    due  = feeCache[pk].due;
+  }
+  pdData = { pk, name, studentId, sport, total, paid, due };
+
+  // Header info
+  document.getElementById('pd-av').textContent   = initials;
+  document.getElementById('pd-name').textContent = name;
+  document.getElementById('pd-meta').textContent = studentId + ' · ' + sport;
+
+  // Fee progress bar
+  _updateDrawerHeader(paid, due, total);
+
+  // Reset form fields
+  document.getElementById('pf-amount').value       = '';
+  document.getElementById('pf-mode').value         = '';
+  document.getElementById('pf-ref').value          = '';
+  document.getElementById('pf-note').value         = '';
+  document.getElementById('pf-date').value         = new Date().toISOString().split('T')[0];
+  document.getElementById('pf-amount-hint').textContent = '';
+  document.getElementById('pf-amount-hint').className  = 'pf-hint';
+  document.getElementById('pf-ref-group').style.display = 'none';
+  document.getElementById('btn-record-pay').disabled   = true;
+
+  // Quick chips
+  buildQuickAmounts(due, total);
+
+  // Open overlay
+  document.getElementById('payDrawerOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Load payment history via AJAX
+  loadPaymentHistory(pk);
+
+  // Focus amount input after animation
+  setTimeout(() => document.getElementById('pf-amount').focus(), 400);
+}
+
+function closePayDrawer() {
+  document.getElementById('payDrawerOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── Update drawer header bar + numbers ── */
+function _updateDrawerHeader(paid, due, total) {
+  const paidPct = total > 0 ? Math.round((paid / total) * 100) : 0;
+  document.getElementById('pd-bar-paid').style.width = paidPct + '%';
+  document.getElementById('pd-bar-due').style.width  = (100 - paidPct) + '%';
+  document.getElementById('pd-num-paid').textContent  = '₹' + paid.toLocaleString('en-IN');
+  document.getElementById('pd-num-due').textContent   = '₹' + due.toLocaleString('en-IN');
+  document.getElementById('pd-num-total').textContent = '₹' + total.toLocaleString('en-IN');
+}
+
+/* ── Quick amount chips ── */
+function buildQuickAmounts(due, total) {
+  const wrap = document.getElementById('quick-amounts');
+  wrap.innerHTML = '';
+  const opts = [];
+  if (due > 0) {
+    opts.push({ label: '₹' + due.toLocaleString('en-IN') + ' (Full Due)', val: due, cls: 'full-due' });
+    if (due >= 2000) opts.push({ label: '₹' + Math.round(due / 2).toLocaleString('en-IN') + ' (Half)', val: Math.round(due / 2), cls: '' });
+    [1000, 2000, 5000].forEach(v => {
+      if (v < due) opts.push({ label: '₹' + v.toLocaleString('en-IN'), val: v, cls: '' });
+    });
+  }
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'qa-chip ' + o.cls;
+    btn.textContent = o.label;
+    btn.onclick = () => {
+      document.getElementById('pf-amount').value = o.val;
+      onAmountInput(document.getElementById('pf-amount'));
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+/* ── Amount validation ── */
+function onAmountInput(el) {
+  const amt  = parseFloat(el.value) || 0;
+  const due  = pdData.due;
+  const hint = document.getElementById('pf-amount-hint');
+  const btn  = document.getElementById('btn-record-pay');
+  const mode = document.getElementById('pf-mode').value;
+
+  if (amt <= 0) {
+    hint.textContent = '';
+    hint.className = 'pf-hint';
+    btn.disabled = true;
+    return;
+  }
+  if (due > 0 && amt > due) {
+    hint.textContent = '⚠ Amount exceeds outstanding due (₹' + due.toLocaleString('en-IN') + ')';
+    hint.className = 'pf-hint err';
+    btn.disabled = true;
+    return;
+  }
+  const remaining = due - amt;
+  if (remaining > 0) {
+    hint.textContent = '₹' + remaining.toLocaleString('en-IN') + ' will remain as due after this payment.';
+    hint.className = 'pf-hint';
+  } else {
+    hint.textContent = '✓ This will fully clear the outstanding amount.';
+    hint.className = 'pf-hint ok';
+  }
+  btn.disabled = !(amt > 0 && mode);
+}
+
+/* ── Show/hide reference field ── */
+function onModeChange(sel) {
+  const refGroup = document.getElementById('pf-ref-group');
+  refGroup.style.display = ['upi', 'online', 'cheque'].includes(sel.value) ? 'block' : 'none';
+  // Re-evaluate submit button
+  const amt = parseFloat(document.getElementById('pf-amount').value) || 0;
+  document.getElementById('btn-record-pay').disabled = !(amt > 0 && sel.value);
+}
+
+/* ── Submit payment via AJAX ── */
+function submitPayment() {
+  const amt  = parseFloat(document.getElementById('pf-amount').value);
+  const mode = document.getElementById('pf-mode').value;
+  const date = document.getElementById('pf-date').value;
+  const ref  = document.getElementById('pf-ref').value.trim();
+  const note = document.getElementById('pf-note').value.trim();
+
+  if (!amt || amt <= 0) { toast('Please enter a valid amount.', 'err'); return; }
+  if (!mode)            { toast('Please select a payment mode.', 'err'); return; }
+  if (!date)            { toast('Please select a payment date.', 'err'); return; }
+  if (amt > pdData.due) { toast('Amount cannot exceed outstanding due.', 'err'); return; }
+
+  const btn = document.getElementById('btn-record-pay');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin" style="border-top-color:var(--gold)"></div>&nbsp;Saving…';
+
+  fetch(URL_RECORD_PAY, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': CSRF,
+    },
+    body: JSON.stringify({
+      student_pk:   pdData.pk,
+      amount:       amt,
+      payment_mode: mode,
+      payment_date: date,
+      reference:    ref,
+      note:         note,
+    }),
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      toast('✓ Payment of ₹' + amt.toLocaleString('en-IN') + ' recorded!', 'ok');
+
+      // Update local state + persist in cache so reopening the drawer
+      // uses fresh values instead of the stale page-load onclick data.
+      pdData.paid = d.fee_paid;
+      pdData.due  = d.fee_due;
+      feeCache[pdData.pk] = { paid: d.fee_paid, due: d.fee_due };
+
+      // Refresh drawer header
+      _updateDrawerHeader(pdData.paid, pdData.due, pdData.total);
+
+      // Rebuild quick chips
+      buildQuickAmounts(pdData.due, pdData.total);
+
+      // Update table row cells without page reload
+      updateTableRow(pdData.pk, pdData.paid, pdData.due, pdData.total);
+
+      // Reset form
+      document.getElementById('pf-amount').value = '';
+      document.getElementById('pf-ref').value    = '';
+      document.getElementById('pf-note').value   = '';
+      document.getElementById('pf-mode').value   = '';
+      document.getElementById('pf-ref-group').style.display = 'none';
+      document.getElementById('pf-amount-hint').textContent = '';
+      document.getElementById('pf-amount-hint').className   = 'pf-hint';
+
+      // Reload payment history
+      loadPaymentHistory(pdData.pk);
+    } else {
+      toast(d.error || 'Something went wrong. Please try again.', 'err');
+    }
+  })
+  .catch(() => toast('Network error. Please try again.', 'err'))
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg> Record Payment';
+  });
+}
+
+/* ── Update table row cells without reload ── */
+function updateTableRow(pk, paid, due, total) {
+  const paidCell  = document.getElementById('paid-cell-'  + pk);
+  const dueCell   = document.getElementById('due-cell-'   + pk);
+  const badgeCell = document.getElementById('badge-cell-' + pk);
+  if (!paidCell) return;
+
+  const barPct   = total > 0 ? Math.round((paid / total) * 100) : 0;
+  const barColor = due === 0 ? 'var(--green)' : paid > 0 ? 'var(--amber)' : 'var(--red)';
+
+  paidCell.innerHTML = `
+    <div class="fee-paid">₹${paid.toLocaleString('en-IN')}</div>
+    <div class="fee-bar-wrap">
+      <div class="fee-bar-bg" style="margin-left:auto">
+        <div class="fee-bar-fill" style="width:${barPct}%;background:${barColor}"></div>
+      </div>
+    </div>`;
+
+  dueCell.innerHTML = `
+    <div class="fee-due ${due > 0 ? 'has-due' : 'cleared'}">
+      ${due > 0 ? '₹' + due.toLocaleString('en-IN') : '✓ Cleared'}
+    </div>`;
+
+  badgeCell.innerHTML = due === 0 && total > 0
+    ? '<span class="pay-badge pb-paid">✓ Paid</span>'
+    : paid === 0
+      ? '<span class="pay-badge pb-unpaid">✗ Unpaid</span>'
+      : '<span class="pay-badge pb-partial">◑ Partial</span>';
+}
+
+/* ── Load payment history via AJAX ── */
+function loadPaymentHistory(pk) {
+  document.getElementById('pd-history-wrap').innerHTML =
+    '<div class="drawer-loading"><div class="spin"></div> Loading history…</div>';
+
+  fetch(URL_PAY_HISTORY + pk + '/', {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+  })
+  .then(r => r.json())
+  .then(d => renderHistory(d.payments))
+  .catch(() => {
+    document.getElementById('pd-history-wrap').innerHTML = `
+      <div class="no-history">
+        <div class="no-history-icon">⚠️</div>
+        <div class="no-history-text">Could not load history. Please try again.</div>
+      </div>`;
+  });
+}
+
+const MODE_ICONS = { cash: '💵', upi: '📱', online: '🌐', cheque: '📝', other: '💳' };
+const MODE_CLS   = { cash: 'cash', upi: 'upi', online: 'online', cheque: 'cheque', other: 'other' };
+
+function renderHistory(payments) {
+  if (!payments || payments.length === 0) {
+    document.getElementById('pd-history-wrap').innerHTML = `
+      <div class="no-history">
+        <div class="no-history-icon">📋</div>
+        <div class="no-history-text">No payments recorded yet.</div>
+      </div>`;
+    return;
+  }
+
+  const html = payments.map((p, i) => `
+    <div class="pay-hist-item" style="animation-delay:${i * 40}ms">
+      <div class="phi-dot-wrap">
+        <div class="phi-dot ${MODE_CLS[p.mode] || 'other'}">${MODE_ICONS[p.mode] || '💳'}</div>
+      </div>
+      <div class="phi-body">
+        <div class="phi-top">
+          <span class="phi-amount">₹${parseFloat(p.amount).toLocaleString('en-IN')}</span>
+          <span class="phi-date">${p.date}</span>
+        </div>
+        <div class="phi-method">${p.mode_display}</div>
+        ${p.note      ? `<div class="phi-note">"${p.note}"</div>`         : ''}
+        ${p.reference ? `<div class="phi-ref">Ref: ${p.reference}</div>`  : ''}
+        ${p.recorded_by ? `<div class="phi-by">By: ${p.recorded_by}</div>` : ''}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('pd-history-wrap').innerHTML =
+    '<div class="pay-hist-list">' + html + '</div>';
+}
+
+/* ESC closes drawer / modal */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('payDrawerOv').classList.contains('open')) closePayDrawer();
+  else if (document.getElementById('waOv').classList.contains('open')) closeWA();
+});
+
+/* ═════════════════════════════════════════════════════════════
+   WHATSAPP MODAL
+═════════════════════════════════════════════════════════════ */
+let waData = {};
+
+function openWA(name, phone, parent, sport, id, due, total, expiry, daysLeft) {
+  waData = { name, phone, parent, sport, id, due, total, expiry, daysLeft };
+  document.getElementById('wm-title').textContent = 'Notify — ' + parent;
+  document.getElementById('wm-sub').textContent   = 'For student: ' + name + ' (' + id + ')';
+
+  const clean = phone.replace(/\D/g, '');
+  waData.num  = clean.length === 10 ? '91' + clean : clean;
+
+  // Auto-select best template
+  const firstChip = document.querySelector('.wa-chip');
+  document.querySelectorAll('.wa-chip').forEach(c => c.classList.remove('active'));
+
+  let autoTpl;
+  if (due > 0 && daysLeft <= 15)  autoTpl = 'both';
+  else if (due > 0)               autoTpl = 'fee';
+  else if (daysLeft <= 15)        autoTpl = 'expiry';
+  else                             autoTpl = 'fee';
+
+  // Find the matching chip and activate it
+  document.querySelectorAll('.wa-chip').forEach(chip => {
+    const tplMap = { '💸 Fee Reminder':'fee','⏰ Expiry Reminder':'expiry','🔔 Fee + Expiry':'both','🔄 Renewal Request':'renewal','✏️ Custom':'custom' };
+    if (tplMap[chip.textContent.trim()] === autoTpl) chip.classList.add('active');
+  });
+
+  document.getElementById('waMsg').value = TPLS[autoTpl]?.(waData) || '';
+  document.getElementById('wm-sending-to').textContent = 'Sending to: ' + parent + ' · ' + phone;
+
+  updateWALink();
+  document.getElementById('waOv').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWA() {
+  document.getElementById('waOv').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+const TPLS = {
+  fee:     d => `Hello *${d.parent}*! 🏅\n\nThis is a gentle reminder from *Pradip Sports Academy*.\n\nYour child *${d.name}* has a pending fee of *₹${d.due}* towards their ${d.sport} training.\n\n📋 Details:\n• Student ID: ${d.id}\n• Total Fee: ₹${d.total}\n• Amount Due: ₹${d.due}\n\nKindly clear the dues at your earliest convenience.\n\nThank you! 🙏\n— Team Pradip Sports Academy`,
+  expiry:  d => `Hello *${d.parent}*! 🏅\n\nThis is a reminder from *Pradip Sports Academy*.\n\nYour child *${d.name}*'s *${d.sport}* subscription is expiring on *${d.expiry}* — that's ${d.daysLeft > 0 ? `in *${d.daysLeft} days*` : '*today*'}.\n\n📋 Student ID: ${d.id}\n\nPlease renew at the earliest to continue uninterrupted training sessions.\n\nThank you! 🙏\n— Team Pradip Sports Academy`,
+  both:    d => `Hello *${d.parent}*! 🏅\n\nThis is an important reminder from *Pradip Sports Academy*.\n\nYour child *${d.name}* (${d.id}) has:\n\n💸 *Pending Fee:* ₹${d.due}\n⏰ *Subscription Expiry:* ${d.expiry}${d.daysLeft > 0 ? ` (${d.daysLeft} days left)` : ' *(expired)*'}\n\nKindly take prompt action to ensure uninterrupted ${d.sport} training.\n\nThank you! 🙏\n— Team Pradip Sports Academy`,
+  renewal: d => `Hello *${d.parent}*! 👋\n\nWe hope *${d.name}* is enjoying their *${d.sport}* training at *Pradip Sports Academy*!\n\nTheir current subscription ends on *${d.expiry}*. We would love to continue their training journey.\n\nPlease contact us to renew and choose a plan that suits you best.\n\n📞 Call or WhatsApp us to renew.\n\nThank you! 🏆\n— Team Pradip Sports Academy`,
+  custom:  () => '',
+};
+
+function setTpl(type, chipEl) {
+  document.querySelectorAll('.wa-chip').forEach(c => c.classList.remove('active'));
+  if (chipEl) chipEl.classList.add('active');
+  document.getElementById('waMsg').value = TPLS[type]?.(waData) || '';
+  updateWALink();
+}
+
+function updateWALink() {
+  const msg = document.getElementById('waMsg').value.trim();
+  document.getElementById('waLink').href =
+    'https://wa.me/' + (waData.num || '') + '?text=' + encodeURIComponent(msg);
+}
+
+function beforeSend(e) {
+  if (!document.getElementById('waMsg').value.trim()) {
+    e.preventDefault();
+    toast('Please select or type a message first.', 'err');
+    return false;
+  }
+  return true;
+}
+
+function copyMsg() {
+  const msg = document.getElementById('waMsg').value.trim();
+  if (!msg) { toast('Nothing to copy.', 'err'); return; }
+  navigator.clipboard.writeText(msg).then(() => toast('Message copied!', 'ok'));
+}
+
+/* ─── Toast ─────────────────────────────────────────────────── */
+function toast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast toast-' + type + ' show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+</script>
+{% endblock %}

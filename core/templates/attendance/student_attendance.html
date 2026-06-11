@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Student Attendance — Pradip Sports Academy{% endblock %}
+{% block sb_att_parent %}has-active{% endblock %}
+{% block sb_attendance %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink)}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem}
+.alert-success{background:var(--green-pale);color:var(--green);border:1px solid rgba(58,122,82,.2)}
+.date-bar{display:flex;align-items:center;gap:14px;padding:14px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+.date-label{font-size:12px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
+.date-input{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);outline:none}
+.date-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,151,58,.12)}
+.date-nav-btn{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;text-decoration:none;color:var(--ink-soft);display:inline-flex;align-items:center}
+.date-nav-btn:hover{background:var(--cream-dark)}
+.qr-link{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-size:13px;font-weight:500;text-decoration:none;transition:all .15s}
+.qr-link:hover{background:#2e2a26}
+.att-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.att-card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:#FDFCFA}
+.att-card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink)}
+.save-btn{padding:9px 20px;border-radius:var(--radius-sm);background:var(--ink);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .15s}
+.save-btn:hover{background:#2e2a26}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 18px;text-align:left;font-size:10.5px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;background:#FDFCFA;border-bottom:1px solid var(--border)}
+thead th:first-child{padding-left:22px}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FDFCFA}
+tbody td{padding:12px 18px;vertical-align:middle}
+tbody td:first-child{padding-left:22px}
+.coach-cell{display:flex;align-items:center;gap:10px}
+.c-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;background:var(--gold-pale);color:var(--amber);flex-shrink:0;overflow:hidden}
+.c-av img{width:100%;height:100%;object-fit:cover}
+.c-name{font-weight:500;font-size:13px;color:var(--ink)}.c-id{font-size:11px;color:var(--ink-muted)}
+/* Status radio buttons */
+.status-radios{display:flex;gap:6px;flex-wrap:wrap}
+.status-radio{display:none}
+.status-radio-label{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--border-mid);background:#fff;color:var(--ink-soft);transition:all .15s;user-select:none}
+.status-radio-label:hover{border-color:var(--border-strong)}
+.status-radio:checked+.status-radio-label{border-width:2px}
+.status-radio[value="present"]:checked+.status-radio-label{background:var(--green-pale);color:var(--green);border-color:var(--green)}
+.status-radio[value="absent"]:checked+.status-radio-label{background:var(--red-pale);color:var(--red);border-color:var(--red)}
+.status-radio[value="late"]:checked+.status-radio-label{background:var(--amber-pale);color:var(--amber);border-color:var(--amber)}
+.status-radio[value="excused"]:checked+.status-radio-label{background:var(--yellow-pale);color:var(--yellow);border-color:var(--yellow)}
+.time-input{padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);outline:none;width:100px}
+.time-input:focus{border-color:var(--gold)}
+.empty-state{text-align:center;padding:48px;color:var(--ink-muted);font-size:13px}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
+    <span>Student Attendance</span>
+  </div>
+  <div class="page-header">
+    <div><h1>Student Attendance</h1><p>Mark daily attendance for all active students</p></div>
+  </div>
+
+  {% if messages %}{% for msg in messages %}
+    <div class="alert alert-success">✓ {{ msg }}</div>
+  {% endfor %}{% endif %}
+
+  <!-- Date bar -->
+  <form method="GET" id="date-form">
+    <div class="date-bar">
+      <span class="date-label">Date</span>
+      <input type="date" name="date" class="date-input" value="{{ sel_date }}"
+             onchange="this.form.submit()">
+      {% if sel_date != today|date:"Y-m-d" %}
+        <a href="?date={{ today }}" class="date-nav-btn">Today</a>
+      {% endif %}
+      <a href="{% url 'qr_scan' %}" class="qr-link">📷 QR Scan</a>
+    </div>
+  </form>
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="att-card">
+      <div class="att-card-head">
+        <div class="att-card-title">
+          Students — {{ sel_date|date:"l, d F Y" }}
+        </div>
+        <button type="submit" class="save-btn">✓ Save Attendance</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Student</th><th>Sports</th><th>Status</th>
+            <th>Check In</th><th>Check Out</th>
+          </tr></thead>
+          <tbody>
+            {% for row in student_rows %}
+            {% with s=row.student att=row.attendance %}
+            {% comment %}Determine current status for this row{% endcomment %}
+            {% if att %}
+              {% with cur_status=att.status %}
+              <tr>
+                <td>
+                  <div class="coach-cell">
+                    <div class="c-av">
+                      {% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.initials }}{% endif %}
+                    </div>
+                    <div>
+                      <div class="c-name">{{ s.full_name }}</div>
+                      <div class="c-id">{{ s.student_id }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="font-size:12px;color:var(--ink-soft)">
+                  {{ s.sport.icon }} {{ s.sport.name }}
+                </td>
+                <td>
+                  <div class="status-radios">
+                    {% for val, lbl in att_status_choices %}
+                    <input type="radio" class="status-radio"
+                          name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
+                          value="{{ val }}"
+                          {% if att.status == val %}checked{% endif %}
+                          onchange="toggleTimeInputs({{ s.pk }}, this.value)">
+                    <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
+                    {% endfor %}
+                  </div>
+                </td>
+                <td>
+                  <input type="time" name="checkin_{{ s.pk }}" class="time-input"
+                        id="checkin_{{ s.pk }}"
+                        value="{{ att.check_in_time|time:'H:i'|default:'' }}"
+                        {% if cur_status == 'absent' %}disabled{% endif %}>
+                </td>
+                <td>
+                  <input type="time" name="checkout_{{ s.pk }}" class="time-input"
+                        id="checkout_{{ s.pk }}"
+                        value="{{ att.check_out_time|time:'H:i'|default:'' }}"
+                        {% if cur_status == 'absent' %}disabled{% endif %}>
+                </td>
+              </tr>
+              {% endwith %}
+            {% else %}
+            <tr>
+              <td>
+                <div class="coach-cell">
+                  <div class="c-av">
+                    {% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.initials }}{% endif %}
+                  </div>
+                  <div>
+                    <div class="c-name">{{ s.full_name }}</div>
+                    <div class="c-id">{{ s.student_id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:12px;color:var(--ink-soft)">
+                {{ s.sport.icon }} {{ s.sport.name }}
+              </td>
+              <td>
+                <div class="status-radios">
+                  {% for val, lbl in att_status_choices %}
+                  <input type="radio" class="status-radio"
+                        name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
+                        value="{{ val }}"
+                        {% if val == 'present' %}checked{% endif %}
+                        onchange="toggleTimeInputs({{ s.pk }}, this.value)">
+                  <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
+                  {% endfor %}
+                </div>
+              </td>
+              <td>
+                <input type="time" name="checkin_{{ s.pk }}" class="time-input"
+                      id="checkin_{{ s.pk }}" value="">
+              </td>
+              <td>
+                <input type="time" name="checkout_{{ s.pk }}" class="time-input"
+                      id="checkout_{{ s.pk }}" value="">
+              </td>
+            </tr>
+            {% endif %}
+            {% endwith %}
+            {% empty %}
+            <tr><td colspan="5"><div class="empty-state">No active students found.</div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .time-input:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    background: var(--surface-muted, #f3f4f6);
+  }
+</style>
+
+<script>
+  function toggleTimeInputs(studentPk, status) {
+    const checkin  = document.getElementById('checkin_'  + studentPk);
+    const checkout = document.getElementById('checkout_' + studentPk);
+    const isAbsent = status === 'absent';
+
+    checkin.disabled  = isAbsent;
+    checkout.disabled = isAbsent;
+
+    if (isAbsent) {
+      checkin.value  = '';
+      checkout.value = '';
+    }
+  }
+</script>
+{% endblock %}

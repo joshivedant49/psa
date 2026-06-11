@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block title %}Student Attendance History — Pradip Sports Academy{% endblock %}
+
+{% block sb_att_parent %}has-active{% endblock %}
+{% block sb_student_att_hist %}active{% endblock %}
+
+{% block extra_css %}
+.page-wrap{padding:2.5rem 2.5rem 4rem;max-width:100%;overflow-x:hidden}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted);margin-bottom:8px}
+.breadcrumb a{color:var(--ink-muted);text-decoration:none}.breadcrumb a:hover{color:var(--gold)}
+.breadcrumb-sep{color:var(--ink-faint)}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.page-header h1{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
+.month-nav{display:flex;flex-direction:column;gap:10px;padding:14px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+.month-nav-row1{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.month-nav-row2{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.month-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);min-width:140px;text-align:center}
+.nav-btn{display:inline-flex;align-items:center;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-decoration:none;color:var(--ink-soft);transition:all .15s}
+.nav-btn:hover{background:var(--cream-dark)}.nav-btn.disabled{opacity:.4;pointer-events:none}
+.filter-select{padding:7px 28px 7px 12px;border-radius:20px;border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:12.5px;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238A8480' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer}
+.filter-select:focus{border-color:var(--gold);outline:none}
+.tab-links{display:flex;gap:8px;margin-left:auto}
+.tab-link{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:500;text-decoration:none;border:1px solid var(--border-mid);background:var(--cream);color:var(--ink-soft);transition:all .15s}
+.tab-link:hover{background:var(--cream-dark)}.tab-link.active-tab{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sum-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px}
+.sum-label{font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.sum-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--ink)}
+.sum-val.c-green{color:var(--green)}
+.hist-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-width:0}
+.hist-card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:#FDFCFA;flex-wrap:wrap;gap:8px}
+.hist-card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:500;color:var(--ink)}
+.hist-card-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.matrix-wrap{overflow-x:auto;max-height:600px;overflow-y:auto;width:100%;display:block}
+.matrix-table{border-collapse:collapse;font-size:12px;table-layout:auto;width:max-content}
+.matrix-table th{padding:8px 6px;background:#FDFCFA;font-size:10px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px;border:1px solid var(--border);text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2}
+.matrix-table th.name-col{text-align:left;padding-left:16px;min-width:200px;position:sticky;left:0;z-index:3;background:#FDFCFA}
+.matrix-table td{border:1px solid var(--border);padding:4px 3px;text-align:center;vertical-align:middle;white-space:nowrap}
+.matrix-table td.name-col{text-align:left;padding:10px 14px;background:#fff;position:sticky;left:0;z-index:1;border-right:2px solid var(--border-mid)}
+.matrix-table tbody tr:hover td{background:#FDFCFA}
+.matrix-table tbody tr:hover td.name-col{background:var(--gold-pale)}
+.dc{width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;cursor:default}
+.dc-present {background:var(--green-pale);color:var(--green)}
+.dc-absent  {background:var(--red-pale);color:var(--red)}
+.dc-late    {background:var(--amber-pale);color:var(--amber)}
+.dc-excused {background:#EEF2FD;color:#3B5CB8}
+.dc-none    {background:var(--cream);color:var(--ink-faint);font-weight:400}
+.dc-future  {color:var(--ink-faint);font-size:10px}
+.dc[data-method="qr"]{position:relative}
+.dc[data-method="qr"]::after{content:'';display:block;width:4px;height:4px;border-radius:50%;background:var(--blue);position:absolute;top:1px;right:1px}
+.tail-val{font-size:12px;font-weight:600;padding:0 6px}
+.pct-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:52px}
+.pct-num{font-size:12px;font-weight:600;color:var(--ink)}
+.pct-bar-bg{width:44px;height:5px;background:var(--cream-dark);border-radius:3px;overflow:hidden}
+.pct-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.name-cell{display:flex;align-items:center;gap:8px}
+.nc-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;background:var(--gold-pale);color:var(--amber);flex-shrink:0;overflow:hidden}
+.nc-av img{width:100%;height:100%;object-fit:cover}
+.nc-name{font-weight:500;font-size:12.5px;color:var(--ink)}
+.nc-id{font-size:10px;color:var(--ink-muted)}
+.sport-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.legend{display:flex;align-items:center;gap:16px;padding:11px 22px;border-top:1px solid var(--border);background:#FDFCFA;font-size:11.5px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;color:var(--ink-soft)}
+.ld{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.table-footer{display:flex;align-items:center;justify-content:space-between;padding:11px 22px;border-top:1px solid var(--border);background:#FDFCFA;font-size:12px;color:var(--ink-muted)}
+.empty-state{text-align:center;padding:48px 24px;color:var(--ink-muted)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:.35}
+@media(max-width:900px){.page-wrap{padding:1.5rem 1rem 3rem}.sum-row{grid-template-columns:1fr 1fr}}
+{% endblock %}
+
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Dashboard</a>
+    <span class="breadcrumb-sep">›</span>
+    <span>Attendance</span>
+    <span class="breadcrumb-sep">›</span>
+    <span>Student History</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <h1>Student Attendance History</h1>
+      <p>Monthly attendance calendar — browse any past month</p>
+    </div>
+  </div>
+
+  <!-- Month nav + filters -->
+  <form method="GET" id="nav-form">
+    <input type="hidden" name="year"  value="{{ year }}">
+    <input type="hidden" name="month" value="{{ month }}">
+    <div class="month-nav">
+      <!-- Row 1: month navigation + filters -->
+      <div class="month-nav-row1">
+        <a href="?year={{ prev_year }}&month={{ prev_month }}{% if sel_sport %}&sport={{ sel_sport }}{% endif %}{% if sel_batch %}&batch={{ sel_batch }}{% endif %}{% if sel_student %}&student={{ sel_student }}{% endif %}"
+           class="nav-btn">← Prev</a>
+        <span class="month-title">{{ month_name }}</span>
+        <a href="?year={{ next_year }}&month={{ next_month }}{% if sel_sport %}&sport={{ sel_sport }}{% endif %}{% if sel_batch %}&batch={{ sel_batch }}{% endif %}{% if sel_student %}&student={{ sel_student }}{% endif %}"
+           class="nav-btn {% if not can_go_next %}disabled{% endif %}">Next →</a>
+
+        <select name="sport" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Sports</option>
+          {% for s in sports %}
+            <option value="{{ s.pk }}" {% if sel_sport == s.pk|stringformat:"s" %}selected{% endif %}>
+              {{ s.icon }} {{ s.name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <select name="batch" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Batches</option>
+          {% for b in batches %}
+            <option value="{{ b.pk }}" {% if sel_batch == b.pk|stringformat:"s" %}selected{% endif %}>
+              {{ b.name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <select name="student" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Students</option>
+          {% for st in all_students %}
+            <option value="{{ st.pk }}" {% if sel_student == st.pk|stringformat:"s" %}selected{% endif %}>
+              {{ st.full_name }} ({{ st.student_id }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Row 2: action tab buttons, always on their own line -->
+      <div class="month-nav-row2">
+        <div class="tab-links">
+          <a href="{% url 'student_attendance' %}" class="tab-link">✎ Mark</a>
+          <a href="{% url 'student_attendance_history' %}" class="tab-link active-tab">📅 History</a>
+          <a href="{% url 'student_attendance_history_export' %}?year={{ year }}&month={{ month }}{% if sel_sport %}&sport={{ sel_sport }}{% endif %}{% if sel_batch %}&batch={{ sel_batch }}{% endif %}{% if sel_student %}&student={{ sel_student }}{% endif %}"
+            class="tab-link"
+            style="background:#3A7A52;color:#fff;border-color:#3A7A52;">
+            ⬇ Download CSV
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Summary cards -->
+  {% if student_rows %}
+  <div class="sum-row">
+    <div class="sum-card">
+      <div class="sum-label">Students</div>
+      <div class="sum-val">{{ student_rows|length }}</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Working Days</div>
+      <div class="sum-val">{{ days_in_month }}</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Avg Attendance</div>
+      <div class="sum-val c-green" id="avg-pct">—</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Month</div>
+      <div class="sum-val" style="font-size:17px">{{ month_name }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Matrix -->
+  <div class="hist-card">
+    <div class="hist-card-head">
+      <div>
+        <div class="hist-card-title">Attendance Calendar — {{ month_name }}</div>
+        <div class="hist-card-sub">
+          {{ student_rows|length }} student{{ student_rows|length|pluralize }} · {{ days_in_month }} days
+        </div>
+      </div>
+    </div>
+
+    {% if student_rows %}
+    <div class="matrix-wrap">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th class="name-col">Student</th>
+            {% for d in day_range %}<th>{{ d }}</th>{% endfor %}
+            <th style="color:var(--green)">P</th>
+            <th style="color:var(--red)">A</th>
+            <th style="color:var(--amber)">L</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in student_rows %}
+          <tr>
+            <td class="name-col">
+              <div class="name-cell">
+                <div class="nc-av">
+                  {% if row.student.photo %}<img src="{{ row.student.photo.url }}" alt="">
+                  {% else %}{{ row.student.initials }}{% endif %}
+                </div>
+                <div>
+                  <div class="nc-name">{{ row.student.full_name }}</div>
+                  <div class="nc-id">
+                    {{ row.student.student_id }}
+                    <span class="sport-dot" style="background:{{ row.student.expertise_level.color_hex }}"></span>
+                    {{ row.student.sport.name }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            {% for cell in row.day_cells %}
+            <td title="{{ cell.title }}">
+              <div class="dc {{ cell.css }}"
+                   {% if cell.method %}data-method="{{ cell.method }}"{% endif %}>
+                {{ cell.label }}
+              </div>
+            </td>
+            {% endfor %}
+
+            <td><span class="tail-val" style="color:var(--green)">{{ row.present }}</span></td>
+            <td><span class="tail-val" style="color:var(--red)">{{ row.absent }}</span></td>
+            <td><span class="tail-val" style="color:var(--amber)">{{ row.late }}</span></td>
+            <td>
+              <div class="pct-wrap">
+                <span class="pct-num">{{ row.pct }}%</span>
+                <div class="pct-bar-bg">
+                  <div class="pct-bar-fill"
+                       style="width:{{ row.pct }}%;background:{% if row.pct >= 75 %}var(--green){% elif row.pct >= 50 %}var(--amber){% else %}var(--red){% endif %}">
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <strong style="font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.4px">Key:</strong>
+      <span class="legend-item"><span class="ld" style="background:var(--green-pale);border:1px solid var(--green)"></span>P Present</span>
+      <span class="legend-item"><span class="ld" style="background:var(--red-pale);border:1px solid var(--red)"></span>A Absent</span>
+      <span class="legend-item"><span class="ld" style="background:var(--amber-pale);border:1px solid var(--amber)"></span>L Late</span>
+      <span class="legend-item"><span class="ld" style="background:#EEF2FD;border:1px solid #3B5CB8"></span>Ex Excused</span>
+      <span class="legend-item"><span class="ld" style="background:var(--cream);border:1px solid var(--border)"></span>— Not marked</span>
+      <span class="legend-item" style="color:var(--ink-muted)">· Blue dot = QR marked</span>
+    </div>
+
+    <div class="table-footer">
+      <span>{{ student_rows|length }} student{{ student_rows|length|pluralize }} · {{ month_name }}</span>
+      <span>Pradip Sports Academy — Attendance Records</span>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <p>No students or attendance records found for {{ month_name }}.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  var rows = document.querySelectorAll('.matrix-table tbody tr');
+  if (!rows.length) return;
+  var total = 0, count = 0;
+  rows.forEach(function(row) {
+    var pctEl = row.querySelector('.pct-num');
+    if (pctEl) { total += parseInt(pctEl.textContent) || 0; count++; }
+  });
+  var avgEl = document.getElementById('avg-pct');
+  if (avgEl && count) avgEl.textContent = Math.round(total / count) + '%';
+});
+</script>
+{% endblock %}

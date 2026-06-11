@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+{% block title %}Enquiry Dashboard — Pradip Sports Academy{% endblock %}
+{% block sb_enquiries %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --gold: #C9912A;
+    --gold-light: #E8B84B;
+    --gold-pale: rgba(201,145,42,0.10);
+    --green-wa: #25D366;
+    --green-wa-dark: #1BA84F;
+    --surface: #FAFAF9;
+    --surface-2: #F4F2EE;
+    --border: rgba(0,0,0,0.08);
+    --border-m: rgba(0,0,0,0.14);
+    --text: #1A1814;
+    --text-dim: #5A5650;
+    --text-muted: #9A9690;
+    --radius: 8px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  #content { padding: 0 !important; background: #F7F5F1 !important; }
+  #content-main { padding: 28px 36px 60px !important; }
+
+  /* ── Header ── */
+  .eq-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .eq-header-left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 4px;
+    letter-spacing: -0.3px;
+  }
+  .eq-header-left p { font-size: 13px; color: var(--text-muted); margin: 0; }
+
+  /* ── Stat cards ── */
+  .eq-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .eq-stat {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .eq-stat::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .eq-stat.s-total::before  { background: #C9912A; }
+  .eq-stat.s-new::before    { background: #1a73e8; }
+  .eq-stat.s-pending::before{ background: #f57c00; }
+  .eq-stat.s-done::before   { background: #1e8e3e; }
+
+  .eq-stat-num {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .s-total  .eq-stat-num { color: #C9912A; }
+  .s-new    .eq-stat-num { color: #1a73e8; }
+  .s-pending .eq-stat-num { color: #f57c00; }
+  .s-done   .eq-stat-num { color: #1e8e3e; }
+
+  .eq-stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* ── Panel ── */
+  .eq-panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* ── Filters bar ── */
+  .eq-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    background: var(--surface-2);
+  }
+  .eq-filters-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: 1px solid var(--border-m);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .filter-chip:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-chip.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .filter-chip .chip-count {
+    background: rgba(0,0,0,0.12);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .filter-chip.active .chip-count { background: rgba(255,255,255,0.25); }
+
+  .filter-sep { width: 1px; height: 20px; background: var(--border-m); margin: 0 4px; }
+
+  .eq-search {
+    margin-left: auto;
+    position: relative;
+  }
+  .eq-search input {
+    padding: 6px 12px 6px 32px;
+    border: 1px solid var(--border-m);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.2s, width 0.2s;
+  }
+  .eq-search input:focus { border-color: var(--gold); width: 240px; }
+  .eq-search::before {
+    content: '⌕';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* ── Toolbar ── */
+  .eq-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+  }
+  .select-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .select-all-wrap input[type="checkbox"] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
+
+  .toolbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-m);
+    background: #fff;
+    color: var(--text-dim);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-action:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-pale); }
+  .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-action.btn-done {
+    border-color: rgba(30,142,62,0.4);
+    color: #1e8e3e;
+    background: rgba(30,142,62,0.06);
+  }
+  .btn-action.btn-done:hover { background: rgba(30,142,62,0.12); }
+
+  .selected-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 0 4px;
+  }
+
+  /* ── Table ── */
+  .eq-table-wrap { overflow-x: auto; }
+  .eq-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .eq-table thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .eq-table thead th.th-check { width: 44px; text-align: center; }
+  .eq-table thead th.th-actions { width: 140px; text-align: center; }
+
+  .eq-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s ease;
+  }
+  .eq-table tbody tr:hover { background: #FDFBF8; }
+  .eq-table tbody tr.selected { background: rgba(201,145,42,0.05); }
+  .eq-table tbody tr.responded { opacity: 0.5; }
+
+  .eq-table td {
+    padding: 13px 16px;
+    color: var(--text);
+    vertical-align: middle;
+  }
+  .eq-table td.td-check { text-align: center; }
+  .eq-table td.td-check input[type="checkbox"] { accent-color: var(--gold); width: 15px; height: 15px; cursor: pointer; }
+
+  /* Cell types */
+  .td-name { font-weight: 600; color: var(--text); }
+  .td-sub  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .td-phone a { color: var(--text); text-decoration: none; }
+  .td-phone a:hover { color: var(--gold); }
+
+  /* Status badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .badge-new      { background: #E8F0FE; color: #1a73e8; }
+  .badge-new::before { background: #1a73e8; }
+  .badge-contacted{ background: #FFF3E0; color: #e65100; }
+  .badge-contacted::before { background: #f57c00; }
+  .badge-enrolled { background: #E6F4EA; color: #137333; }
+  .badge-enrolled::before { background: #1e8e3e; }
+  .badge-closed   { background: #F1F3F4; color: #5f6368; }
+  .badge-closed::before { background: #9aa0a6; }
+  .badge-responded{ background: #E6F4EA; color: #137333; }
+  .badge-responded::before { background: #1e8e3e; }
+
+  /* WA badge */
+  .wa-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; }
+  .wa-sent    { color: #1e8e3e; }
+  .wa-pending { color: #f57c00; }
+
+  /* Action buttons */
+  .td-actions { text-align: center; }
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: var(--green-wa);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-wa:hover { background: var(--green-wa-dark); transform: translateY(-1px); box-shadow: 0 3px 8px rgba(37,211,102,0.3); }
+  .btn-wa svg { width: 13px; height: 13px; fill: #fff; flex-shrink: 0; }
+
+  .btn-wa-resend {
+    background: rgba(37,211,102,0.12);
+    color: #1e8e3e;
+    border: 1px solid rgba(37,211,102,0.3);
+  }
+  .btn-wa-resend:hover { background: rgba(37,211,102,0.2); }
+  .btn-wa-resend svg { fill: #1e8e3e; }
+
+  /* Empty state */
+  .eq-empty {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .eq-empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .eq-empty-title { font-size: 15px; font-weight: 600; color: var(--text-dim); margin-bottom: 4px; }
+  .eq-empty-sub { font-size: 13px; }
+
+  /* Pagination */
+  .eq-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .eq-pagination { display: flex; gap: 4px; }
+  .eq-pagination a, .eq-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: none;
+    background: #fff;
+    transition: all 0.15s;
+  }
+  .eq-pagination a:hover { border-color: var(--gold); color: var(--gold); }
+  .eq-pagination span.current { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+  /* Toast */
+  .eq-toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    max-width: 320px;
+  }
+  .eq-toast.show { transform: translateY(0); opacity: 1; }
+  .eq-toast.success { background: #1e8e3e; }
+  .eq-toast.error   { background: #c62828; }
+  .eq-toast.info    { background: #1565c0; }
+
+  /* Show-all toggle */
+  .show-all-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { display: none; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border-m);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle-switch input:checked + .toggle-track { background: var(--gold); }
+  .toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    pointer-events: none;
+  }
+  .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(14px); }
+
+  /* Sort arrows */
+  .th-sort { cursor: pointer; user-select: none; }
+  .th-sort:hover { color: var(--gold); }
+  .sort-arrow { margin-left: 4px; opacity: 0.4; font-size: 9px; }
+  .sort-arrow.active { opacity: 1; color: var(--gold); }
+
+  @media (max-width: 900px) {
+    #content-main { padding: 16px !important; }
+    .eq-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="eq-header">
+  <div class="eq-header-left">
+    <h1>🏆 Enquiry Dashboard</h1>
+    <p>Pradip Sports Academy · All student enquiries in one place</p>
+  </div>
+  <a href="{% url 'admin:index' %}" style="font-size:13px;color:var(--text-muted);text-decoration:none;">← Back to Admin</a>
+</div>
+
+<!-- STATS -->
+<div class="eq-stats">
+  <div class="eq-stat s-total">
+    <div class="eq-stat-num" id="count-total">{{ total_count }}</div>
+    <div class="eq-stat-label">Total Enquiries</div>
+  </div>
+  <div class="eq-stat s-new">
+    <div class="eq-stat-num" id="count-new">{{ new_count }}</div>
+    <div class="eq-stat-label">New (Unread)</div>
+  </div>
+  <div class="eq-stat s-pending">
+    <div class="eq-stat-num" id="count-pending">{{ pending_count }}</div>
+    <div class="eq-stat-label">Contacted</div>
+  </div>
+  <div class="eq-stat s-done">
+    <div class="eq-stat-num" id="count-done">{{ done_count }}</div>
+    <div class="eq-stat-label">Enrolled / Closed</div>
+  </div>
+</div>
+
+<!-- MAIN PANEL -->
+<div class="eq-panel">
+
+  <!-- FILTERS -->
+  <div class="eq-filters">
+    <span class="eq-filters-label">Filter:</span>
+
+    <a href="?status=" class="filter-chip {% if not request.GET.status %}active{% endif %}">
+      All <span class="chip-count">{{ total_count }}</span>
+    </a>
+    <a href="?status=new" class="filter-chip {% if request.GET.status == 'new' %}active{% endif %}">
+      New <span class="chip-count">{{ new_count }}</span>
+    </a>
+    <a href="?status=contacted" class="filter-chip {% if request.GET.status == 'contacted' %}active{% endif %}">
+      Contacted <span class="chip-count">{{ pending_count }}</span>
+    </a>
+    <a href="?status=enrolled" class="filter-chip {% if request.GET.status == 'enrolled' %}active{% endif %}">
+      Enrolled <span class="chip-count">{{ enrolled_count }}</span>
+    </a>
+    <a href="?status=closed" class="filter-chip {% if request.GET.status == 'closed' %}active{% endif %}">
+      Closed <span class="chip-count">{{ closed_count }}</span>
+    </a>
+
+    <div class="filter-sep"></div>
+
+    {% for sport in sports_list %}
+    <a href="?sport={{ sport }}" class="filter-chip {% if request.GET.sport == sport %}active{% endif %}">
+      {{ sport }}
+    </a>
+    {% endfor %}
+
+    <div class="eq-search">
+      <input type="text" id="searchInput" placeholder="Search name, phone…" value="{{ request.GET.q }}">
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="eq-toolbar">
+    <div class="select-all-wrap">
+      <input type="checkbox" id="selectAll" title="Select all">
+      <span id="selectedLabel">Select all</span>
+    </div>
+    <span class="selected-count" id="selectedCount"></span>
+
+    <div class="toolbar-actions">
+      <button class="btn-action btn-done" id="btnMarkResponded" disabled onclick="bulkMarkResponded()">
+        ✓ Mark as Responded
+      </button>
+      <button class="btn-action" id="btnMarkContacted" disabled onclick="bulkMarkStatus('contacted')">
+        📞 Mark Contacted
+      </button>
+      <button class="btn-action" id="btnBulkWA" disabled onclick="bulkWhatsApp()">
+        📲 Send WA to Selected
+      </button>
+    </div>
+
+    <div class="show-all-wrap">
+      <span>Show responded</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="showAllToggle" {% if show_all %}checked{% endif %} onchange="toggleShowAll(this)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="eq-table-wrap">
+    <table class="eq-table" id="enquiryTable">
+      <thead>
+        <tr>
+          <th class="th-check"></th>
+          <th class="th-sort" onclick="sortTable(1)">#  <span class="sort-arrow">↕</span></th>
+          <th class="th-sort" onclick="sortTable(2)">Name <span class="sort-arrow">↕</span></th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th class="th-sort" onclick="sortTable(5)">Sport <span class="sort-arrow">↕</span></th>
+          <th>Age</th>
+          <th>Message</th>
+          <th class="th-sort" onclick="sortTable(8)">Status <span class="sort-arrow">↕</span></th>
+          <th>WhatsApp</th>
+          <th class="th-sort" onclick="sortTable(10)">Received <span class="sort-arrow">↕</span></th>
+          <th class="th-actions">Notify</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        {% for enquiry in enquiries %}
+        <tr
+          class="{% if enquiry.status == 'closed' or enquiry.responded %}responded{% endif %}"
+          data-id="{{ enquiry.id }}"
+          data-responded="{{ enquiry.responded|yesno:'true,false' }}"
+          data-status="{{ enquiry.status }}"
+        >
+          <td class="td-check">
+            <input type="checkbox" class="row-check" value="{{ enquiry.id }}">
+          </td>
+          <td style="color:var(--text-muted);font-size:12px;">{{ forloop.counter }}</td>
+          <td>
+            <div class="td-name">{{ enquiry.full_name }}</div>
+            <div class="td-sub">ID #{{ enquiry.id }}</div>
+          </td>
+          <td class="td-phone">
+            <a href="tel:{{ enquiry.phone }}">{{ enquiry.phone }}</a>
+          </td>
+          <td>
+            {% if enquiry.email %}
+              <a href="mailto:{{ enquiry.email }}" style="color:var(--text);text-decoration:none;font-size:12px;">{{ enquiry.email }}</a>
+            {% else %}
+              <span style="color:var(--text-muted);">—</span>
+            {% endif %}
+          </td>
+          <td>{{ enquiry.sport|default:"—" }}</td>
+          <td style="text-align:center;">{{ enquiry.age|default:"—" }}</td>
+          <td style="max-width:180px;">
+            {% if enquiry.message %}
+              <span title="{{ enquiry.message }}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;font-size:12px;color:var(--text-dim);">
+                {{ enquiry.message }}
+              </span>
+            {% else %}
+              <span style="color:var(--text-muted);">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge badge-{{ enquiry.status }}">{{ enquiry.get_status_display }}</span>
+          </td>
+          <td>
+            {% if enquiry.whatsapp_sent %}
+              <span class="wa-badge wa-sent">✓ Sent</span>
+            {% else %}
+              <span class="wa-badge wa-pending">○ Pending</span>
+            {% endif %}
+          </td>
+          <td style="font-size:12px;color:var(--text-muted);white-space:nowrap;">
+            {{ enquiry.created_at|date:"d M Y" }}<br>
+            <span style="font-size:11px;">{{ enquiry.created_at|time:"h:i A" }}</span>
+          </td>
+          <td class="td-actions">
+            <a href="{% url 'admin:send_whatsapp' enquiry.id %}"
+               class="btn-wa {% if enquiry.whatsapp_sent %}btn-wa-resend{% endif %}"
+               onclick="return confirmWA(event, this, '{{ enquiry.full_name|escapejs }}')">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              {% if enquiry.whatsapp_sent %}Resend{% else %}Send WA{% endif %}
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="12">
+            <div class="eq-empty">
+              <div class="eq-empty-icon">📭</div>
+              <div class="eq-empty-title">No enquiries found</div>
+              <div class="eq-empty-sub">Try changing your filters or check back later.</div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER / PAGINATION -->
+  <div class="eq-footer">
+    <span>Showing {{ enquiries|length }} of {{ total_count }} enquiries</span>
+    {% if is_paginated %}
+    <div class="eq-pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&{{ query_string }}">‹</a>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="current">{{ num }}</span>
+        {% elif num|add:"-2" <= page_obj.number and page_obj.number <= num|add:"2" %}
+          <a href="?page={{ num }}&{{ query_string }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&{{ query_string }}">›</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="eq-toast" id="toast"></div>
+
+<script>
+const CSRF = '{{ csrf_token }}';
+
+// ── Toast helper ─────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `eq-toast ${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── Search (client-side) ─────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#tableBody tr[data-id]').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+  updateSelectedCount();
+});
+
+// ── Select all ───────────────────────────────────────────────
+document.getElementById('selectAll').addEventListener('change', function() {
+  document.querySelectorAll('.row-check').forEach(cb => {
+    if (cb.closest('tr').style.display !== 'none') cb.checked = this.checked;
+  });
+  updateSelectedCount();
+});
+
+document.querySelectorAll('.row-check').forEach(cb => {
+  cb.addEventListener('change', updateSelectedCount);
+});
+
+function getSelected() {
+  return [...document.querySelectorAll('.row-check:checked')].map(cb => cb.value);
+}
+
+function updateSelectedCount() {
+  const ids = getSelected();
+  const n = ids.length;
+  document.getElementById('selectedCount').textContent = n > 0 ? `${n} selected` : '';
+  document.getElementById('btnMarkResponded').disabled = n === 0;
+  document.getElementById('btnMarkContacted').disabled = n === 0;
+  document.getElementById('btnBulkWA').disabled = n === 0;
+  document.getElementById('selectedLabel').textContent = n > 0 ? `${n} selected` : 'Select all';
+}
+
+// ── Show responded toggle ─────────────────────────────────────
+function toggleShowAll(el) {
+  const url = new URL(window.location.href);
+  if (el.checked) url.searchParams.set('show_all', '1');
+  else url.searchParams.delete('show_all');
+  window.location.href = url.toString();
+}
+
+// ── Bulk mark responded ──────────────────────────────────────
+function bulkMarkResponded() {
+  const ids = getSelected();
+  if (!ids.length) return;
+  if (!confirm(`Mark ${ids.length} enquir${ids.length === 1 ? 'y' : 'ies'} as Responded? They will be hidden from the default view.`)) return;
+
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'mark_responded', ids })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast(`✓ ${d.count} enquir${d.count === 1 ? 'y' : 'ies'} marked as responded`);
+      ids.forEach(id => {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (row) {
+          const badge = row.querySelector('.badge');
+          badge.className = 'badge badge-closed';
+          badge.textContent = 'Responded';
+          setTimeout(() => { if (!document.getElementById('showAllToggle').checked) row.style.display = 'none'; }, 800);
+        }
+      });
+      document.getElementById('selectAll').checked = false;
+      updateSelectedCount();
+    } else {
+      showToast('Something went wrong. Please try again.', 'error');
+    }
+  })
+  .catch(() => showToast('Network error. Please try again.', 'error'));
+}
+
+// ── Bulk mark contacted ──────────────────────────────────────
+function bulkMarkStatus(status) {
+  const ids = getSelected();
+  if (!ids.length) return;
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'mark_status', ids, status })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast(`✓ ${d.count} enquir${d.count === 1 ? 'y' : 'ies'} marked as ${status}`);
+      ids.forEach(id => {
+        const badge = document.querySelector(`tr[data-id="${id}"] .badge`);
+        if (badge) { badge.className = `badge badge-${status}`; badge.textContent = status.charAt(0).toUpperCase() + status.slice(1); }
+      });
+      document.getElementById('selectAll').checked = false;
+      updateSelectedCount();
+    }
+  })
+  .catch(() => showToast('Network error.', 'error'));
+}
+
+// ── Bulk WhatsApp ────────────────────────────────────────────
+function bulkWhatsApp() {
+  const ids = getSelected();
+  if (!ids.length) return;
+  if (!confirm(`Send WhatsApp notification for ${ids.length} enqu${ids.length === 1 ? 'iry' : 'iries'}?`)) return;
+  fetch('{% url "enquiry_bulk_action" %}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+    body: JSON.stringify({ action: 'send_whatsapp', ids })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      showToast(`📲 WhatsApp sent for ${d.sent} of ${ids.length} enquiries`);
+      ids.forEach(id => {
+        const waCell = document.querySelector(`tr[data-id="${id}"] .wa-badge`);
+        if (waCell) { waCell.className = 'wa-badge wa-sent'; waCell.textContent = '✓ Sent'; }
+        const waBtn = document.querySelector(`tr[data-id="${id}"] .btn-wa`);
+        if (waBtn) { waBtn.classList.add('btn-wa-resend'); waBtn.querySelector('span, text') && (waBtn.lastChild.textContent = 'Resend'); }
+      });
+    } else {
+      showToast('WhatsApp send failed. Check Twilio credentials.', 'error');
+    }
+  })
+  .catch(() => showToast('Network error.', 'error'));
+}
+
+// ── WA confirm ───────────────────────────────────────────────
+function confirmWA(e, btn, name) {
+  if (!confirm(`Send WhatsApp notification for ${name}?`)) {
+    e.preventDefault();
+    return false;
+  }
+  return true;
+}
+
+// ── Sort table ───────────────────────────────────────────────
+let sortCol = -1, sortDir = 1;
+function sortTable(col) {
+  const tbody = document.getElementById('tableBody');
+  const rows  = [...tbody.querySelectorAll('tr[data-id]')];
+  if (sortCol === col) sortDir *= -1;
+  else { sortCol = col; sortDir = 1; }
+
+  rows.sort((a, b) => {
+    const av = a.cells[col]?.textContent.trim() || '';
+    const bv = b.cells[col]?.textContent.trim() || '';
+    return av.localeCompare(bv, undefined, {numeric: true}) * sortDir;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+
+  document.querySelectorAll('.sort-arrow').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.th-sort')[col - 1]?.querySelector('.sort-arrow')?.classList.add('active');
+}
+</script>
+{% endblock %}
