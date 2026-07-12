@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}New Student Admission — Pradip Sports Academy{% endblock %}
+{% block title %}{% if edit_student %}Edit Student — {{ edit_student.full_name }}{% else %}New Student Admission{% endif %} — Pradip Sports Academy{% endblock %}
 {% block sb_students %}active{% endblock %}
 
 {% block extra_css %}
@@ -60,6 +60,7 @@
 .alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
 .step-error-banner{background:var(--red-pale);border:1px solid rgba(184,64,64,.2);border-radius:var(--radius-sm);padding:11px 16px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
 .step-error-banner.show{display:flex;align-items:center;gap:8px}
+.edit-badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber-pale);color:var(--amber);border:1px solid rgba(196,151,58,.3);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;margin-left:12px}
 @media(max-width:860px){.col-2,.col-3{grid-template-columns:1fr 1fr}.stepper{flex-direction:column;align-items:flex-start;gap:12px}.step::after{display:none}}
 @media(max-width:560px){.col-2,.col-3{grid-template-columns:1fr}}
 {% endblock %}
@@ -69,11 +70,31 @@
   <div class="breadcrumb">
     <a href="{% url 'home' %}">Dashboard</a><span class="breadcrumb-sep">›</span>
     <a href="{% url 'student_list' %}">Students</a><span class="breadcrumb-sep">›</span>
-    <span>New Admission</span>
+    {% if edit_student %}
+      <a href="{% url 'student_detail' edit_student.pk %}">{{ edit_student.full_name }}</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Edit</span>
+    {% else %}
+      <span>New Admission</span>
+    {% endif %}
   </div>
+
   <div class="page-header">
-    <h1>New Student Admission</h1>
-    <p>Complete all three sections to register a new student</p>
+    <h1>
+      {% if edit_student %}
+        Edit Student
+        <span class="edit-badge">✎ Editing: {{ edit_student.full_name }}</span>
+      {% else %}
+        New Student Admission
+      {% endif %}
+    </h1>
+    <p>
+      {% if edit_student %}
+        Update student details below. Fee and payment changes must be done from the payments section.
+      {% else %}
+        Complete all three sections to register a new student
+      {% endif %}
+    </p>
   </div>
 
   {% if messages %}
@@ -91,6 +112,9 @@
   <form method="POST" enctype="multipart/form-data" id="admission-form" novalidate>
     {% csrf_token %}
     <input type="hidden" name="fee_id" id="fee-id-hidden">
+    {% if edit_student %}
+      <input type="hidden" name="edit_pk" value="{{ edit_student.pk }}">
+    {% endif %}
 
     <div class="form-card">
 
@@ -100,48 +124,81 @@
         <div class="step-body">
           <div class="step-error-banner" id="err-1">⚠ Please fix the errors above before continuing.</div>
           <div class="field-grid col-3">
+
             <div class="field"><label class="req" for="f-fname">First Name</label>
-              <input type="text" name="first_name" id="f-fname" placeholder="e.g. Arjun" required></div>
-            <div class="field"><label class="req" for="f-lname">Last Name</label>
-              <input type="text" name="last_name" id="f-lname" placeholder="e.g. Mehta" required></div>
+              <input type="text" name="first_name" id="f-fname" placeholder="e.g. Arjun"
+                     value="{{ edit_student.first_name|default:'' }}" required>
+            </div>
+
+            <div class="field"><label for="f-lname">Last Name</label>
+              <input type="text" name="last_name" id="f-lname" placeholder="e.g. Mehta"
+                     value="{{ edit_student.last_name|default:'' }}" required>
+            </div>
+
             <div class="field"><label class="req" for="f-dob">Date of Birth</label>
-              <input type="date" name="dob" id="f-dob" required></div>
+              <input type="date" name="dob" id="f-dob"
+                     value="{{ edit_student.dob|date:'Y-m-d'|default:'' }}" required>
+            </div>
+
             <div class="field"><label class="req" for="f-gender">Gender</label>
               <select name="gender" id="f-gender" required>
                 <option value="">— Select —</option>
-                <option value="M">Male</option><option value="F">Female</option><option value="O">Other</option>
-              </select></div>
-            <div class="field"><label for="f-blood">Blood Group</label>
-              <select name="blood_group" id="f-blood">
-                <option value="NK">Not Known</option>
-                <option value="A+">A+</option><option value="A-">A-</option>
-                <option value="B+">B+</option><option value="B-">B-</option>
-                <option value="O+">O+</option><option value="O-">O-</option>
-                <option value="AB+">AB+</option><option value="AB-">AB-</option>
-              </select></div>
-            <div class="field"><label class="req" for="f-phone">Contact Number</label>
-              <input type="tel" name="contact_number" id="f-phone" placeholder="98765 43210" maxlength="10"
-                    required
-                    oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+                <option value="M" {% if edit_student.gender == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if edit_student.gender == 'F' %}selected{% endif %}>Female</option>
+                <option value="O" {% if edit_student.gender == 'O' %}selected{% endif %}>Other</option>
+              </select>
             </div>
 
-          <div class="field"><label for="f-email">Email Address</label>
-            <input type="email" name="email" id="f-email" placeholder="student@email.com" maxlength="254"
-                  oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
-          </div>
+            <div class="field"><label for="f-blood">Blood Group</label>
+              <select name="blood_group" id="f-blood">
+                <option value="NK" {% if edit_student.blood_group == 'NK' %}selected{% endif %}>Not Known</option>
+                <option value="A+"  {% if edit_student.blood_group == 'A+'  %}selected{% endif %}>A+</option>
+                <option value="A-"  {% if edit_student.blood_group == 'A-'  %}selected{% endif %}>A-</option>
+                <option value="B+"  {% if edit_student.blood_group == 'B+'  %}selected{% endif %}>B+</option>
+                <option value="B-"  {% if edit_student.blood_group == 'B-'  %}selected{% endif %}>B-</option>
+                <option value="O+"  {% if edit_student.blood_group == 'O+'  %}selected{% endif %}>O+</option>
+                <option value="O-"  {% if edit_student.blood_group == 'O-'  %}selected{% endif %}>O-</option>
+                <option value="AB+" {% if edit_student.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                <option value="AB-" {% if edit_student.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+              </select>
+            </div>
+
+            <div class="field"><label class="req" for="f-phone">Contact Number</label>
+              <input type="tel" name="contact_number" id="f-phone" placeholder="98765 43210" maxlength="10"
+                     value="{{ edit_student.contact_number|default:'' }}" required
+                     oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+            </div>
+
+            <div class="field"><label for="f-email">Email Address</label>
+              <input type="email" name="email" id="f-email" placeholder="student@email.com" maxlength="254"
+                     value="{{ edit_student.email|default:'' }}"
+                     oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
+            </div>
+
             <div class="field"><label>Photo</label>
               <div class="photo-upload">
-                <div class="photo-preview" id="photo-preview" onclick="document.getElementById('f-photo').click()">📷</div>
+                <div class="photo-preview" id="photo-preview" onclick="document.getElementById('f-photo').click()">
+                  {% if edit_student.photo %}
+                    <img src="{{ edit_student.photo.url }}" alt="{{ edit_student.full_name }}">
+                  {% else %}
+                    📷
+                  {% endif %}
+                </div>
                 <div>
-                  <div style="font-size:13px;color:var(--ink-soft)">Click to upload photo</div>
+                  <div style="font-size:13px;color:var(--ink-soft)">
+                    {% if edit_student.photo %}Click to change photo{% else %}Click to upload photo{% endif %}
+                  </div>
                   <div style="font-size:11.5px;color:var(--ink-muted);margin-top:3px">JPG, PNG · max 2MB</div>
                   <input type="file" name="photo" id="f-photo" accept="image/*" style="display:none" onchange="previewPhoto(this)">
                 </div>
-              </div></div>
+              </div>
+            </div>
+
             <div class="field col-full"><label class="req" for="f-address">Address</label>
               <textarea name="address" id="f-address" placeholder="Full residential address…" required
-                        oninput="this.value=this.value.replace(/[^a-zA-Z0-9\s,.\-\/\#\(\)]/g,'')"></textarea>
+                        oninput="this.value=this.value.replace(/[^a-zA-Z0-9\s,.\-\/\#\(\)]/g,'')">{{ edit_student.address|default:'' }}</textarea>
             </div>
+
           </div>
         </div>
         <div class="form-nav"><span></span>
@@ -155,33 +212,47 @@
         <div class="step-body">
           <div class="step-error-banner" id="err-2">⚠ Please fix the errors above before continuing.</div>
           <div class="field-grid col-3">
+
             <div class="field"><label class="req" for="f-pname">Parent / Guardian Name</label>
-              <input type="text" name="parent_name" id="f-pname" placeholder="e.g. Ramesh Mehta" required></div>
+              <input type="text" name="parent_name" id="f-pname" placeholder="e.g. Ramesh Mehta"
+                     value="{{ edit_student.parent_name|default:'' }}" required>
+            </div>
+
             <div class="field"><label for="f-prelation">Relation</label>
               <select name="parent_relation" id="f-prelation">
-                <option value="Father">Father</option><option value="Mother">Mother</option>
-                <option value="Guardian">Guardian</option><option value="Sibling">Sibling</option>
-                <option value="Other">Other</option>
-              </select></div>
-           <div class="field"><label class="req" for="f-pwa">WhatsApp Number</label>
-            <input type="tel" name="parent_whatsapp" id="f-pwa" placeholder="98765 43210" maxlength="10"
-                  required
-                  oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
-            <span class="field-hint">Used for fee & expiry reminders</span>
+                <option value="Father"   {% if edit_student.parent_relation == 'Father'   %}selected{% endif %}>Father</option>
+                <option value="Mother"   {% if edit_student.parent_relation == 'Mother'   %}selected{% endif %}>Mother</option>
+                <option value="Guardian" {% if edit_student.parent_relation == 'Guardian' %}selected{% endif %}>Guardian</option>
+                <option value="Sibling"  {% if edit_student.parent_relation == 'Sibling'  %}selected{% endif %}>Sibling</option>
+                <option value="Other"    {% if edit_student.parent_relation == 'Other'    %}selected{% endif %}>Other</option>
+              </select>
             </div>
+
+            <div class="field"><label class="req" for="f-pwa">WhatsApp Number</label>
+              <input type="tel" name="parent_whatsapp" id="f-pwa" placeholder="98765 43210" maxlength="10"
+                     value="{{ edit_student.parent_whatsapp|default:'' }}" required
+                     oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
+              <span class="field-hint">Used for fee &amp; expiry reminders</span>
+            </div>
+
             <div class="field"><label for="f-pemail">Parent Email</label>
-            <input type="email" name="parent_email" id="f-pemail" placeholder="parent@email.com" maxlength="254"
-                  oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
+              <input type="email" name="parent_email" id="f-pemail" placeholder="parent@email.com" maxlength="254"
+                     value="{{ edit_student.parent_email|default:'' }}"
+                     oninput="this.value=this.value.replace(/[^a-zA-Z0-9.@]/g,'')">
             </div>
+
             <div class="field"><label for="f-poccu">Occupation</label>
-            <input type="text" name="parent_occupation" id="f-poccu" placeholder="e.g. Engineer" maxlength="100"
-                  oninput="this.value=this.value.replace(/[^a-zA-Z\s\.\-]/g,'')">
+              <input type="text" name="parent_occupation" id="f-poccu" placeholder="e.g. Engineer" maxlength="100"
+                     value="{{ edit_student.parent_occupation|default:'' }}"
+                     oninput="this.value=this.value.replace(/[^a-zA-Z\s\.\-]/g,'')">
             </div>
+
             <div class="field"><label for="f-emerg" class="req">Emergency Contact</label>
-            <input type="tel" name="emergency_contact" id="f-emerg" placeholder="Alternate number" maxlength="10"
-                  oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
-            <span class="field-hint">Leave blank if same as WhatsApp</span>
+              <input type="tel" name="emergency_contact" id="f-emerg" placeholder="Alternate number" maxlength="10"
+                     value="{{ edit_student.emergency_contact|default:'' }}"
+                     oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value.length===1&&!/^[6-9]/.test(this.value))this.value='';">
             </div>
+
           </div>
         </div>
         <div class="form-nav">
@@ -196,49 +267,101 @@
         <div class="step-body">
           <div class="step-error-banner" id="err-3">⚠ Please fix the errors above before submitting.</div>
           <div class="field-grid col-3">
+
             <div class="field"><label class="req" for="f-sport">Sport</label>
               <select name="sport" id="f-sport" onchange="lookupFee()" required>
                 <option value="">— Select Sport —</option>
-                {% for s in sports %}<option value="{{ s.pk }}">{{ s.icon }} {{ s.name }}</option>{% endfor %}
-              </select></div>
+                {% for s in sports %}
+                  <option value="{{ s.pk }}" {% if edit_student.sport_id == s.pk %}selected{% endif %}>
+                    {{ s.icon }} {{ s.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="field"><label class="req" for="f-batch">Batch</label>
               <select name="batch" id="f-batch" onchange="lookupFee()" required>
                 <option value="">— Select Batch —</option>
-                {% for b in batches %}<option value="{{ b.pk }}">{{ b.name }}</option>{% endfor %}
-              </select></div>
+                {% for b in batches %}
+                  <option value="{{ b.pk }}" {% if edit_student.batch_id == b.pk %}selected{% endif %}>
+                    {{ b.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="field"><label class="req" for="f-level">Expertise Level</label>
               <select name="expertise_level" id="f-level" onchange="lookupFee()" required>
                 <option value="">— Select Level —</option>
-                {% for lv in levels %}<option value="{{ lv.pk }}">{{ lv.name }}</option>{% endfor %}
-              </select></div>
+                {% for lv in levels %}
+                  <option value="{{ lv.pk }}" {% if edit_student.expertise_level_id == lv.pk %}selected{% endif %}>
+                    {{ lv.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="field"><label class="req" for="f-duration">Duration</label>
               <select name="duration" id="f-duration" onchange="lookupFee()" required>
                 <option value="">— Select Duration —</option>
-                {% for d in durations %}<option value="{{ d.pk }}">{{ d.duration_name }}</option>{% endfor %}
-              </select></div>
+                {% for d in durations %}
+                  <option value="{{ d.pk }}" {% if edit_student.duration_id == d.pk %}selected{% endif %}>
+                    {{ d.duration_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
             <div class="field"><label class="req" for="f-admdate">Admission Date</label>
-              <input type="date" name="admission_date" id="f-admdate" required></div>
+              <input type="date" name="admission_date" id="f-admdate"
+                     value="{{ edit_student.admission_date|date:'Y-m-d'|default:'' }}" required>
+            </div>
+
             <div class="field"><label for="f-slot">Preferred Time Slot</label>
-              <input type="text" name="time_slot" id="f-slot" placeholder="e.g. 6:00 – 7:00 AM"></div>
+              <input type="text" name="time_slot" id="f-slot" placeholder="e.g. 6:00 – 7:00 AM"
+                     value="{{ edit_student.time_slot|default:'' }}">
+            </div>
+
             {% if coaches %}
             <div class="field"><label for="f-coach">Assign Coach</label>
               <select name="assigned_coach" id="f-coach">
                 <option value="">— No coach assigned —</option>
-                {% for c in coaches %}<option value="{{ c.pk }}">{{ c.full_name }}</option>{% endfor %}
-              </select></div>
+                {% for c in coaches %}
+                  <option value="{{ c.pk }}" {% if edit_student.assigned_coach_id == c.pk %}selected{% endif %}>
+                    {{ c.full_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
             {% endif %}
+
             <div class="field col-full"><label>Fee Details</label>
               <div class="fee-box" id="fee-box">
                 <div class="fee-box-loading">← Select all four fields above to load fee</div>
-              </div></div>
-            <div class="field" id="fee-paid-wrap" style="display:none"><label for="f-feepaid">Amount Paid Today (₹)</label>
+              </div>
+            </div>
+
+            {% if not edit_student %}
+            <div class="field" id="fee-paid-wrap" style="display:none">
+              <label for="f-feepaid">Amount Paid Today (₹)</label>
               <input type="number" name="fee_paid" id="f-feepaid" placeholder="0" min="0" step="0.01" value="0">
-              <span class="field-hint">Leave 0 if collecting later</span></div>
+              <span class="field-hint">Leave 0 if collecting later</span>
+            </div>
+            {% else %}
+            <div class="field col-full" style="padding:14px 18px;background:var(--amber-pale);border-radius:var(--radius-sm);border:1px solid rgba(196,151,58,.3)">
+              <p style="font-size:13px;color:var(--amber);margin:0">
+                💡 Fee and payment changes are not updated here. Use the <strong>Payments</strong> section on the student profile to record or adjust payments.
+              </p>
+            </div>
+            {% endif %}
+
           </div>
         </div>
         <div class="form-nav">
           <button type="button" class="btn btn-ghost" onclick="goPrev(3)">← Back</button>
-          <button type="submit" class="btn btn-green" id="submit-btn">✓ Confirm Admission</button>
+          <button type="submit" class="btn btn-green" id="submit-btn">
+            {% if edit_student %}✓ Update Student{% else %}✓ Confirm Admission{% endif %}
+          </button>
         </div>
       </div>
 
@@ -252,7 +375,7 @@
 // ── Rules for each step ─────────────────────────────────────────
 const RULES_1 = {
   first_name:     [{rule:'required'},{rule:'alphaName'},{rule:'minLength',value:2},{rule:'maxLength',value:20}],
-  last_name:      [{rule:'required'},{rule:'alphaName'},{rule:'minLength',value:2},{rule:'maxLength',value:20}],
+  last_name:      [{rule:'alphaName'},{rule:'maxLength',value:20}],
   dob:            [{rule:'required'},{rule:'date'},{rule:'notFutureDate'},{rule:'minAge',value:3}],
   gender:         [{rule:'required'}],
   contact_number: [{rule:'required'},{rule:'phone'},{rule:'minLength',value:10},{rule:'maxLength',value:10},{rule:'regex',value:/^[6-9]\d{9}$/,message:'Must start with 6–9 and be 10 digits'}],
@@ -272,14 +395,31 @@ const RULES_3 = {
   expertise_level: [{rule:'required'}],
   duration:        [{rule:'required'}],
   admission_date:  [{rule:'required'},{rule:'date'}],
+  {% if not edit_student %}
   fee_paid:        [{rule:'positiveNumber'}],
+  {% endif %}
 };
+
+const IS_EDIT = {{ edit_student|yesno:'true,false' }};
 
 // Bind live validation
 window.addEventListener('DOMContentLoaded', () => {
   SA.validate.bindAll('admission-form', {...RULES_1, ...RULES_2, ...RULES_3});
-  document.getElementById('f-admdate').valueAsDate = new Date();
+
+  // Only set today's date for new admissions (edit mode already has the value pre-filled)
+  if (!IS_EDIT) {
+    document.getElementById('f-admdate').valueAsDate = new Date();
+  }
+
   SA.charCounter('#f-address', 200);
+
+  // In edit mode: trigger fee lookup on load since dropdowns are already pre-selected
+  if (IS_EDIT) {
+    lookupFee();
+    {% if edit_student.fee_structure %}
+    document.getElementById('fee-id-hidden').value = '{{ edit_student.fee_structure.pk }}';
+    {% endif %}
+  }
 });
 
 function goNext(step) {
@@ -340,7 +480,7 @@ function lookupFee() {
   if (!sport || !batch || !level || !dur) {
     box.innerHTML = '<div class="fee-box-loading">← Select all four fields above to load fee</div>';
     document.getElementById('fee-id-hidden').value = '';
-    document.getElementById('fee-paid-wrap').style.display = 'none';
+    if (!IS_EDIT) document.getElementById('fee-paid-wrap').style.display = 'none';
     return;
   }
   box.innerHTML = '<div class="fee-box-loading">🔍 Looking up fee…</div>';
@@ -348,7 +488,9 @@ function lookupFee() {
     .then(r => r.json())
     .then(data => {
       document.getElementById('fee-id-hidden').value = data.found ? data.fee_id : '';
-      document.getElementById('fee-paid-wrap').style.display = data.found ? 'block' : 'none';
+      if (!IS_EDIT) {
+        document.getElementById('fee-paid-wrap').style.display = data.found ? 'block' : 'none';
+      }
       if (data.found) {
         const hasDisc = data.discount_pct > 0;
         box.innerHTML = `<div>
@@ -356,7 +498,9 @@ function lookupFee() {
           ${hasDisc?`<div class="fee-row"><span class="fee-row-label">Discount</span><span class="disc-tag">${data.discount_pct}% off</span></div>`:''}
           <div class="fee-row" style="background:var(--green-pale)"><span class="fee-row-label" style="color:var(--green)">Payable</span><span class="fee-row-val payable">₹${Math.round(data.discounted_amount).toLocaleString('en-IN')}</span></div>
         </div>`;
-        document.getElementById('f-feepaid').value = Math.round(data.discounted_amount);
+        if (!IS_EDIT) {
+          document.getElementById('f-feepaid').value = Math.round(data.discounted_amount);
+        }
       } else {
         box.innerHTML = '<div class="fee-box-not-found">⚠ No fee configured for this combination. You can still proceed.</div>';
       }

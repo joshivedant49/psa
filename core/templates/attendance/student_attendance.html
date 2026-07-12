@@ -117,15 +117,16 @@ tbody td:first-child{padding-left:22px}
                   {{ s.sport.icon }} {{ s.sport.name }}
                 </td>
                 <td>
-                  <div class="status-radios">
+                  <div class="status-radios">                    
                     {% for val, lbl in att_status_choices %}
                     <input type="radio" class="status-radio"
                           name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
                           value="{{ val }}"
-                          {% if att.status == val %}checked{% endif %}
+                          {% if att.status == val %}checked{% endif %}   {# ← this must be here #}
                           onchange="toggleTimeInputs({{ s.pk }}, this.value)">
                     <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
                     {% endfor %}
+
                   </div>
                 </td>
                 <td>
@@ -160,11 +161,12 @@ tbody td:first-child{padding-left:22px}
               </td>
               <td>
                 <div class="status-radios">
+                  <input type="radio" name="status_{{ s.pk }}" value="not_marked" checked style="display:none">
+
                   {% for val, lbl in att_status_choices %}
                   <input type="radio" class="status-radio"
                         name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
                         value="{{ val }}"
-                        {% if val == 'present' %}checked{% endif %}
                         onchange="toggleTimeInputs({{ s.pk }}, this.value)">
                   <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
                   {% endfor %}

@@ -8,7 +8,6 @@ from django.views.decorators.http import require_POST, require_GET
 from django.db.models import (
     Count, Sum, Q, F, DecimalField, ExpressionWrapper
 )
-from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
 from .models import (
@@ -524,7 +523,9 @@ def student_attendance(request):
     if request.method == 'POST':
         marked_by = request.current_user
         for student in student_qs:
-            status    = request.POST.get(f'status_{student.pk}', 'absent')
+            status    = request.POST.get(f'status_{student.pk}', 'not_marked')
+            if status == 'not_marked':
+                continue  # ← skip students whose attendance wasn't explicitly marked
             notes_val = request.POST.get(f'notes_{student.pk}', '')
             # Strip empty strings → None so TimeField accepts them
             checkin   = request.POST.get(f'checkin_{student.pk}') or None
@@ -982,6 +983,15 @@ def get_fee(request):
 @login_required
 @permission_required('student_admission')
 def student_admission(request):
+    # ── Edit mode: fetch existing student if ?edit=pk is passed ──────
+    edit_pk = request.GET.get('edit') or request.POST.get('edit_pk')
+    student_obj = None
+    if edit_pk:
+        try:
+            student_obj = StudentData.objects.get(pk=edit_pk)
+        except StudentData.DoesNotExist:
+            student_obj = None
+
     if request.method == 'POST':
         first_name        = request.POST.get('first_name', '').strip()
         last_name         = request.POST.get('last_name', '').strip()
@@ -1005,7 +1015,6 @@ def student_admission(request):
         time_slot         = request.POST.get('time_slot', '').strip()
         admission_date_str= request.POST.get('admission_date', str(date.today()))
         fee_id            = request.POST.get('fee_id', '')
-        # Keep as Decimal throughout — never use float for money
         fee_paid_decimal  = Decimal(request.POST.get('fee_paid', '0') or '0')
 
         errs = {}
@@ -1043,76 +1052,97 @@ def student_admission(request):
                 except Coach.DoesNotExist:
                     pass
 
-            # ── Create student with fee_paid=0 and fee_due=total_fee ──────
-            #
-            # IMPORTANT: Do NOT pass fee_paid or pre-calculated fee_due here.
-            #
-            # Reason: Payment.save() will do:
-            #   fee_paid = fee_paid + amount
-            #   fee_due  = fee_due  - amount
-            #
-            # If we set fee_paid=700 here AND then create Payment(700),
-            # Payment.save() adds another 700 → fee_paid becomes 1400 (doubled).
-            # And fee_due = 300 - 700 hits the default=0 case → due is wiped.
-            #
-            # By starting from fee_paid=0 / fee_due=total_fee, Payment.save()
-            # produces the correct result:
-            #   fee_paid = 0 + 700   = 700  ✅
-            #   fee_due  = 1000 - 700 = 300  ✅
-            student = StudentData.objects.create(
-                first_name=first_name, last_name=last_name, dob=dob, gender=gender,
-                blood_group=blood_group, contact_number=contact_number,
-                email=email, address=address,
-                parent_name=parent_name, parent_relation=parent_relation,
-                parent_whatsapp=parent_whatsapp, parent_email=parent_email,
-                parent_occupation=parent_occupation, emergency_contact=emergency_contact,
-                sport_id=sport_id, batch_id=batch_id, expertise_level_id=level_id,
-                duration_id=duration_id, fee_structure=fee_obj,
-                assigned_coach=assigned_coach,
-                admission_date=adm_date, subscription_start=adm_date,
-                subscription_expiry=sub_expiry, time_slot=time_slot,
-                total_fee=total_fee,
-                fee_paid=Decimal('0'),    # ← always 0; Payment.save() sets this
-                fee_due=total_fee,        # ← full amount; Payment.save() reduces this
-            )
+            # ── EDIT mode: update existing student ────────────────────
+            if student_obj:
+                student_obj.first_name        = first_name
+                student_obj.last_name         = last_name
+                student_obj.dob               = dob
+                student_obj.gender            = gender
+                student_obj.blood_group       = blood_group
+                student_obj.contact_number    = contact_number
+                student_obj.email             = email
+                student_obj.address           = address
+                student_obj.parent_name       = parent_name
+                student_obj.parent_relation   = parent_relation
+                student_obj.parent_whatsapp   = parent_whatsapp
+                student_obj.parent_email      = parent_email
+                student_obj.parent_occupation = parent_occupation
+                student_obj.emergency_contact = emergency_contact
+                student_obj.sport_id          = sport_id
+                student_obj.batch_id          = batch_id
+                student_obj.expertise_level_id= level_id
+                student_obj.duration_id       = duration_id
+                student_obj.fee_structure     = fee_obj
+                student_obj.assigned_coach    = assigned_coach
+                student_obj.time_slot         = time_slot
+                student_obj.admission_date    = adm_date
+                student_obj.subscription_start= adm_date
+                student_obj.subscription_expiry= sub_expiry
+                student_obj.total_fee         = total_fee
+                if 'photo' in request.FILES:
+                    student_obj.photo = request.FILES['photo']
+                student_obj.save()
 
-            if 'photo' in request.FILES:
-                student.photo = request.FILES['photo']
-                student.save()
-
-            # ── Payment record — this is the ONLY thing that updates fee_paid/fee_due
-            # Payment.save() runs after super().save() and does the atomic F() update:
-            #   fee_paid = 0 + fee_paid_decimal  = fee_paid_decimal  ✅
-            #   fee_due  = total_fee - fee_paid_decimal               ✅
-            if fee_paid_decimal > 0:
-                Payment.objects.create(
-                    student=student,
-                    amount=fee_paid_decimal,
-                    payment_mode='cash',
-                    payment_date=adm_date,
-                    note=f'Admission payment — {student.sport.name} ({student.duration.duration_name})',
-                    recorded_by=request.current_user,
+                _log(
+                    'admission',
+                    f'{student_obj.full_name} profile updated',
+                    f'ID:{student_obj.student_id}',
+                    student=student_obj,
                 )
-            # If fee_paid_decimal == 0:
-            #   fee_paid = 0          ✅  (no payment created, stays at 0)
-            #   fee_due  = total_fee  ✅  (full amount still outstanding)
+                messages.success(request, f'{student_obj.full_name}\'s profile updated successfully.')
+                return redirect('student_detail', pk=student_obj.pk)
 
-            _log(
-                'admission',
-                f'{student.full_name} enrolled in {student.sport.name}',
-                f'ID:{student.student_id}',
-                student=student,
-            )
-            return redirect('admission_success', pk=student.pk)
+            # ── CREATE mode: new student ──────────────────────────────
+            else:
+                student = StudentData.objects.create(
+                    first_name=first_name, last_name=last_name, dob=dob, gender=gender,
+                    blood_group=blood_group, contact_number=contact_number,
+                    email=email, address=address,
+                    parent_name=parent_name, parent_relation=parent_relation,
+                    parent_whatsapp=parent_whatsapp, parent_email=parent_email,
+                    parent_occupation=parent_occupation, emergency_contact=emergency_contact,
+                    sport_id=sport_id, batch_id=batch_id, expertise_level_id=level_id,
+                    duration_id=duration_id, fee_structure=fee_obj,
+                    assigned_coach=assigned_coach,
+                    admission_date=adm_date, subscription_start=adm_date,
+                    subscription_expiry=sub_expiry, time_slot=time_slot,
+                    total_fee=total_fee,
+                    fee_paid=Decimal('0'),
+                    fee_due=total_fee,
+                )
 
+                if 'photo' in request.FILES:
+                    student.photo = request.FILES['photo']
+                    student.save()
+
+                if fee_paid_decimal > 0:
+                    Payment.objects.create(
+                        student=student,
+                        amount=fee_paid_decimal,
+                        payment_mode='cash',
+                        payment_date=adm_date,
+                        note=f'Admission payment — {student.sport.name} ({student.duration.duration_name})',
+                        recorded_by=request.current_user,
+                    )
+
+                _log(
+                    'admission',
+                    f'{student.full_name} enrolled in {student.sport.name}',
+                    f'ID:{student.student_id}',
+                    student=student,
+                )
+                return redirect('admission_success', pk=student.pk)
+
+    # ── GET: render form (pre-filled if edit mode) ────────────────────
     return render(request, 'students/admission.html', {
-        'user':      request.current_user,
-        'sports':    Sport.objects.filter(is_active=True),
-        'batches':   Batch.objects.filter(is_active=True),
-        'levels':    ExpertiseLevel.objects.filter(is_active=True),
-        'durations': Duration.objects.filter(is_active=True),
-        'coaches':   Coach.objects.filter(status='active'),
-        'today':     date.today().isoformat(),
+        'user':         request.current_user,
+        'sports':       Sport.objects.filter(is_active=True),
+        'batches':      Batch.objects.filter(is_active=True),
+        'levels':       ExpertiseLevel.objects.filter(is_active=True),
+        'durations':    Duration.objects.filter(is_active=True),
+        'coaches':      Coach.objects.filter(status='active'),
+        'today':        date.today().isoformat(),
+        'edit_student': student_obj,   # ← None for new admission, object for edit
     })
 
 @login_required
@@ -1319,7 +1349,7 @@ def sports_master(request):
         elif Sport.objects.filter(name__iexact=name).exists(): messages.error(request,f'"{name}" exists.')
         else: Sport.objects.create(name=name,icon=icon,description=desc,is_active=ia); messages.success(request,f'"{name}" added!'); return redirect('sports_master')
     sports=Sport.objects.all()
-    return render(request,'masters/sports_master.html',{'user':request.current_user,'sports':sports,'icon_choices':ICON_CHOICES,'total':sports.count(),'active_count':sports.filter(is_active=True).count()})
+    return render(request,'masters/sports_master.html',{'user':request.current_user,'sports':sports,'icon_choices':ICON_CHOICES,'total':sports.count(),'active_count':sports.filter(is_active=True).count(),'inactive_count':sports.filter(is_active=False).count()})
 
 @admin_required
 def sport_edit(request,pk):
@@ -1356,7 +1386,7 @@ def batch_master(request):
             for msg in collect(errs): messages.error(request, msg)
         else: Batch.objects.create(name=name,batch_type=bt,days_per_week=int(days),description=desc,is_active=ia);messages.success(request,f'"{name}" added!');return redirect('batch_master')
     batches=Batch.objects.all()
-    return render(request,'masters/batch_master.html',{'user':request.current_user,'batches':batches,'batch_type_choices':BATCH_TYPE_CHOICES,'days_choices':DAYS_CHOICES,'total':batches.count(),'active_count':batches.filter(is_active=True).count()})
+    return render(request,'masters/batch_master.html',{'user':request.current_user,'batches':batches,'batch_type_choices':BATCH_TYPE_CHOICES,'days_choices':DAYS_CHOICES,'total':batches.count(),'active_count':batches.filter(is_active=True).count(),'inactive_count':batches.filter(is_active=False).count()})
 
 @admin_required
 def batch_edit(request,pk):
@@ -1388,7 +1418,7 @@ def expertise_level_master(request):
         elif ExpertiseLevel.objects.filter(name__iexact=name).exists(): messages.error(request,'Exists.')
         else: ExpertiseLevel.objects.create(name=name,order=int(order),color_hex=color,description=desc,is_active=ia);messages.success(request,f'"{name}" added!');return redirect('expertise_level_master')
     levels=ExpertiseLevel.objects.all()
-    return render(request,'masters/expertise_level_master.html',{'user':request.current_user,'levels':levels,'color_choices':LEVEL_COLOR_CHOICES,'order_choices':range(1,11),'total':levels.count(),'active_count':levels.filter(is_active=True).count()})
+    return render(request,'masters/expertise_level_master.html',{'user':request.current_user,'levels':levels,'color_choices':LEVEL_COLOR_CHOICES,'order_choices':range(1,11),'total':levels.count(),'active_count':levels.filter(is_active=True).count(),'inactive_count':levels.filter(is_active=False).count()})
 
 @admin_required
 def expertise_level_edit(request,pk):
@@ -1468,11 +1498,13 @@ def duration_master(request):
     durations = Duration.objects.all()
     total       = durations.count()
     active_count = durations.filter(is_active=True).count()
-
+    inactive_count = durations.filter(is_active=False).count()
+    
     return render(request, 'masters/duration_master.html', {
         'durations':       durations,
         'total':        total,
         'active_count': active_count,
+        'inactive_count': inactive_count
         # 'user': request.current_user,
     })
 
@@ -1954,7 +1986,7 @@ def student_payment_history(request):
  
     ctx = {
         'students':            students,
-        'total_students':      total_students,
+        # 'total_students':      total_students,
         'active_students':     active_students,
         'expired_students':    expired_students,
         'suspended_students':  suspended_students,

@@ -576,6 +576,13 @@ function generatePDF() {
   const pageW = doc.internal.pageSize.getWidth();
   const today = new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'});
 
+  // Helper to strip currency symbol (₹) which helvetica can't render,
+  // and replace with a plain "Rs. " prefix that renders correctly.
+  const cleanFee = (text) => {
+    if (!text) return '';
+    return 'Rs. ' + text.replace(/[₹\u20B9]/g, '').trim();
+  };
+
   // ── Header ─────────────────────────────
   doc.setFillColor(26, 22, 18);
   doc.rect(0, 0, pageW, 22, 'F');
@@ -591,7 +598,6 @@ function generatePDF() {
   doc.text(`Generated: ${today}`, pageW - 14, 16, {align:'right'});
 
   // ── Collect visible rows ────────────────
-  const rows = [];
   const sportGroups = {};
 
   document.querySelectorAll('#main-tbody tr[id^="row-"]:not([style*="display: none"])').forEach(tr => {
@@ -604,14 +610,17 @@ function generatePDF() {
     const batchName   = tags[0]?.textContent?.trim() || '';
     const levelName   = tags[1]?.textContent?.trim() || '';
     const durName     = tags[2]?.textContent?.trim() || '';
-    const feeMain     = cells[2].querySelector('.fee-main')?.textContent?.trim() || '';
-    const feeOrig     = cells[2].querySelector('.fee-original')?.textContent?.trim() || '';
+    const feeMainRaw  = cells[2].querySelector('.fee-main')?.textContent?.trim() || '';
+    const feeOrigRaw  = cells[2].querySelector('.fee-original')?.textContent?.trim() || '';
     const discBadge   = cells[2].querySelector('.fee-discount')?.textContent?.trim() || '';
     const effDate     = cells[3]?.textContent?.trim() || '';
     const status      = cells[4].querySelector('.badge-label')?.textContent?.trim() || '';
 
+    const feeMain = cleanFee(feeMainRaw);
+    const feeOrig = cleanFee(feeOrigRaw || feeMainRaw);
+
     if (!sportGroups[sportName]) sportGroups[sportName] = [];
-    sportGroups[sportName].push([batchName, levelName, durName, feeMain, feeOrig||feeMain, discBadge||'—', effDate, status]);
+    sportGroups[sportName].push([batchName, levelName, durName, feeMain, feeOrig, discBadge||'—', effDate, status]);
   });
 
   if (!Object.keys(sportGroups).length) {
@@ -621,20 +630,30 @@ function generatePDF() {
 
   let yPos = 30;
 
+  // ── Column widths that proportionally fill the full usable width ─────
+  const marginLeft = 14;
+  const marginRight = 14;
+  const usableWidth = pageW - marginLeft - marginRight; // 269mm on landscape A4
+
+  // Relative weights (sum doesn't need to be 100, just proportional)
+  const weights = [32, 30, 24, 26, 24, 18, 28, 18]; // same ratios as before
+  const weightSum = weights.reduce((a,b) => a+b, 0);
+  const colWidths = weights.map(w => (w / weightSum) * usableWidth);
+
   Object.entries(sportGroups).forEach(([sport, rows]) => {
     // ── Sport heading ─────────────────────
     if (yPos > 170) { doc.addPage(); yPos = 20; }
 
     doc.setFillColor(248, 244, 238);
-    doc.roundedRect(14, yPos, pageW - 28, 8, 2, 2, 'F');
+    doc.roundedRect(marginLeft, yPos, pageW - marginLeft - marginRight, 8, 2, 2, 'F');
     doc.setTextColor(26, 22, 18);
     doc.setFontSize(11);
     doc.setFont('helvetica','bold');
-    doc.text(sport, 20, yPos + 5.5);
+    doc.text(sport, marginLeft + 6, yPos + 5.5);
     doc.setFont('helvetica','normal');
     doc.setFontSize(8);
     doc.setTextColor(138, 132, 128);
-    doc.text(`${rows.length} entr${rows.length===1?'y':'ies'}`, pageW - 14, yPos + 5.5, {align:'right'});
+    doc.text(`${rows.length} entr${rows.length===1?'y':'ies'}`, pageW - marginRight, yPos + 5.5, {align:'right'});
     yPos += 11;
 
     // ── Table ────────────────────────────
@@ -642,19 +661,20 @@ function generatePDF() {
       startY: yPos,
       head: [['Batch', 'Expertise Level', 'Duration', 'Fee (Payable)', 'Original Fee', 'Discount', 'Effective Date', 'Status']],
       body: rows,
-      margin: { left: 14, right: 14 },
+      margin: { left: marginLeft, right: marginRight },
+      tableWidth: usableWidth,
       styles: { fontSize: 8.5, cellPadding: 3.5, font: 'helvetica', textColor: [26,22,18] },
       headStyles: { fillColor: [26,22,18], textColor: [196,151,58], fontStyle:'bold', fontSize:8 },
       alternateRowStyles: { fillColor: [252, 250, 248] },
       columnStyles: {
-        0: { cellWidth: 32 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 24 },
-        3: { cellWidth: 26, fontStyle:'bold' },
-        4: { cellWidth: 24, textColor:[138,132,128] },
-        5: { cellWidth: 18, textColor:[58,122,82] },
-        6: { cellWidth: 28 },
-        7: { cellWidth: 18 },
+        0: { cellWidth: colWidths[0] },
+        1: { cellWidth: colWidths[1] },
+        2: { cellWidth: colWidths[2] },
+        3: { cellWidth: colWidths[3], fontStyle:'bold' },
+        4: { cellWidth: colWidths[4], textColor:[138,132,128] },
+        5: { cellWidth: colWidths[5], textColor:[58,122,82] },
+        6: { cellWidth: colWidths[6] },
+        7: { cellWidth: colWidths[7] },
       },
       didParseCell: (data) => {
         if (data.section==='body' && data.column.index===7) {

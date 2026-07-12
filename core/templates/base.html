@@ -342,7 +342,7 @@ body {
     <a class="sidebar-item {% block sb_home %}{% endblock %}"
        href="{% url 'home' %}"
        {% if not active_user|has_module_permission:'dashboard' %}style="display:none"{% endif %}>
-      <span class="s-icon">⊞</span> Dashboard
+      <span class="s-icon">🏠</span> Dashboard
     </a>
 
     <a class="sidebar-item {% block sb_students %}{% endblock %}"
@@ -445,13 +445,13 @@ body {
     <a class="sidebar-item {% block sb_attendance_db %}{% endblock %}"
        href="{% url 'attendance_dashboard' %}"
        {% if not active_user|has_module_permission:'attendance_dashboard' %}style="display:none"{% endif %}>
-      <span class="s-icon">📊</span> Attendance Insights
+      <span class="s-icon">📶</span> Attendance Insights
     </a>
     
     <a class="sidebar-item {% block sb_reports %}{% endblock %}"
        href="{% url 'reports' %}"
        {% if not active_user|has_module_permission:'reports' %}style="display:none"{% endif %}>
-      <span class="s-icon">📊</span> Reports
+      <span class="s-icon">📝</span> Reports
     </a>
 
   </div>

@@ -22,7 +22,7 @@ from django.utils import timezone
 
 from .models import (
     Sport, Batch, ExpertiseLevel, Duration, Coach,
-    StudentData, FeeStructures,SystemUser,CoachPermission,
+    StudentData, FeeStructures,SystemUser,CoachPermission,Payment
 )
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -321,25 +321,33 @@ class ReportCanvas:
 #  SUMMARY BOX builder
 # ════════════════════════════════════════════════════════════════════
 
-def _summary_table(students, st):
+def _summary_table(students, st, total_fee=None, total_paid=None, total_due=None):
     total     = len(students)
     active    = sum(1 for s in students if s.status == 'active')
     expired   = sum(1 for s in students if s.status == 'expired')
-    total_fee = sum(float(s.total_fee) for s in students)
-    paid      = sum(float(s.fee_paid)  for s in students)
-    due       = sum(float(s.fee_due)   for s in students)
+
+    # Use passed-in aggregates if available, else fall back to field sums
+    if total_fee is None:
+        total_fee = sum(float(s.total_fee) for s in students)
+    if total_paid is None:
+        total_paid = sum(float(s.fee_paid) for s in students)
+    if total_due is None:
+        total_due = sum(float(s.fee_due) for s in students)
+
+    other = total - active - expired  # suspended etc.
 
     def _box(label, value, vstyle):
         return [Paragraph(label, st['summary_label']),
                 Paragraph(value, st[vstyle])]
 
     data = [[
-        _box('Total Students',    str(total),              'summary_val'),
-        _box('Active',            str(active),             'summary_val_green'),
-        _box('Expired/Suspended', str(expired + total - active - expired), 'summary_val'),
-        _box('Total Fee',         f'Rs.{total_fee:,.0f}',  'summary_val'),
-        _box('Total Collected',   f'Rs.{paid:,.0f}',       'summary_val_green'),
-        _box('Total Outstanding', f'Rs.{due:,.0f}',        'summary_val_red' if due > 0 else 'summary_val_green'),
+        _box('Total Students',    str(total),                   'summary_val'),
+        _box('Active',            str(active),                  'summary_val_green'),
+        _box('Expired/Suspended', str(expired + other),         'summary_val'),
+        _box('Total Fee',         f'Rs.{float(total_fee):,.0f}','summary_val'),
+        _box('Total Collected',   f'Rs.{float(total_paid):,.0f}','summary_val_green'),
+        _box('Total Outstanding', f'Rs.{float(total_due):,.0f}',
+             'summary_val_red' if float(total_due) > 0 else 'summary_val_green'),
     ]]
 
     col_w = [45*mm] * 6
@@ -353,7 +361,6 @@ def _summary_table(students, st):
         ('TOPPADDING',  (0,0), (-1,-1), 8),
     ]))
     return tbl
-
 
 # ════════════════════════════════════════════════════════════════════
 #  FEE STATUS helper
@@ -578,7 +585,8 @@ def _filters_table(filter_parts, st):
 #  PDF BUILDER
 # ════════════════════════════════════════════════════════════════════
 
-def _build_pdf(students, params, report_type, cols):
+def _build_pdf(students, params, report_type, cols,
+               total_fee=None, total_paid=None, total_due=None):  # ← new params
     buffer = BytesIO()
     pw, ph = landscape(A4)
     margin = 15 * mm
@@ -594,8 +602,8 @@ def _build_pdf(students, params, report_type, cols):
 
     st = _styles()
     today_str = date.today().strftime('%d %B %Y')
-    now_str   = timezone.now().strftime('%d %b %Y, %I:%M %p')
-
+    now_str   = timezone.localtime().strftime('%d %b %Y, %I:%M %p')
+    print("i want: ",now_str)
     REPORT_NAMES = {
         'student': 'Student Report',
         'fee':     'Fee Collection Report',
@@ -639,10 +647,16 @@ def _build_pdf(students, params, report_type, cols):
                            textColor=C_INK_MUTED, leading=11)))
         story.append(Spacer(1, 4*mm))
 
-    # ── Summary boxes ──
-    story.append(_summary_table(students, st))
+    # ── Summary boxes — pass the correct aggregates ──
+    story.append(_summary_table(
+        students, st,
+        total_fee=total_fee,
+        total_paid=total_paid,
+        total_due=total_due,
+    ))
     story.append(Spacer(1, 6*mm))
 
+    # rest of function unchanged ...
     # ── Section header ──
     section_data = [[
         Paragraph(f'  {report_title.upper()}  —  {len(students)} RECORDS', st['section_head']),
@@ -660,7 +674,6 @@ def _build_pdf(students, params, report_type, cols):
     story.append(section_tbl)
     story.append(Spacer(1, 1*mm))
 
-    # ── Main data table ──
     if students:
         story.append(_data_table(students, cols, st))
     else:
@@ -669,7 +682,6 @@ def _build_pdf(students, params, report_type, cols):
             ParagraphStyle('empty', fontName='Helvetica-Oblique', fontSize=11,
                            textColor=C_INK_MUTED, leading=16, alignment=TA_CENTER)))
 
-    # ── Footer note ──
     story.append(Spacer(1, 6*mm))
     story.append(HRFlowable(width='100%', thickness=0.5, color=C_BORDER))
     story.append(Spacer(1, 3*mm))
@@ -682,7 +694,6 @@ def _build_pdf(students, params, report_type, cols):
     doc.build(story, onFirstPage=canvas_cb, onLaterPages=canvas_cb)
     buffer.seek(0)
     return buffer
-
 
 # ════════════════════════════════════════════════════════════════════
 #  VIEWS
@@ -713,9 +724,13 @@ def report_count(request):
 @admin_required
 def report_pdf(request):
     """Generate and stream the PDF."""
+    from decimal import Decimal
+    from django.db.models import Sum
+
     params      = request.GET
     report_type = params.get('report_type', 'student')
-    students    = list(_build_queryset(params))
+    qs          = _build_queryset(params)
+    students    = list(qs)
 
     # ── Columns selected ──
     col_keys = [
@@ -726,14 +741,31 @@ def report_pdf(request):
         'col_parent', 'col_whatsapp', 'col_gender',
     ]
     cols = {k: params.get(k) for k in col_keys}
-    # If nothing selected, show all
     if not any(cols.values()):
         cols = {k: '1' for k in col_keys}
 
     if not students:
         return redirect(f"{request.META.get('HTTP_REFERER', '/reports/')}?error=no_results")
 
-    buffer = _build_pdf(students, params, report_type, cols)
+    # ── Aggregate the same way the payments page does ──
+    student_pks = qs.values_list('pk', flat=True)
+
+    total_paid = Payment.objects.filter(
+        student_id__in=student_pks
+    ).aggregate(t=Sum('amount'))['t'] or Decimal('0')
+
+    total_due = qs.filter(total_fee__gt=0).aggregate(
+        t=Sum('fee_due')
+    )['t'] or Decimal('0')
+
+    total_fee = total_paid + total_due
+
+    buffer = _build_pdf(
+        students, params, report_type, cols,
+        total_fee=total_fee,
+        total_paid=total_paid,
+        total_due=total_due,
+    )
 
     REPORT_NAMES = {
         'student': 'Student_Report',
