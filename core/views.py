@@ -45,6 +45,38 @@ def get_current_user(request):
             pass
     return None
 
+MODULE_URL_MAP = {
+    'dashboard':          'home',
+    'student_admission':  'student_admission',
+    'student_list':       'student_list',
+    'attendance':         'student_attendance',
+    'notifications':      'notifications',
+    'fee_structure':      'fee_structure',
+    'reports':            'reports',
+    'coach_list':         'coach_list',
+    'Payments':           'payment_records',
+}
+
+
+def get_landing_url(user):
+    """
+    Returns the url name of the first page (in CoachPermission.MODULE_CHOICES
+    order) this user is allowed to see.
+    - Admins always go to the dashboard.
+    - A coach with zero module permissions lands on 'no_access'.
+    """
+    if user.is_admin:
+        return 'home'
+
+    allowed = set(
+        CoachPermission.objects.filter(user=user, allowed=True)
+        .values_list('module', flat=True)
+    )
+    for module, _label in CoachPermission.MODULE_CHOICES:
+        if module in allowed:
+            return MODULE_URL_MAP.get(module, 'no_access')
+
+    return 'no_access'
 
 def login_required(view_fn):
     @wraps(view_fn)
@@ -65,7 +97,7 @@ def admin_required(view_fn):
             return redirect('login')
         if not user.is_admin:
             messages.error(request, 'Admin access required.')
-            return redirect('home')
+            return redirect(get_landing_url(user))
         request.current_user = user
         return view_fn(request, *args, **kwargs)
     return wrapper
@@ -99,7 +131,7 @@ def permission_required(module):
 
             if not has_perm:
                 messages.error(request, 'You do not have access to this module.')
-                return redirect('home')
+                return redirect(get_landing_url(user))
 
             request.current_user = user
             return view_fn(request, *args, **kwargs)
@@ -157,7 +189,7 @@ def login_view(request):
                     user.last_login = timezone.now()
                     user.save(update_fields=['last_login'])
                     _log('login', f'{user.full_name} logged in', f'Role: {user.role}')
-                    return redirect('home')
+                    return redirect(get_landing_url(user))
                 else:
                     messages.error(request, 'Invalid username or password.')
             except SystemUser.DoesNotExist:
@@ -174,12 +206,14 @@ def logout_view(request):
     request.session.flush()
     return redirect('login')
 
-
+@login_required
+def no_access(request):
+    return render(request, 'auth/no_access.html', {'user': request.current_user})
 # ════════════════════════════════════════════════════════════════════
 #  DASHBOARD
 # ════════════════════════════════════════════════════════════════════
 
-@login_required
+@permission_required('dashboard')
 def home(request):
     user  = request.current_user
     today = date.today()

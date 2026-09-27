@@ -9,6 +9,7 @@ urlpatterns = [
     # ── Auth ───────────────────────────────────────────────────────────
     path('',                              views.login_view,             name='login'),
     path('logout/',                             views.logout_view,            name='logout'),
+    path('no-access/', views.no_access, name='no_access'),
     # ── Masters: Sports ────────────────────────────────────
     path('masters/sports/',            views.sports_master,       name='sports_master'),
     path('masters/sports/<int:pk>/edit/',   views.sport_edit,     name='sport_edit'),
@@ -59,7 +60,7 @@ urlpatterns = [
     # ── Coaches ────────────────────────────────────────────────────────
     path('coaches/',                            views.coach_list,             name='coach_list'),
     path('coaches/add/',                        views.coach_add,              name='coach_add'),
-    path('coaches/<int:pk>/',                   views.coach_detail,           name='coach_detail'),
+         path('coaches/<int:pk>/',                   views.coach_detail,           name='coach_detail'),
     path('coaches/<int:pk>/edit/',              views.coach_edit,             name='coach_edit'),
     path('coaches/<int:pk>/delete/',            views.coach_delete,           name='coach_delete'),
     path('coaches/<int:pk>/toggle/',            views.coach_toggle_status,    name='coach_toggle'),
