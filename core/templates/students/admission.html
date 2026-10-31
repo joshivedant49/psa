@@ -284,7 +284,7 @@
                 <option value="">— Select Batch —</option>
                 {% for b in batches %}
                   <option value="{{ b.pk }}" {% if edit_student.batch_id == b.pk %}selected{% endif %}>
-                    {{ b.name }}
+                    {{ b.full_label }}
                   </option>
                 {% endfor %}
               </select>

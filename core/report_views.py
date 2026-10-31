@@ -249,12 +249,18 @@ def _build_queryset(params):
     return qs
 
 
+def _batch_label(pk):
+    """Full label (name | type | days/week) for a batch pk, or None if not found."""
+    b = Batch.objects.filter(pk=pk).first()
+    return b.full_label if b else None
+
+
 def _active_filters_text(params):
     """Build a human-readable list of applied filters for the PDF header."""
     parts = []
     labels = {
         'sport':           ('Sport',         lambda v: Sport.objects.filter(pk=v).values_list('name', flat=True).first()),
-        'batch':           ('Batch',         lambda v: Batch.objects.filter(pk=v).values_list('name', flat=True).first()),
+        'batch':           ('Batch',         _batch_label),
         'expertise_level': ('Level',         lambda v: ExpertiseLevel.objects.filter(pk=v).values_list('name', flat=True).first()),
         'duration':        ('Duration',      lambda v: Duration.objects.filter(pk=v).values_list('duration_name', flat=True).first()),
         'coach':           ('Coach',         lambda v: Coach.objects.filter(pk=v).values_list('first_name', flat=True).first()),
@@ -392,7 +398,7 @@ def _data_table(students, cols, st):
         ('col_id',         '#',            18, 'CENTER'),
         ('col_name',       'Student Name', 38, 'LEFT'),
         ('col_sport',      'Sport',        28, 'LEFT'),
-        ('col_batch',      'Batch',        28, 'LEFT'),
+        ('col_batch',      'Batch',        42, 'LEFT'),   # wider: shows name | type | days/week
         ('col_level',      'Level',        22, 'CENTER'),
         ('col_duration',   'Duration',     22, 'CENTER'),
         ('col_coach',      'Coach',        30, 'LEFT'),
@@ -481,7 +487,7 @@ def _data_table(students, cols, st):
             elif key == 'col_sport':
                 row.append(_cell(s.sport.name, 'cell_normal', al))
             elif key == 'col_batch':
-                row.append(_cell(s.batch.name, 'cell_normal', al))
+                row.append(_cell(s.batch.full_label, 'cell_normal', al))
             elif key == 'col_level':
                 row.append(_cell(s.expertise_level.name, 'cell_normal', al))
             elif key == 'col_duration':
@@ -565,7 +571,8 @@ def _filters_table(filter_parts, st):
             chunk.append([Paragraph('', st['filter_label']), Paragraph('', st['filter_val'])])
         row_data.append([cell for pair in chunk for cell in pair])
 
-    col_widths = [22*mm, 50*mm, 22*mm, 50*mm, 22*mm, 50*mm]
+    # value columns widened (50 → 60mm) so the full batch label fits; total 246mm < 267mm usable
+    col_widths = [22*mm, 60*mm, 22*mm, 60*mm, 22*mm, 60*mm]
     tbl = Table(row_data, colWidths=col_widths)
     tbl.setStyle(TableStyle([
         ('FONTNAME',     (0,0), (-1,-1), 'Helvetica'),

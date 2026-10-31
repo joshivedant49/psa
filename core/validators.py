@@ -258,18 +258,38 @@ def validate_sport(data, existing_pk=None):
 def validate_batch(data, existing_pk=None):
     from .models import Batch
     e = {}
-    name = data.get('name', '').strip()
-    e['name'] = required(name, 'Batch name') or max_length(name, 100, 'Batch name')
-    if not e.get('name'):
-        qs = Batch.objects.filter(name__iexact=name)
-        if existing_pk:
-            qs = qs.exclude(pk=existing_pk)
-        if qs.exists():
-            e['name'] = [f'Batch "{name}" already exists.']
-    e['batch_type']    = required(data.get('batch_type',''), 'Batch type')
-    e['days_per_week'] = is_positive_number(data.get('days_per_week', 0), 'Days per week')
-    return {k: v for k, v in e.items() if v}
 
+    name       = data.get('name', '').strip()
+    batch_type = data.get('batch_type', '')
+    days       = data.get('days_per_week', 0)
+
+    e['name']          = required(name, 'Batch name') or max_length(name, 100, 'Batch name')
+    e['batch_type']    = required(batch_type, 'Batch type')
+    e['days_per_week'] = is_positive_number(days, 'Days per week')
+
+    # Check the combination only if all three fields are individually valid
+    if not (e['name'] or e['batch_type'] or e['days_per_week']):
+        try:
+            days_int = int(days)
+        except (TypeError, ValueError):
+            days_int = None
+
+        if days_int is not None:
+            qs = Batch.objects.filter(
+                name__iexact=name,
+                batch_type=batch_type,
+                days_per_week=days_int,
+            )
+            if existing_pk:
+                qs = qs.exclude(pk=existing_pk)
+            if qs.exists():
+                type_label = dict(Batch.BATCH_TYPE_CHOICES).get(batch_type, batch_type)
+                e['name'] = [
+                    f'Batch "{name}" with type "{type_label}" and '
+                    f'{days_int} day(s) / week already exists.'
+                ]
+
+    return {k: v for k, v in e.items() if v}
 
 def validate_expertise_level(data, existing_pk=None):
     from .models import ExpertiseLevel

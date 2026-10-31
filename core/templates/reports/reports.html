@@ -180,7 +180,7 @@
               <option value="">All Batches</option>
               {% for b in batches %}
               <option value="{{ b.pk }}" {% if request.GET.batch == b.pk|stringformat:"s" %}selected{% endif %}>
-                {{ b.name }}
+                {{ b.full_label }}
               </option>
               {% endfor %}
             </select>

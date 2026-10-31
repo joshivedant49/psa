@@ -13,6 +13,8 @@
 .page-header p{font-size:13px;color:var(--ink-muted);margin-top:5px;font-weight:300}
 .alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:1.5rem}
 .alert-success{background:var(--green-pale);color:var(--green);border:1px solid rgba(58,122,82,.2)}
+.alert-error{background:var(--red-pale);color:var(--red);border:1px solid rgba(184,64,64,.2)}
+.alert-warning{background:var(--amber-pale);color:var(--amber);border:1px solid rgba(196,151,58,.3)}
 .date-bar{display:flex;align-items:center;gap:14px;padding:14px 22px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
 .date-label{font-size:12px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px}
 .date-input{padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-mid);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--ink);outline:none}
@@ -32,6 +34,7 @@ thead th:first-child{padding-left:22px}
 tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:#FDFCFA}
+tbody tr.row-error,tbody tr.row-error:hover{background:var(--red-pale)}
 tbody td{padding:12px 18px;vertical-align:middle}
 tbody td:first-child{padding-left:22px}
 .coach-cell{display:flex;align-items:center;gap:10px}
@@ -64,7 +67,7 @@ tbody td:first-child{padding-left:22px}
   </div>
 
   {% if messages %}{% for msg in messages %}
-    <div class="alert alert-success">✓ {{ msg }}</div>
+    <div class="alert alert-{{ msg.tags|default:'success' }}">{% if msg.tags == 'success' %}✓{% else %}⚠{% endif %} {{ msg }}</div>
   {% endfor %}{% endif %}
 
   <!-- Date bar -->
@@ -80,7 +83,7 @@ tbody td:first-child{padding-left:22px}
     </div>
   </form>
 
-  <form method="POST">
+  <form method="POST" id="att-form" onsubmit="return validateAttendance()">
     {% csrf_token %}
     <div class="att-card">
       <div class="att-card-head">
@@ -98,52 +101,6 @@ tbody td:first-child{padding-left:22px}
           <tbody>
             {% for row in student_rows %}
             {% with s=row.student att=row.attendance %}
-            {% comment %}Determine current status for this row{% endcomment %}
-            {% if att %}
-              {% with cur_status=att.status %}
-              <tr>
-                <td>
-                  <div class="coach-cell">
-                    <div class="c-av">
-                      {% if s.photo %}<img src="{{ s.photo.url }}">{% else %}{{ s.initials }}{% endif %}
-                    </div>
-                    <div>
-                      <div class="c-name">{{ s.full_name }}</div>
-                      <div class="c-id">{{ s.student_id }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td style="font-size:12px;color:var(--ink-soft)">
-                  {{ s.sport.icon }} {{ s.sport.name }}
-                </td>
-                <td>
-                  <div class="status-radios">                    
-                    {% for val, lbl in att_status_choices %}
-                    <input type="radio" class="status-radio"
-                          name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
-                          value="{{ val }}"
-                          {% if att.status == val %}checked{% endif %}   {# ← this must be here #}
-                          onchange="toggleTimeInputs({{ s.pk }}, this.value)">
-                    <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
-                    {% endfor %}
-
-                  </div>
-                </td>
-                <td>
-                  <input type="time" name="checkin_{{ s.pk }}" class="time-input"
-                        id="checkin_{{ s.pk }}"
-                        value="{{ att.check_in_time|time:'H:i'|default:'' }}"
-                        {% if cur_status == 'absent' %}disabled{% endif %}>
-                </td>
-                <td>
-                  <input type="time" name="checkout_{{ s.pk }}" class="time-input"
-                        id="checkout_{{ s.pk }}"
-                        value="{{ att.check_out_time|time:'H:i'|default:'' }}"
-                        {% if cur_status == 'absent' %}disabled{% endif %}>
-                </td>
-              </tr>
-              {% endwith %}
-            {% else %}
             <tr>
               <td>
                 <div class="coach-cell">
@@ -161,27 +118,31 @@ tbody td:first-child{padding-left:22px}
               </td>
               <td>
                 <div class="status-radios">
-                  <input type="radio" name="status_{{ s.pk }}" value="not_marked" checked style="display:none">
-
                   {% for val, lbl in att_status_choices %}
                   <input type="radio" class="status-radio"
-                        name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
-                        value="{{ val }}"
-                        onchange="toggleTimeInputs({{ s.pk }}, this.value)">
+                         name="status_{{ s.pk }}" id="s{{ s.pk }}_{{ val }}"
+                         value="{{ val }}"
+                         {% if att and att.status == val %}checked
+                         {% elif not att and val == 'present' %}checked
+                         {% endif %}
+                         onchange="toggleTimeInputs({{ s.pk }}, this.value)">
                   <label class="status-radio-label" for="s{{ s.pk }}_{{ val }}">{{ lbl }}</label>
                   {% endfor %}
                 </div>
               </td>
               <td>
                 <input type="time" name="checkin_{{ s.pk }}" class="time-input"
-                      id="checkin_{{ s.pk }}" value="">
+                       id="checkin_{{ s.pk }}"
+                       value="{{ att.check_in_time|time:'H:i'|default:'' }}"
+                       {% if att and att.status == 'absent' %}disabled{% endif %}>
               </td>
               <td>
                 <input type="time" name="checkout_{{ s.pk }}" class="time-input"
-                      id="checkout_{{ s.pk }}" value="">
+                       id="checkout_{{ s.pk }}"
+                       value="{{ att.check_out_time|time:'H:i'|default:'' }}"
+                       {% if att and att.status == 'absent' %}disabled{% endif %}>
               </td>
             </tr>
-            {% endif %}
             {% endwith %}
             {% empty %}
             <tr><td colspan="5"><div class="empty-state">No active students found.</div></td></tr>
@@ -214,6 +175,43 @@ tbody td:first-child{padding-left:22px}
       checkin.value  = '';
       checkout.value = '';
     }
+
+    // A status was chosen, so clear any "select status" highlight on this row
+    const row = checkin.closest('tr');
+    if (row) row.classList.remove('row-error');
+  }
+
+  // Safety net: block submit if a time is filled but no status is selected
+  function validateAttendance() {
+    const badRows = [];
+
+    document.querySelectorAll('input[id^="checkin_"]').forEach(function (inTime) {
+      const pk      = inTime.id.replace('checkin_', '');
+      const outTime = document.getElementById('checkout_' + pk);
+      const hasTime = inTime.value || (outTime && outTime.value);
+      const checked = document.querySelector('input[name="status_' + pk + '"]:checked');
+      const noStatus = !checked || checked.value === 'not_marked';
+      const row = inTime.closest('tr');
+
+      row.classList.remove('row-error');
+      if (hasTime && noStatus) {
+        row.classList.add('row-error');
+        badRows.push(row);
+      }
+    });
+
+    if (badRows.length) {
+      const names = badRows.map(function (r) {
+        return r.querySelector('.c-name').textContent.trim();
+      });
+      alert(
+        'Please select an attendance status (Present, Late, Excused or Absent) ' +
+        'before entering check-in / check-out time.\n\nStudent(s): ' + names.join(', ')
+      );
+      badRows[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
   }
 </script>
 {% endblock %}

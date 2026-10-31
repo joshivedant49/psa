@@ -234,19 +234,21 @@
           </select>
         </div>
 
-        <!-- Batch + Level side by side -->
+        <!-- Batch (full width so the long label fits) -->
+        <div class="field">
+          <label class="field-required" for="f-batch">Batch</label>
+          <select id="f-batch" name="batch" required>
+            <option value="">— Select Batch —</option>
+            {% for b in batches %}
+            <option value="{{ b.pk }}">{{ b.full_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Level + Duration side by side -->
         <div class="two-col-fields">
           <div class="field">
-            <label class="field-required">Batch</label>
-            <select id="f-batch" name="batch" required>
-              <option value="">— Select Batch —</option>
-              {% for b in batches %}
-              <option value="{{ b.pk }}">{{ b.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="field">
-            <label class="field-required">Expertise Level</label>
+            <label class="field-required" for="f-level">Expertise Level</label>
             <select id="f-level" name="expertise_level" required>
               <option value="">— Select Level —</option>
               {% for lv in levels %}
@@ -254,17 +256,15 @@
               {% endfor %}
             </select>
           </div>
-        </div>
-
-        <!-- Duration -->
-        <div class="field">
-          <label class="field-required">Duration</label>
-          <select id="f-duration" name="duration" required>
-            <option value="">— Select Duration —</option>
-            {% for d in durations %}
-            <option value="{{ d.pk }}" data-months="{{ d.months }}">{{ d.duration_name }}</option>
-            {% endfor %}
-          </select>
+          <div class="field">
+            <label class="field-required" for="f-duration">Duration</label>
+            <select id="f-duration" name="duration" required>
+              <option value="">— Select Duration —</option>
+              {% for d in durations %}
+              <option value="{{ d.pk }}" data-months="{{ d.months }}">{{ d.duration_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
 
         <!-- Fee + Discount -->
@@ -349,7 +349,7 @@
         </select>
         <select class="filter-select" id="filter-batch" onchange="filterRows()">
           <option value="">All Batches</option>
-          {% for b in batches %}<option value="{{ b.name|lower }}">{{ b.name }}</option>{% endfor %}
+          {% for b in batches %}<option value="{{ b.pk }}">{{ b.full_label }}</option>{% endfor %}
         </select>
         <select class="filter-select" id="filter-dur" onchange="filterRows()">
           <option value="">All Durations</option>
@@ -373,9 +373,9 @@
             {% for f in fees %}
             <tr id="row-{{ f.pk }}"
                 data-sport="{{ f.sport.name|lower }}"
-                data-batch="{{ f.batch.name|lower }}"
+                data-batch="{{ f.batch.pk }}"
                 data-dur="{{ f.duration.duration_name|lower }}"
-                data-search="{{ f.sport.name|lower }} {{ f.batch.name|lower }} {{ f.expertise_level.name|lower }} {{ f.duration.duration_name|lower }}"
+                data-search="{{ f.sport.name|lower }} {{ f.batch.full_label|lower }} {{ f.expertise_level.name|lower }} {{ f.duration.duration_name|lower }}"
                 style="animation-delay:{{ forloop.counter0 }}0ms">
               <td style="color:var(--ink-muted);font-size:12px">{{ forloop.counter }}</td>
               <td>
@@ -385,7 +385,7 @@
                     <strong>{{ f.sport.name }}</strong>
                   </div>
                   <div class="combo-meta">
-                    <span class="tag tag-batch">{{ f.batch.name }}</span>
+                    <span class="tag tag-batch">{{ f.batch.full_label }}</span>
                     <span class="tag tag-level" style="background:{{ f.expertise_level.color_hex }}">{{ f.expertise_level.name }}</span>
                     <span class="tag tag-dur">{{ f.duration.duration_name }}</span>
                   </div>
@@ -417,7 +417,7 @@
                     '{{ f.effective_date|date:"Y-m-d" }}','{{ f.notes|escapejs }}',
                     {{ f.is_active|yesno:'true,false' }})">✎ Edit</button>
                   <button class="act-btn act-btn-delete"
-                    onclick="confirmDelete({{ f.pk }},'{{ f.sport.name|escapejs }} / {{ f.batch.name|escapejs }}')">✕ Delete</button>
+                    onclick="confirmDelete({{ f.pk }},'{{ f.sport.name|escapejs }} / {{ f.batch.full_label|escapejs }}')">✕ Delete</button>
                 </div>
               </td>
             </tr>

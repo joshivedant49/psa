@@ -32,6 +32,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
+from django.db.models import ProtectedError
+
 # ════════════════════════════════════════════════════════════════════
 #  AUTH HELPERS
 # ════════════════════════════════════════════════════════════════════
@@ -45,6 +47,38 @@ def get_current_user(request):
             pass
     return None
 
+MODULE_URL_MAP = {
+    'dashboard':          'home',
+    'student_admission':  'student_admission',
+    'student_list':       'student_list',
+    'attendance':         'student_attendance',
+    'notifications':      'notifications',
+    'fee_structure':      'fee_structure',
+    'reports':            'reports',
+    'coach_list':         'coach_list',
+    'Payments':           'payment_records',
+}
+
+
+def get_landing_url(user):
+    """
+    Returns the url name of the first page (in CoachPermission.MODULE_CHOICES
+    order) this user is allowed to see.
+    - Admins always go to the dashboard.
+    - A coach with zero module permissions lands on 'no_access'.
+    """
+    if user.is_admin:
+        return 'home'
+
+    allowed = set(
+        CoachPermission.objects.filter(user=user, allowed=True)
+        .values_list('module', flat=True)
+    )
+    for module, _label in CoachPermission.MODULE_CHOICES:
+        if module in allowed:
+            return MODULE_URL_MAP.get(module, 'no_access')
+
+    return 'no_access'
 
 def login_required(view_fn):
     @wraps(view_fn)
@@ -65,7 +99,7 @@ def admin_required(view_fn):
             return redirect('login')
         if not user.is_admin:
             messages.error(request, 'Admin access required.')
-            return redirect('home')
+            return redirect(get_landing_url(user))
         request.current_user = user
         return view_fn(request, *args, **kwargs)
     return wrapper
@@ -99,7 +133,7 @@ def permission_required(module):
 
             if not has_perm:
                 messages.error(request, 'You do not have access to this module.')
-                return redirect('home')
+                return redirect(get_landing_url(user))
 
             request.current_user = user
             return view_fn(request, *args, **kwargs)
@@ -157,7 +191,7 @@ def login_view(request):
                     user.last_login = timezone.now()
                     user.save(update_fields=['last_login'])
                     _log('login', f'{user.full_name} logged in', f'Role: {user.role}')
-                    return redirect('home')
+                    return redirect(get_landing_url(user))
                 else:
                     messages.error(request, 'Invalid username or password.')
             except SystemUser.DoesNotExist:
@@ -174,12 +208,14 @@ def logout_view(request):
     request.session.flush()
     return redirect('login')
 
-
+@login_required
+def no_access(request):
+    return render(request, 'auth/no_access.html', {'user': request.current_user})
 # ════════════════════════════════════════════════════════════════════
 #  DASHBOARD
 # ════════════════════════════════════════════════════════════════════
 
-@login_required
+@permission_required('dashboard')
 def home(request):
     user  = request.current_user
     today = date.today()
@@ -522,12 +558,32 @@ def student_attendance(request):
 
     if request.method == 'POST':
         marked_by = request.current_user
+
+        # ── Pass 1: validate — a time was entered but no status was chosen ──
+        missing_status = []
         for student in student_qs:
-            status    = request.POST.get(f'status_{student.pk}', 'not_marked')
+            status   = request.POST.get(f'status_{student.pk}', 'not_marked')
+            checkin  = request.POST.get(f'checkin_{student.pk}') or None
+            checkout = request.POST.get(f'checkout_{student.pk}') or None
+            if status == 'not_marked' and (checkin or checkout):
+                missing_status.append(student.full_name)
+
+        if missing_status:
+            messages.error(
+                request,
+                'Please select an attendance status (Present, Absent, Late or Excused) '
+                'before entering check-in / check-out time for: '
+                + ', '.join(missing_status) + '.'
+            )
+            return redirect(request.get_full_path())   # nothing is saved
+
+        # ── Pass 2: save ──
+        saved = 0
+        for student in student_qs:
+            status = request.POST.get(f'status_{student.pk}', 'not_marked')
             if status == 'not_marked':
-                continue  # ← skip students whose attendance wasn't explicitly marked
+                continue  # skip students whose attendance wasn't explicitly marked
             notes_val = request.POST.get(f'notes_{student.pk}', '')
-            # Strip empty strings → None so TimeField accepts them
             checkin   = request.POST.get(f'checkin_{student.pk}') or None
             checkout  = request.POST.get(f'checkout_{student.pk}') or None
 
@@ -544,12 +600,18 @@ def student_attendance(request):
                     'check_out_time': checkout,
                 }
             )
+            saved += 1
+
+        if saved == 0:
+            messages.warning(request, 'No attendance was marked. Select a status for at least one student.')
+            return redirect(request.get_full_path())
+
         _log(
             'attendance',
             f'Student attendance marked for {sel_date_obj}',
             f'Marked by {marked_by.full_name}',
         )
-        messages.success(request, f'Student attendance saved for {sel_date_obj}.')
+        messages.success(request, f'Student attendance saved for {sel_date_obj} ({saved} marked).')
         return redirect(request.get_full_path())
 
     student_rows = []
@@ -1389,18 +1451,44 @@ def batch_master(request):
     return render(request,'masters/batch_master.html',{'user':request.current_user,'batches':batches,'batch_type_choices':BATCH_TYPE_CHOICES,'days_choices':DAYS_CHOICES,'total':batches.count(),'active_count':batches.filter(is_active=True).count(),'inactive_count':batches.filter(is_active=False).count()})
 
 @admin_required
-def batch_edit(request,pk):
-    b=get_object_or_404(Batch,pk=pk)
-    if request.method=='POST':
-        name=request.POST.get('name','').strip();bt=request.POST.get('batch_type',b.batch_type);days=request.POST.get('days_per_week',b.days_per_week);desc=request.POST.get('description','').strip();ia=request.POST.get('is_active')=='on'
-        if Batch.objects.filter(name__iexact=name).exclude(pk=pk).exists(): messages.error(request,'Exists.')
-        else: b.name=name;b.batch_type=bt;b.days_per_week=int(days);b.description=desc;b.is_active=ia;b.save();messages.success(request,f'"{name}" updated!')
-        return redirect('batch_master')
+def batch_edit(request, pk):
+    b = get_object_or_404(Batch, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        bt   = request.POST.get('batch_type', b.batch_type)
+        days = request.POST.get('days_per_week', b.days_per_week)
+        desc = request.POST.get('description', '').strip()
+        ia   = request.POST.get('is_active') == 'on'
+
+        errs = validate_batch(
+            {'name': name, 'batch_type': bt, 'days_per_week': days},
+            existing_pk=pk,
+        )
+        if errs:
+            for msg in collect(errs):
+                messages.error(request, msg)
+        else:
+            b.name = name
+            b.batch_type = bt
+            b.days_per_week = int(days)
+            b.description = desc
+            b.is_active = ia
+            b.save()
+            messages.success(request, f'"{name}" updated!')
+    return redirect('batch_master')
+
 
 @admin_required
 @require_POST
-def batch_delete(request,pk):
-    b=get_object_or_404(Batch,pk=pk);n=b.name;b.delete();messages.success(request,f'"{n}" deleted.');return redirect('batch_master')
+def batch_delete(request, pk):
+    b = get_object_or_404(Batch, pk=pk)
+    n = b.name
+    try:
+        b.delete()
+        messages.success(request, f'"{n}" deleted.')
+    except ProtectedError:
+        messages.error(request, f'"{n}" is in use by students or fee structures and cannot be deleted.')
+    return redirect('batch_master')
 
 @admin_required
 @require_POST

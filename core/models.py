@@ -50,7 +50,7 @@ class Batch(models.Model):
 
     DAYS_PER_WEEK_CHOICES = [(i, f'{i} day{"s" if i > 1 else ""} / week') for i in range(1, 8)]
 
-    name          = models.CharField(max_length=100, unique=True)
+    name          = models.CharField(max_length=100)   # no longer unique on its own
     batch_type    = models.CharField(max_length=20, choices=BATCH_TYPE_CHOICES, default='regular')
     days_per_week = models.PositiveSmallIntegerField(choices=DAYS_PER_WEEK_CHOICES, default=6)
     description   = models.TextField(blank=True)
@@ -61,13 +61,25 @@ class Batch(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'Batches'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'batch_type', 'days_per_week'],
+                name='unique_batch_name_type_days',
+            )
+        ]
 
     def __str__(self):
-        return self.name
+        return self.full_label
 
     @property
     def type_label(self):
         return dict(self.BATCH_TYPE_CHOICES).get(self.batch_type, self.batch_type)
+
+    @property
+    def full_label(self):
+        """e.g. 'Regular Batch | Weekend | 2 days/week' — used in dropdowns and tags."""
+        days = f'{self.days_per_week} day{"s" if self.days_per_week != 1 else ""}/week'
+        return f'{self.name} | {self.type_label} | {days}'
 
 
 class ExpertiseLevel(models.Model):
